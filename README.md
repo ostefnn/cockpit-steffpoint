@@ -4,6 +4,8 @@ Page d'accueil personnelle pour Safari (et tout navigateur) : horloge, météo, 
 
 Un seul fichier `index.html`, sans dépendance ni serveur. Inspiré de [Bonjourr](https://bonjourr.fr).
 
+**En ligne : https://ostefnn.github.io/cockpit-steffpoint/**
+
 ## Fonctionnalités
 
 - **Accueil** : horloge, date, salutation, météo ([Open-Meteo](https://open-meteo.com), sans clé).
@@ -16,17 +18,26 @@ Un seul fichier `index.html`, sans dépendance ni serveur. Inspiré de [Bonjourr
 - **Réglages** façon Bonjourr, thème clair / sombre / système.
 - **Sauvegarde** : export / import JSON, import des signets Safari, rappel d'export.
 
-## Utilisation locale
+## Installation dans Safari
 
-1. Cloner le dépôt.
-2. Safari → Réglages → Général → **Page d'accueil** : `file:///chemin/vers/cockpit-steffpoint/index.html`.
-3. Choisir « Page d'accueil » pour les nouvelles fenêtres et les nouveaux onglets.
+**Version en ligne (recommandée)**
 
-## Publication sur GitHub Pages
+1. Safari → Réglages → Général → **Page d'accueil** : `https://ostefnn.github.io/cockpit-steffpoint/`.
+2. Choisir « Page d'accueil » pour les nouvelles fenêtres et les nouveaux onglets.
 
-1. Pousser le dépôt sur GitHub.
+**Version locale** (fonctionne hors ligne, sauf météo, photos et polices)
+
+```bash
+git clone https://github.com/ostefnn/cockpit-steffpoint.git
+```
+
+Puis mettre `file:///chemin/vers/cockpit-steffpoint/index.html` comme page d'accueil.
+
+## Publier sa propre copie
+
+1. Forker le dépôt.
 2. Settings → Pages → Source : **Deploy from a branch**, branche `main`, dossier `/ (root)`.
-3. La page est servie sur `https://<utilisateur>.github.io/cockpit-steffpoint/`. La mettre comme page d'accueil de Safari.
+3. La page est servie sur `https://<utilisateur>.github.io/cockpit-steffpoint/`.
 
 > Le site GitHub Pages est **public**. Le fichier ne contient que des exemples génériques : tes favoris restent dans ton navigateur. Ne commite jamais un export JSON ni des adresses internes.
 
@@ -62,3 +73,9 @@ https://mail.{domain}                 → https://mail.client-a.com (si le domai
 ```
 
 Les tenants se gèrent dans **Réglages → Tenants**. Les exemples « Client A » et « Client B » peuvent être supprimés.
+
+## Licence
+
+[MIT](LICENSE) © 2026 ostefnn.
+
+Services tiers utilisés, chacun sous ses propres conditions : [Open-Meteo](https://open-meteo.com) (données météo CC BY 4.0), [Picsum](https://picsum.photos) (photos [Unsplash](https://unsplash.com/license)), Google Fonts (Lexend, Source Sans 3 — SIL Open Font License), favicons Google.
