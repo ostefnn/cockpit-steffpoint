@@ -1,0 +1,8 @@
+# Exports de données personnelles : ne jamais publier
+*.json
+
+# macOS
+.DS_Store
+
+# Outils locaux
+.claude/

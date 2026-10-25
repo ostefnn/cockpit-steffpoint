@@ -1,0 +1,1571 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cockpit SteffPoint</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e7490'/%3E%3Cpath d='M9 22V10l14 12V10' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@200;300;400;500&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#f3f7f8; --surface:#ffffff; --tint:#e6f1f4; --line:#d4e3e8;
+  --fg:#16303a; --muted:#587079; --accent:#0e7490; --accent-strong:#0b5a70; --accent-soft:#d3ecf2;
+  --hero-a:#0c4a5c; --hero-b:#1a7f96; --on-accent:#ffffff;
+  --danger:#b42318; --warn:#9a6700;
+  --c1:#0e7490; --c2:#2563a8; --c3:#3d4852; --c4:#6b4fa0; --c5:#b45a2a; --c6:#2f855a;
+  --glass:rgb(255 255 255 / .74); --glass-line:rgb(255 255 255 / .6);
+  --panel-bg:#eef3f5; --row-line:#e1eaed; --switch-off:#cfdbe0;
+  --shadow:0 1px 2px rgba(12,74,92,.08),0 8px 24px rgba(12,74,92,.12);
+  --f-display:"Lexend",system-ui,sans-serif;
+  --f-body:"Source Sans 3",-apple-system,"Segoe UI",system-ui,sans-serif;
+  /* driven by settings */
+  --blur:12px; --bright:.85; --veil:.35; --clock-scale:1; --radius:12px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1a1f; --surface:#132429; --tint:#1b343c; --line:#24414b;
+  --fg:#e3eff2; --muted:#93aab2; --accent:#4cc3dc; --accent-strong:#7fd6e8; --accent-soft:#163f4b;
+  --hero-a:#0a3240; --hero-b:#11576a; --on-accent:#06222b;
+  --danger:#ff8a80; --warn:#f6c26b;
+  --c1:#2aa6c2; --c2:#5b93d6; --c3:#8b98a5; --c4:#9d82d1; --c5:#d98a5c; --c6:#5bb98a;
+  --glass:rgb(17 33 38 / .72); --glass-line:rgb(255 255 255 / .08);
+  --panel-bg:#0f1d22; --row-line:#203840; --switch-off:#2c444c;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1a1f; --surface:#132429; --tint:#1b343c; --line:#24414b;
+  --fg:#e3eff2; --muted:#93aab2; --accent:#4cc3dc; --accent-strong:#7fd6e8; --accent-soft:#163f4b;
+  --hero-a:#0a3240; --hero-b:#11576a; --on-accent:#06222b;
+  --danger:#ff8a80; --warn:#f6c26b;
+  --c1:#2aa6c2; --c2:#5b93d6; --c3:#8b98a5; --c4:#9d82d1; --c5:#d98a5c; --c6:#5bb98a;
+  --glass:rgb(17 33 38 / .72); --glass-line:rgb(255 255 255 / .08);
+  --panel-bg:#0f1d22; --row-line:#203840; --switch-off:#2c444c;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3); color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--f-body);min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.gutter{max-width:1120px;margin:0 auto;width:100%;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+
+/* ---------- Background ---------- */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:var(--hero-a)}
+.bg-img{position:absolute;inset:-60px;background:linear-gradient(120deg,var(--hero-a),var(--hero-b)) center/cover no-repeat;filter:blur(var(--blur)) brightness(var(--bright));opacity:0;transition:opacity .7s ease}
+.bg-img.ready{opacity:1}
+.bg-veil{position:absolute;inset:0;background:linear-gradient(160deg,rgb(12 74 92 / var(--veil)),rgb(26 127 150 / calc(var(--veil) * .5)) 60%,rgb(6 30 38 / calc(var(--veil) * 1.1)))}
+body.bg-flat .bg-img{inset:0;filter:none}
+body.bg-flat .bg-veil{display:none}
+
+/* ---------- Hero ---------- */
+.hero{min-height:min(60vh,600px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;color:#fff;text-shadow:0 1px 14px rgb(0 0 0 / .28);padding-block:56px 32px}
+.timebox{display:grid;gap:4px}
+.clock{font:200 calc(clamp(4rem,11vw,7.5rem) * var(--clock-scale))/1 var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.date{font-size:1.25rem;font-weight:400;opacity:.95}
+.date::first-letter{text-transform:uppercase}
+.welcome{display:grid;gap:6px;justify-items:center}
+.greet{font:300 clamp(1.8rem,4vw,2.6rem)/1.15 var(--f-display)}
+.w-desc{font-size:1.15rem;margin:0}
+.w-now{display:flex;align-items:center;gap:10px;font:300 1.8rem var(--f-display)}
+.w-now svg{filter:drop-shadow(0 1px 8px rgb(0 0 0 / .25))}
+.w-range{font:400 .95rem var(--f-body);opacity:.85}
+.search-wrap{width:100%;max-width:640px;display:grid;gap:8px}
+.search{display:flex;align-items:center;gap:10px;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border:1px solid var(--glass-line);color:var(--fg);border-radius:14px;padding:5px 6px 5px 16px;box-shadow:var(--shadow);text-shadow:none}
+.search svg{flex:none;color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;background:transparent;font-size:1.05rem;padding:11px 0;outline:none}
+.search input::placeholder{color:var(--muted)}
+.search input::-webkit-search-cancel-button{display:none}
+kbd{font:500 .72rem ui-monospace,Menlo,monospace;color:var(--muted);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;text-shadow:none}
+.engine-btn{border:0;background:var(--accent);color:var(--on-accent);border-radius:9px;padding:9px 14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.search-hint{font-size:.88rem;opacity:.9;min-height:1.3em}
+
+/* ---------- Board ---------- */
+.board{padding-bottom:120px;display:grid;gap:16px}
+.blocks{display:grid;grid-template-columns:var(--cols,repeat(auto-fill,minmax(290px,1fr)));gap:16px;align-items:start}
+@media (max-width:700px){.blocks{grid-template-columns:1fr}}
+.block{background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);border:1px solid var(--glass-line);border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
+body.cards-solid .block,body.cards-solid .search,body.cards-solid .no-hit{background:var(--surface);border-color:var(--line);-webkit-backdrop-filter:none;backdrop-filter:none}
+.block-h{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 16px;border-bottom:1px solid var(--line)}
+.block.collapsed .block-h{border-bottom-color:transparent}
+.sw{width:10px;height:10px;border-radius:3px;flex:none}
+.block-h h2{flex:1;min-width:0;margin:0;font:500 1rem var(--f-display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.count{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.icon-btn{border:0;background:transparent;color:var(--muted);cursor:pointer;width:30px;height:30px;border-radius:7px;display:grid;place-items:center;flex:none}
+.icon-btn:hover{background:var(--tint);color:var(--fg)}
+.chev svg{transition:transform .15s}
+.block.collapsed .chev svg{transform:rotate(-90deg)}
+.block.collapsed .links{display:none}
+.links{list-style:none;margin:0;padding:8px;display:grid;grid-template-columns:minmax(0,1fr);gap:2px;min-height:20px}
+.links li{min-width:0}
+.links.grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:4px}
+.lk{display:flex;align-items:center;gap:11px;padding:7px 9px;border-radius:calc(var(--radius) * .66);text-decoration:none;color:var(--fg);position:relative;min-width:0}
+.lk:hover{background:var(--tint)}
+.ico{width:28px;height:28px;border-radius:calc(var(--radius) * .55);display:grid;place-items:center;flex:none;font:500 .74rem var(--f-display);color:#fff;overflow:hidden}
+.ico img{width:20px;height:20px;display:block}
+.ico.img{background:var(--surface)!important;box-shadow:inset 0 0 0 1px var(--line)}
+.nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dm{font-size:.75rem;color:var(--muted);max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.links.grid .lk{flex-direction:column;gap:6px;padding:10px 4px;text-align:center;font-size:.8rem}
+.links.grid .ico{width:42px;height:42px;font-size:.9rem}
+.links.grid .ico img{width:26px;height:26px}
+.links.grid .nm{width:100%}
+.links.grid .dm{display:none}
+.more-row{grid-column:1/-1}
+.more-btn{width:100%;border:0;background:transparent;color:var(--accent-strong);font-weight:600;font-size:.88rem;padding:7px 9px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.more-btn:hover{background:var(--tint)}
+.more-btn svg{transition:transform .15s}
+.more-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.empty{padding:14px;color:var(--muted);font-size:.9rem;text-align:center;border:1px dashed var(--line);border-radius:8px}
+
+body.searching .lk:not(.hit){display:none}
+body.searching .links li:not(:has(.hit)){display:none}
+body.searching .block:not(.has-hit){display:none}
+body.searching .block.collapsed .links{display:grid}
+.lk.sel{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.lk.sel::after{content:"↵";font-size:.8rem;color:var(--accent-strong);margin-left:4px}
+.links.grid .lk.sel::after{display:none}
+.no-hit{background:var(--glass);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px dashed var(--glass-line);border-radius:var(--radius);padding:20px;text-align:center;color:var(--fg)}
+
+.grip{display:none;color:var(--muted);cursor:grab}
+body.editing .grip{display:inline-flex}
+body.editing .links.grid .grip{display:none}
+body.editing .block-h{cursor:grab}
+body.editing .lk{outline:1px dashed var(--line);outline-offset:-1px}
+.add-row{display:none}
+body.editing .add-row{display:block}
+.links.grid .add-row,.links.grid .empty{grid-column:1/-1}
+.dashed-btn{width:100%;border:1px dashed var(--accent);background:transparent;color:var(--accent);border-radius:8px;padding:8px;font-weight:600;cursor:pointer}
+.dashed-btn:hover{background:var(--accent-soft)}
+.new-block{display:none;min-height:120px;border:2px dashed var(--glass-line);border-radius:var(--radius);background:var(--glass);color:var(--fg);font:500 1rem var(--f-display);cursor:pointer}
+.new-block:hover{border-color:var(--accent);color:var(--accent)}
+body.editing .new-block{display:block}
+.dragging{opacity:.4}
+.drop-before{box-shadow:0 -2px 0 var(--accent)}
+.block.drop-target{outline:2px solid var(--accent);outline-offset:2px}
+.links.drop-end{box-shadow:inset 0 -2px 0 var(--accent)}
+
+/* Section switches */
+body.no-clock .timebox, body.no-greet .greet, body.no-weather .weather, body.no-search .search-wrap, body.no-links .board{display:none}
+body.no-date .date{display:none}
+
+/* ---------- Floating dock + credit ---------- */
+.dock{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;z-index:45}
+.fab{width:48px;height:48px;border-radius:15px;border:1px solid var(--glass-line);background:var(--glass);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);color:var(--fg);display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s}
+.fab:hover{transform:translateY(-1px)}
+.fab[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.fab svg{transition:transform .4s}
+.fab.gear[aria-expanded="true"] svg{transform:rotate(90deg)}
+body.hide-dock .dock .fab:not([aria-expanded="true"]):not([aria-pressed="true"]){opacity:0}
+body.hide-dock .dock .fab:hover,body.hide-dock .dock .fab:focus-visible{opacity:1}
+.credit{position:fixed;left:calc(20px + env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));font-size:.8rem;color:#fff;background:rgb(0 0 0 / .3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:4px 11px;border-radius:999px;z-index:5;transition:opacity .2s}
+body.scrolled .credit{opacity:0;pointer-events:none}
+
+/* ---------- Spaces, tenant, reminder ---------- */
+.spacebar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tabs,.context,.reminder{background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border:1px solid var(--glass-line);box-shadow:var(--shadow);border-radius:12px}
+body.cards-solid .tabs,body.cards-solid .context,body.cards-solid .reminder{background:var(--surface);border-color:var(--line);-webkit-backdrop-filter:none;backdrop-filter:none}
+.tabs{display:flex;gap:4px;padding:4px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:6px 14px;border-radius:9px;font-weight:600;font-size:.92rem;cursor:pointer;display:flex;gap:7px;align-items:center}
+.tabs button:hover{background:var(--tint)}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+.tabs .n{font-size:.75rem;opacity:.7;font-variant-numeric:tabular-nums}
+[data-env="dev"]{--envc:var(--c6)} [data-env="test"]{--envc:var(--c5)} [data-env="prod"]{--envc:var(--accent)}
+.context{display:flex;align-items:center;gap:4px;padding:4px;margin-left:auto;flex-wrap:wrap;transition:box-shadow .2s}
+.context.off-prod{box-shadow:0 0 0 2px var(--envc),var(--shadow)}
+.context .pill{min-width:130px;background-color:var(--tint);color:var(--fg)}
+.ctx-sep{width:1px;align-self:stretch;margin:6px 4px;background:var(--line)}
+.env{display:flex;gap:2px}
+.env button{border:0;background:transparent;color:var(--muted);font:700 .72rem var(--f-body);letter-spacing:.08em;padding:7px 10px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.env button::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--envc)}
+.env button:hover{background:var(--tint);color:var(--fg)}
+.env button[aria-pressed="true"]{background:var(--envc);color:var(--on-accent)}
+.env button[aria-pressed="true"]::before{background:currentColor;opacity:.75}
+.env-tag{flex:none;font:700 .6rem var(--f-body);letter-spacing:.08em;padding:2px 6px;border-radius:999px;background:var(--envc);color:var(--on-accent)}
+.links.grid .env-tag{position:absolute;top:4px;right:4px}
+.reminder{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px 10px 16px;font-size:.92rem;border-color:var(--warn)}
+.reminder .sp{flex:1;min-width:220px}
+.empty-space{grid-column:1/-1;background:var(--glass);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px dashed var(--glass-line);border-radius:var(--radius);padding:28px 20px;text-align:center;display:grid;gap:12px;justify-items:center}
+.empty-space p{margin:0;max-width:52ch}
+.empty-space .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.lk.tpl-missing{opacity:.5}
+.tip{font-size:.82rem;color:var(--muted);margin:0}
+.field label .env-tag{vertical-align:1px;margin-inline:2px}
+.env-fields{display:grid;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.env-fields[open]{padding-bottom:14px}
+.env-fields summary{cursor:pointer;font-size:.88rem;font-weight:600;color:var(--muted)}
+.env-fields[open] summary{margin-bottom:12px}
+.env-fields .field+.field{margin-top:12px}
+.env-fields .tip{margin-top:10px}
+.tip code,.k{font:500 .78rem ui-monospace,Menlo,monospace}
+.list-edit{flex-basis:100%;display:grid;gap:8px;padding-block:4px 8px}
+.le-row{display:flex;gap:8px;align-items:center}
+.le-row .pill-input{flex:1;width:auto;min-width:0}
+.le-row .n,.le-row .k{color:var(--muted);flex:none}
+.le-row .k{width:66px}
+.tenant-card{display:grid;gap:6px;padding:10px;border:1px solid var(--row-line);border-radius:12px}
+.credit a{color:inherit}
+
+/* ---------- Settings panel ---------- */
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:var(--panel-bg);z-index:40;overflow-y:auto;overscroll-behavior:contain;padding:24px max(18px,env(safe-area-inset-right,0px)) 110px 18px;transform:translateX(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);box-shadow:-12px 0 40px rgb(0 0 0 / .18);color:var(--fg)}
+.panel.open{transform:none}
+.panel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.panel-top h2{margin:0;font:500 1.35rem var(--f-display)}
+.group-t{font-size:.95rem;color:var(--muted);margin:22px 0 8px 14px;font-weight:600}
+.group{background:var(--surface);border-radius:18px;padding:0 16px;box-shadow:0 1px 2px rgb(0 0 0 / .04)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:54px;padding-block:8px;border-top:1px solid var(--row-line);flex-wrap:wrap}
+.group > .row:first-child,.group > .row.first{border-top:0}
+.row > label,.row > .lbl{font-size:1rem;flex:1 1 auto;min-width:0}
+.row .ctl{display:flex;align-items:center;gap:8px;flex:0 1 auto;min-width:0}
+.row .note{flex-basis:100%;font-size:.84rem;color:var(--muted);margin:-4px 0 2px}
+.row .note.err{color:var(--danger)}
+.row .note.ok{color:var(--accent-strong)}
+.pill{appearance:none;-webkit-appearance:none;border:0;background:var(--tint);border-radius:10px;padding:8px 32px 8px 12px;min-width:150px;max-width:210px;font-size:.92rem;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23587079' stroke-width='3'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
+.pill-input{border:0;background:var(--tint);border-radius:10px;padding:8px 12px;width:190px;max-width:100%;font-size:.92rem}
+.pill-input::placeholder{color:var(--muted)}
+.pill-input:focus,.pill:focus{outline:none;box-shadow:0 0 0 2px var(--accent)}
+.pbtn{border:0;background:var(--tint);border-radius:10px;padding:8px 12px;font-size:.9rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.pbtn:hover{background:var(--accent-soft);color:var(--accent-strong)}
+.pbtn.danger{color:var(--danger)}
+.pbtn.sq{width:36px;padding:8px 0;display:grid;place-items:center}
+.switch{position:relative;width:52px;height:31px;flex:none;cursor:pointer}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.switch span{position:absolute;inset:0;border-radius:999px;background:var(--switch-off);transition:background .2s}
+.switch span::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgb(0 0 0 / .2);transition:transform .2s}
+.switch input:checked+span{background:var(--accent)}
+.switch input:checked+span::after{transform:translateX(21px)}
+.switch input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+input[type=range]{width:170px;accent-color:var(--accent);cursor:pointer}
+.val{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;width:40px;text-align:right}
+input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;cursor:pointer}
+.panel .keys{display:grid;gap:6px;padding-block:12px;font-size:.92rem;color:var(--muted)}
+
+/* ---------- Menu + drawers + toast ---------- */
+.menu{position:fixed;z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:6px;min-width:200px;display:grid}
+.menu button{border:0;background:none;text-align:left;padding:8px 10px;border-radius:7px;cursor:pointer}
+.menu button:hover,.menu button:focus-visible{background:var(--tint)}
+.menu .danger{color:var(--danger)}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+.scrim{position:fixed;inset:0;background:rgba(6,30,38,.35);z-index:50}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--surface);z-index:51;box-shadow:-10px 0 40px rgba(0,0,0,.2);display:flex;flex-direction:column}
+.drawer header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}
+.drawer h3{margin:0;font:500 1.15rem var(--f-display)}
+.drawer form{flex:1;overflow:auto;padding:20px;display:grid;gap:16px;align-content:start}
+.field{display:grid;gap:6px}
+.field label,.legend{font-size:.85rem;font-weight:600;color:var(--muted)}
+.field input[type=text],.field input[type=url],.field select{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 11px}
+.field input:focus,.field select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatches label{position:relative;cursor:pointer}
+.swatches input{position:absolute;opacity:0}
+.swatches span{display:block;width:30px;height:30px;border-radius:8px;border:3px solid transparent}
+.swatches input:checked+span{border-color:var(--fg)}
+.swatches input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg label{flex:1;text-align:center;cursor:pointer}
+.seg input{position:absolute;opacity:0}
+.seg span{display:block;padding:7px 4px;font-size:.9rem}
+.seg input:checked+span{background:var(--accent);color:var(--on-accent);font-weight:600}
+.drawer .actions{display:flex;gap:8px;justify-content:space-between;padding:16px 20px;border-top:1px solid var(--line)}
+.drawer .actions .right{display:flex;gap:8px;margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:600;font-size:.9rem;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.danger{color:var(--danger)}
+.err{font-size:.85rem;color:var(--danger)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:14px;align-items:center;z-index:70;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:calc(100vw - 32px)}
+.toast button{border:0;background:transparent;color:var(--accent-soft);font-weight:700;cursor:pointer;padding:4px 6px}
+.banner{position:relative;z-index:6;background:var(--warn);color:#fff;padding:8px 16px;text-align:center;font-weight:600;font-size:.9rem}
+
+@media (max-width:560px){.dm{display:none}.pill{min-width:120px}input[type=range]{width:130px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><div class="bg-img" id="bgImg"></div><div class="bg-veil"></div></div>
+<div class="banner" id="storageBanner" hidden>Safari ne conserve pas les données de cette page. Exporte tes favoris (Réglages → Sauvegarde) pour ne rien perdre.</div>
+
+<header class="hero gutter">
+  <div class="timebox">
+    <div class="clock" id="clock">--:--</div>
+    <div class="date" id="date"></div>
+  </div>
+  <div class="welcome">
+    <div class="greet" id="greet"></div>
+    <div class="weather" id="weather" hidden>
+      <p class="w-desc" id="wDesc"></p>
+      <div class="w-now"><span id="wIcon"></span><span id="wTemp"></span><span class="w-range" id="wRange"></span></div>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <form class="search" id="searchForm" role="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Filtrer les favoris ou chercher sur le web" autocomplete="off" spellcheck="false" aria-label="Recherche" autofocus>
+      <kbd>/</kbd>
+      <button class="engine-btn" type="submit" id="engineBtn">Bing</button>
+    </form>
+    <div class="search-hint" id="hint"></div>
+  </div>
+</header>
+
+<main class="gutter board">
+  <div class="spacebar" id="spacebar"></div>
+  <div class="reminder" id="reminder" role="status" hidden></div>
+  <div class="blocks" id="blocks"></div>
+  <div class="no-hit" id="noHit" hidden>Aucun favori ne correspond. <b>Entrée</b> lance la recherche web.</div>
+</main>
+
+<div class="credit" id="credit" hidden></div>
+
+<div class="dock">
+  <button class="fab" id="editBtn" aria-pressed="false" title="Éditer les favoris (E)" aria-label="Éditer les favoris">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/></svg></button>
+  <button class="fab gear" id="settingsBtn" aria-expanded="false" aria-controls="panel" title="Réglages (,)" aria-label="Réglages">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button>
+</div>
+
+<aside class="panel" id="panel" aria-label="Réglages" aria-hidden="true" inert>
+  <div class="panel-top"><h2>Réglages</h2><button class="icon-btn" id="panelClose" aria-label="Fermer les réglages">✕</button></div>
+  <div id="panelBody"></div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden>
+  <input type="file" id="bgFile" accept="image/*" hidden>
+  <input type="file" id="bookmarkFile" accept=".html,.htm,text/html" hidden>
+</aside>
+
+<div class="menu" id="menu" role="menu" hidden></div>
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="linkDrawer" role="dialog" aria-modal="true" aria-labelledby="linkTitle" hidden>
+  <header><h3 id="linkTitle">Ajouter un lien</h3><button class="icon-btn" data-close aria-label="Fermer">✕</button></header>
+  <form id="linkForm" novalidate>
+    <div class="field"><label for="linkUrl">Adresse principale <span class="env-tag" data-env="prod">PROD</span></label><input id="linkUrl" type="text" inputmode="url" placeholder="https://…" required spellcheck="false" autocomplete="off">
+      <p class="tip">Lien modèle : <code>{tenant}</code> devient l'identifiant du tenant choisi, <code>{domain}</code> son domaine. Ex. <code>https://{tenant}.example.com</code></p></div>
+    <details class="env-fields" id="envFields">
+      <summary>Environnements DEV / TEST</summary>
+      <div class="field"><label for="linkDev"><span class="env-tag" data-env="dev">DEV</span> Adresse</label><input id="linkDev" type="text" inputmode="url" placeholder="Facultatif" spellcheck="false" autocomplete="off"></div>
+      <div class="field"><label for="linkTest"><span class="env-tag" data-env="test">TEST</span> Adresse</label><input id="linkTest" type="text" inputmode="url" placeholder="Facultatif" spellcheck="false" autocomplete="off"></div>
+      <p class="tip">Sans adresse pour l'environnement actif, le lien ouvre l'adresse principale.</p>
+    </details>
+    <div class="field"><label for="linkName">Nom</label><input id="linkName" type="text" placeholder="Deviné depuis l'adresse si vide"></div>
+    <div class="field"><label for="linkBlock">Bloc</label><select id="linkBlock"></select></div>
+    <p class="err" id="linkErr" hidden></p>
+  </form>
+  <div class="actions">
+    <button class="btn danger" id="linkDelete" type="button">Supprimer</button>
+    <div class="right"><button class="btn" type="button" data-close>Annuler</button><button class="btn primary" type="submit" form="linkForm">Enregistrer</button></div>
+  </div>
+</aside>
+
+<aside class="drawer" id="blockDrawer" role="dialog" aria-modal="true" aria-labelledby="blockTitle" hidden>
+  <header><h3 id="blockTitle">Nouveau bloc</h3><button class="icon-btn" data-close aria-label="Fermer">✕</button></header>
+  <form id="blockForm" novalidate>
+    <div class="field"><label for="blockName">Titre</label><input id="blockName" type="text" placeholder="ex. Outils" required></div>
+    <div class="field"><label for="blockSpace">Espace</label><select id="blockSpace"></select></div>
+    <div class="field"><span class="legend">Couleur</span><div class="swatches" id="swatches"></div></div>
+    <div class="field"><span class="legend">Affichage</span>
+      <div class="seg"><label><input type="radio" name="blockView" value="list" checked><span>Liste</span></label><label><input type="radio" name="blockView" value="grid"><span>Grille d'icônes</span></label></div>
+    </div>
+    <p class="err" id="blockErr" hidden></p>
+  </form>
+  <div class="actions">
+    <button class="btn danger" id="blockDelete" type="button">Supprimer le bloc</button>
+    <div class="right"><button class="btn" type="button" data-close>Annuler</button><button class="btn primary" type="submit" form="blockForm">Enregistrer</button></div>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" hidden><span id="toastMsg"></span><button id="toastUndo" type="button">Annuler</button></div>
+
+<script>
+"use strict";
+const KEY = "cockpit-steffpoint";
+const COLORS = ["c1","c2","c3","c4","c5","c6"];
+const ENGINES = {
+  bing: ["Bing", "https://www.bing.com/search?q="],
+  google: ["Google", "https://www.google.com/search?q="],
+  duckduckgo: ["DuckDuckGo", "https://duckduckgo.com/?q="],
+  ecosia: ["Ecosia", "https://www.ecosia.org/search?q="]
+};
+const uid = () => Math.random().toString(36).slice(2, 10);
+const $ = s => document.querySelector(s);
+
+const DEFAULT_SETTINGS = {
+  name: "", theme: "auto", showAll: false, hideDock: false,
+  bg: { type: "photo", freq: "hour", blur: 12, bright: 85, veil: 35, color: "#0e7490", url: "", photo: null, at: 0 },
+  links: { on: true, style: "glass", cols: "auto", radius: 12, newTab: false, icons: "favicon", max: 8 },
+  clock: { on: true, h24: true, seconds: false, size: 100, date: "long" },
+  weather: { on: true, city: "Bruxelles", lat: 50.85, lon: 4.35, unit: "c", display: "full" },
+  greet: { on: true, custom: "" },
+  search: { on: true, engine: "bing" },
+  spaces: { auto: true, weekday: "pro", weekend: "perso" },
+  env: { def: "prod", remember: true }
+};
+const DEFAULT_SPACES = () => [{ id: "pro", name: "Pro" }, { id: "perso", name: "Perso" }];
+
+function defaults() {
+  const L = (name, url) => ({ id: uid(), name, url });
+  return {
+    version: 1,
+    settings: structuredClone(DEFAULT_SETTINGS),
+    meta: { lastExport: null, since: Date.now(), snooze: 0, space: "pro", tenant: "demo-a" },
+    spaces: DEFAULT_SPACES(),
+    tenants: [{ id: "demo-a", name: "Client A", slug: "client-a", domain: "" }, { id: "demo-b", name: "Client B", slug: "client-b", domain: "" }],
+    blocks: [
+      { id: uid(), space: "perso", title: "Perso", color: "c6", view: "grid", collapsed: false, links: [
+        L("YouTube", "https://www.youtube.com"), L("Wikipédia", "https://fr.wikipedia.org"),
+        L("Actualités", "https://news.google.com"), L("Musique", "https://music.youtube.com")] },
+      { id: uid(), title: "Quotidien", color: "c4", view: "grid", collapsed: false, links: [
+        L("Messagerie", "https://mail.google.com"), L("Agenda", "https://calendar.google.com"),
+        L("Documents", "https://drive.google.com"), L("Traduction", "https://www.deepl.com/translator"),
+        L("Cartes", "https://maps.google.com")] },
+      { id: uid(), title: "Développement", color: "c3", view: "list", collapsed: false, links: [
+        L("GitHub", "https://github.com"), L("Stack Overflow", "https://stackoverflow.com"),
+        L("MDN Web Docs", "https://developer.mozilla.org/fr/"), L("Can I use", "https://caniuse.com"),
+        L("Regex101", "https://regex101.com")] },
+      { id: uid(), title: "Exemple · tenants et environnements", color: "c1", view: "list", collapsed: false, links: [
+        { id: uid(), name: "Application", url: "https://{tenant}.example.com",
+          envs: { dev: "https://dev-{tenant}.example.com", test: "https://test-{tenant}.example.com" } },
+        { id: uid(), name: "Console", url: "https://console.example.com/{tenant}",
+          envs: { dev: "https://console-dev.example.com/{tenant}", test: "" } },
+        L("Documentation", "https://docs.example.com")] }
+    ]
+  };
+}
+
+/* ---------- Storage ---------- */
+let storageOk = true;
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+};
+function load() {
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem(KEY)); } catch { storageOk = false; }
+  try { localStorage.setItem(KEY + "-probe", "1"); localStorage.removeItem(KEY + "-probe"); } catch { storageOk = false; }
+  // normalize() also files the example blocks without a space under the first one (Pro)
+  return normalize(data) || normalize(defaults());
+}
+// Keeps only known keys with the expected type, so old or hand-edited files load safely
+function merge(base, over) {
+  const out = {};
+  for (const [k, v] of Object.entries(base)) {
+    const o = over?.[k];
+    if (v && typeof v === "object" && !Array.isArray(v)) out[k] = merge(v, o);
+    else if (v === null) out[k] = o ?? null;
+    else out[k] = typeof o === typeof v ? o : v;
+  }
+  return out;
+}
+function migrateSettings(s = {}) {
+  // MVP stored these flat; move them into their groups
+  const m = structuredClone(s);
+  if ("clock24" in s) m.clock = { ...(m.clock || {}), h24: s.clock24 };
+  if ("seconds" in s) m.clock = { ...(m.clock || {}), seconds: s.seconds };
+  if ("engine" in s) m.search = { ...(m.search || {}), engine: s.engine };
+  if ("newTab" in s) m.links = { ...(m.links || {}), newTab: s.newTab };
+  if ("icons" in s) m.links = { ...(m.links || {}), icons: s.icons };
+  return m;
+}
+function normalize(d) {
+  if (!d || !Array.isArray(d.blocks)) return null;
+  let spaces = (Array.isArray(d.spaces) ? d.spaces : []).filter(s => s && s.id).map(s => ({ id: String(s.id), name: String(s.name || "Espace") }));
+  if (!spaces.length) spaces = DEFAULT_SPACES();
+  const spaceIds = new Set(spaces.map(s => s.id));
+  const tenants = (Array.isArray(d.tenants) ? d.tenants : []).filter(t => t && t.slug)
+    .map(t => ({ id: String(t.id || uid()), name: String(t.name || t.slug), slug: String(t.slug).trim(), domain: String(t.domain || "") }));
+  const m = d.meta || {};
+  return {
+    version: 1,
+    settings: merge(DEFAULT_SETTINGS, migrateSettings(d.settings)),
+    meta: {
+      lastExport: m.lastExport || null, since: +m.since || Date.now(), snooze: +m.snooze || 0,
+      space: spaceIds.has(m.space) ? m.space : spaces[0].id,
+      tenant: tenants.some(t => t.id === m.tenant) ? m.tenant : tenants[0]?.id || null,
+      env: ["dev", "test", "prod"].includes(m.env) ? m.env : null
+    },
+    spaces, tenants,
+    blocks: d.blocks.map(b => ({
+      id: b.id || uid(), space: spaceIds.has(b.space) ? b.space : spaces[0].id,
+      title: String(b.title || "Sans titre"), color: COLORS.includes(b.color) ? b.color : "c1",
+      view: b.view === "grid" ? "grid" : "list", collapsed: !!b.collapsed,
+      links: (Array.isArray(b.links) ? b.links : []).filter(l => l && l.url).map(l => {
+        const link = { id: l.id || uid(), name: String(l.name || guessName(l.url)), url: String(l.url) };
+        const envs = { dev: String(l.envs?.dev || ""), test: String(l.envs?.test || "") };
+        if (envs.dev || envs.test) link.envs = envs;
+        return link;
+      })
+    }))
+  };
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { storageOk = false; }
+  $("#storageBanner").hidden = storageOk;
+}
+let state = load();
+const S = () => state.settings;
+
+/* ---------- Helpers ---------- */
+function h(tag, attrs = {}, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "style") el.style.cssText = v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(c));
+  return el;
+}
+const svg = html => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+const ICON = {
+  chev: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>',
+  more: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  grip: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
+  refresh: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>'
+};
+function normalizeUrl(raw) {
+  let s = String(raw || "").trim();
+  if (!s || /\s/.test(s)) return null;
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(s)) s = "https://" + s;
+  try { const u = new URL(s); return /^(https?|file|mailto|ftp):$/.test(u.protocol) ? u.href : null; } catch { return null; }
+}
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
+function guessName(url) {
+  const host = hostOf(url);
+  if (!host) return url;
+  const parts = host.split(".");
+  const core = parts.length > 2 && parts[0].length > 3 ? parts[0] : parts[parts.length - 2] || parts[0];
+  return core.charAt(0).toUpperCase() + core.slice(1);
+}
+const initials = n => (n.replace(/[^\p{L}\p{N} ]/gu, "").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("") || "?").toUpperCase();
+const findBlock = id => state.blocks.find(b => b.id === id);
+function findLink(id) {
+  for (const b of state.blocks) { const i = b.links.findIndex(l => l.id === id); if (i > -1) return { block: b, index: i, link: b.links[i] }; }
+  return null;
+}
+const looksUrl = s => /^(https?:\/\/|www\.)\S+$/i.test(s.trim()) || /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(s.trim());
+
+/* ---------- Tenants: {tenant} / {domain} link templates ---------- */
+const TPL = /\{(tenant|domain)\}/;
+const fillTpl = (url, slug, domain) => url.replaceAll("{tenant}", slug).replaceAll("{domain}", domain || slug);
+const currentTenant = () => state.tenants.find(t => t.id === state.meta.tenant) || state.tenants[0] || null;
+// Returns the real address, or null when the link needs a tenant and none exists
+function resolveUrl(url) {
+  if (!TPL.test(url)) return url;
+  const t = currentTenant();
+  return t ? fillTpl(url, t.slug, t.domain) : null;
+}
+function normalizeLinkUrl(raw) {
+  const s = String(raw || "").trim();
+  if (!TPL.test(s)) return normalizeUrl(s);
+  const withScheme = /^[a-z][a-z0-9+.-]*:/i.test(s) ? s : "https://" + s;
+  return normalizeUrl(fillTpl(withScheme, "tenant", "")) ? withScheme : null;
+}
+function cycleTenant() {
+  if (state.tenants.length < 2) return;
+  const i = state.tenants.indexOf(currentTenant());
+  state.meta.tenant = state.tenants[(i + 1) % state.tenants.length].id;
+  save(); render();
+  toast(`Tenant : ${currentTenant().name}`);
+}
+
+/* ---------- Environments: optional DEV / TEST address per link, main address = PROD ---------- */
+const ENVS = [["dev", "DEV"], ["test", "TEST"], ["prod", "PROD"]];
+let activeEnv = S().env.remember && state.meta.env ? state.meta.env : S().env.def;
+const hasEnvLinks = () => state.blocks.some(b => b.links.some(l => l.envs));
+// Address for the active environment, falling back to the main one
+const envUrl = l => (activeEnv !== "prod" && l.envs?.[activeEnv]) || l.url;
+const usesEnvUrl = l => activeEnv !== "prod" && !!l.envs?.[activeEnv];
+const linkHref = l => resolveUrl(envUrl(l));
+function setEnv(env) {
+  activeEnv = env; state.meta.env = env;
+  save(); render();
+}
+
+/* ---------- Spaces ---------- */
+function pickSpace() {
+  const s = S().spaces, ids = state.spaces.map(x => x.id), day = new Date().getDay();
+  if (s.auto) { const want = day === 0 || day === 6 ? s.weekend : s.weekday; if (ids.includes(want)) return want; }
+  return ids.includes(state.meta.space) ? state.meta.space : ids[0];
+}
+let currentSpace = pickSpace();
+const spaceName = id => state.spaces.find(s => s.id === id)?.name || "";
+function setSpace(id) {
+  currentSpace = id; state.meta.space = id;
+  save(); expanded.clear(); render();
+}
+const isWeekend = () => [0, 6].includes(new Date().getDay());
+
+/* ---------- Undo + toast ---------- */
+let toastTimer;
+function commit(mutate, message) {
+  const before = JSON.stringify(state);
+  mutate();
+  save(); render();
+  if (message) toast(message, () => {
+    state = JSON.parse(before);
+    save(); applySettings(); render();
+    if (panel.classList.contains("open")) buildPanel();
+    toast("Modification annulée");
+  });
+}
+function toast(msg, undo) {
+  $("#toastMsg").textContent = msg;
+  const btn = $("#toastUndo");
+  btn.hidden = !undo;
+  btn.onclick = () => { $("#toast").hidden = true; undo && undo(); };
+  $("#toast").hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("#toast").hidden = true, undo ? 7000 : 2500);
+}
+
+/* ---------- Favorites render ---------- */
+let editing = false, term = "", sel = 0, hits = [];
+const expanded = new Set(); // blocks opened with "Afficher plus" during this visit
+function iconFor(link, color, href) {
+  const box = h("span", { class: "ico", style: `background:var(--${color})` }, initials(link.name));
+  const host = href ? hostOf(href) : "";
+  if (S().links.icons === "favicon" && host) {
+    const img = h("img", { alt: "", loading: "lazy", src: `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64` });
+    img.onload = () => { if (img.naturalWidth > 1) { box.textContent = ""; box.append(img); box.classList.add("img"); } };
+  }
+  return box;
+}
+function render() {
+  const root = $("#blocks");
+  root.replaceChildren();
+  const t = term.toLowerCase();
+  const newTab = S().links.newTab;
+  hits = [];
+  if (!state.spaces.some(s => s.id === currentSpace)) currentSpace = pickSpace();
+  // Search looks through every space
+  const visible = t ? state.blocks : state.blocks.filter(b => b.space === currentSpace);
+  for (const b of visible) {
+    const list = h("ul", { class: "links" + (b.view === "grid" ? " grid" : ""), "data-block": b.id });
+    let blockHit = false;
+    // Search and edit mode always show every link
+    const max = S().links.max;
+    const capped = !t && !editing && max > 0 && b.links.length > max;
+    const shown = capped && !expanded.has(b.id) ? b.links.slice(0, max) : b.links;
+    for (const l of shown) {
+      const match = !!t && (l.name.toLowerCase().includes(t) || envUrl(l).toLowerCase().includes(t));
+      const href = linkHref(l);
+      const envTag = usesEnvUrl(l) ? h("span", { class: "env-tag", "data-env": activeEnv }, activeEnv.toUpperCase()) : null;
+      const a = h("a", {
+        class: "lk" + (match ? " hit" : "") + (href ? "" : " tpl-missing"), href: href || "#", "data-link": l.id,
+        title: href || "Ajoute un tenant pour ouvrir ce lien",
+        target: newTab && href ? "_blank" : null, rel: newTab && href ? "noopener" : null,
+        onclick: e => {
+          if (editing) { e.preventDefault(); openLinkDrawer(b.id, l.id); }
+          else if (!href) { e.preventDefault(); openPanelAt("tenants"); }
+        }
+      }, h("span", { class: "grip", "aria-hidden": "true" }, svg(ICON.grip)), iconFor(l, b.color, href), h("span", { class: "nm" }, l.name), envTag,
+        h("span", { class: "dm" }, href ? hostOf(href) : "{tenant}"));
+      if (match) { hits.push(a); blockHit = true; }
+      list.append(h("li", { "data-link": l.id, draggable: editing ? "true" : null }, a));
+    }
+    if (capped) {
+      const open = expanded.has(b.id);
+      list.append(h("li", { class: "more-row" }, h("button", {
+        class: "more-btn", type: "button", "aria-expanded": String(open),
+        onclick: () => { open ? expanded.delete(b.id) : expanded.add(b.id); render(); }
+      }, open ? "Afficher moins" : `Afficher plus (${b.links.length - max})`, svg(ICON.chev))));
+    }
+    if (!b.links.length) list.append(h("li", { class: "empty" }, "Glisse un lien ici, colle une URL, ou passe en mode édition."));
+    list.append(h("li", { class: "add-row" }, h("button", { class: "dashed-btn", type: "button", onclick: () => openLinkDrawer(b.id) }, "+ Ajouter un lien")));
+
+    const header = h("div", { class: "block-h", draggable: editing ? "true" : null },
+      h("span", { class: "grip", "aria-hidden": "true" }, svg(ICON.grip)),
+      h("span", { class: "sw", style: `background:var(--${b.color})` }),
+      h("h2", {}, b.title),
+      h("span", { class: "count" }, String(b.links.length)),
+      h("button", { class: "icon-btn chev", type: "button", "aria-label": (b.collapsed ? "Déplier " : "Replier ") + b.title, "aria-expanded": String(!b.collapsed),
+        onclick: () => { b.collapsed = !b.collapsed; save(); render(); } }, svg(ICON.chev)),
+      h("button", { class: "icon-btn", type: "button", "aria-label": "Options du bloc " + b.title, "aria-haspopup": "menu", onclick: e => openMenu(e.currentTarget, b.id) }, svg(ICON.more))
+    );
+    root.append(h("section", { class: "block" + (b.collapsed ? " collapsed" : "") + (blockHit ? " has-hit" : ""), "data-block": b.id, "aria-label": b.title }, header, list));
+  }
+  if (!t && !visible.length) {
+    const name = spaceName(currentSpace);
+    const auto = S().spaces.auto && currentSpace === (isWeekend() ? S().spaces.weekend : S().spaces.weekday);
+    const others = state.spaces.filter(s => s.id !== currentSpace);
+    root.append(h("div", { class: "empty-space" },
+      h("p", {}, `Aucun bloc dans « ${name} » pour l'instant.`, auto ? ` Cet espace s'ouvre automatiquement ${isWeekend() ? "le week-end" : "en semaine"}.` : ""),
+      h("div", { class: "acts" },
+        h("button", { class: "btn primary", type: "button", onclick: () => openBlockDrawer() }, "+ Nouveau bloc"),
+        others.length ? h("button", { class: "btn", type: "button", onclick: () => setSpace(others[0].id) }, `Voir ${others[0].name}`) : null)));
+  }
+  root.append(h("button", { class: "new-block", type: "button", onclick: () => openBlockDrawer() }, "+ Nouveau bloc"));
+  renderSpacebar();
+  renderReminder();
+
+  document.body.classList.toggle("searching", !!t);
+  document.body.classList.toggle("editing", editing);
+  $("#noHit").hidden = !t || hits.length > 0;
+  sel = Math.min(sel, Math.max(hits.length - 1, 0));
+  hits.forEach((a, i) => a.classList.toggle("sel", i === sel));
+  updateHint();
+}
+function updateHint() {
+  const eng = ENGINES[S().search.engine][0];
+  $("#engineBtn").textContent = term && hits.length ? "Ouvrir" : eng;
+  $("#hint").textContent = !term ? "" :
+    hits.length ? `${hits.length} favori${hits.length > 1 ? "s" : ""} · ↑↓ pour choisir · Entrée ouvre · ⌘ Entrée nouvel onglet · Maj Entrée cherche sur ${eng}`
+                : `Entrée cherche « ${term} » sur ${eng}`;
+}
+
+function renderSpacebar() {
+  const bar = $("#spacebar");
+  bar.replaceChildren();
+  bar.append(state.spaces.length > 1
+    ? h("div", { class: "tabs", role: "tablist", "aria-label": "Espaces" }, state.spaces.map((sp, i) =>
+        h("button", { type: "button", role: "tab", "aria-selected": String(sp.id === currentSpace && !term), title: `Touche ${i + 1}`, onclick: () => setSpace(sp.id) },
+          sp.name, h("span", { class: "n" }, String(state.blocks.filter(b => b.space === sp.id).length)))))
+    : h("span"));
+  // One "where do my links point" capsule: tenant picker + environment switch
+  const ctx = h("div", { class: "context", "data-env": activeEnv });
+  const usesTpl = state.blocks.some(b => b.links.some(l => TPL.test(l.url) || TPL.test(l.envs?.dev || "") || TPL.test(l.envs?.test || "")));
+  if (state.tenants.length) {
+    const cur = currentTenant();
+    ctx.append(h("select", { id: "tenantSel", class: "pill", title: "Tenant (touche T)", "aria-label": "Tenant",
+      onchange: e => { state.meta.tenant = e.target.value; save(); render(); toast(`Tenant : ${currentTenant().name}`); } },
+      state.tenants.map(t => h("option", { value: t.id, selected: t.id === cur.id }, t.name))));
+  } else if (usesTpl) {
+    ctx.append(h("button", { class: "pbtn", type: "button", onclick: () => openPanelAt("tenants") }, "+ Ajouter un tenant"));
+  }
+  const showEnv = hasEnvLinks();
+  if (showEnv) {
+    if (ctx.childNodes.length) ctx.append(h("span", { class: "ctx-sep", "aria-hidden": "true" }));
+    ctx.append(h("div", { class: "env", role: "group", "aria-label": "Environnement (touche V)" }, ENVS.map(([id, label]) =>
+      h("button", { type: "button", "data-env": id, "aria-pressed": String(activeEnv === id), title: `Ouvrir les favoris en ${label} (touche V)`, onclick: () => setEnv(id) }, label))));
+  }
+  ctx.classList.toggle("off-prod", showEnv && activeEnv !== "prod");
+  if (ctx.childNodes.length) bar.append(ctx);
+  // Safari tab title warns when links don't point to PROD
+  document.title = (showEnv && activeEnv !== "prod" ? `[${activeEnv.toUpperCase()}] ` : "") + "Cockpit SteffPoint";
+}
+function cycleEnv() {
+  if (!hasEnvLinks()) return;
+  const ids = ENVS.map(([id]) => id);
+  setEnv(ids[(ids.indexOf(activeEnv) + 1) % ids.length]);
+  toast(`Environnement : ${activeEnv.toUpperCase()}`);
+}
+function renderReminder() {
+  const m = state.meta, el = $("#reminder");
+  const days = Math.floor((Date.now() - (m.lastExport ? new Date(m.lastExport).getTime() : m.since)) / 864e5);
+  el.hidden = days < 14 || Date.now() < m.snooze;
+  if (el.hidden) return;
+  el.replaceChildren(
+    h("span", { class: "sp" }, m.lastExport ? `Dernière sauvegarde il y a ${days} jours.` : "Tes favoris n'ont encore jamais été exportés.",
+      " Un export les protège si Safari efface ses données."),
+    h("button", { class: "pbtn", type: "button", onclick: exportData }, "Exporter"),
+    h("button", { class: "pbtn", type: "button", onclick: () => { m.snooze = Date.now() + 7 * 864e5; save(); renderReminder(); } }, "Dans 7 jours"));
+}
+
+/* ---------- Clock + greeting ---------- */
+function tick() {
+  const c = S().clock, d = new Date();
+  $("#clock").textContent = d.toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit", second: c.seconds ? "2-digit" : undefined, hour12: !c.h24 });
+  $("#date").textContent = c.date === "short" ? d.toLocaleDateString("fr-BE") : d.toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" });
+  const hr = d.getHours();
+  const auto = hr < 5 ? "Bonne nuit" : hr < 12 ? "Bonjour" : hr < 18 ? "Bon après-midi" : "Bonsoir";
+  const g = S().greet.custom.trim() || auto;
+  $("#greet").textContent = S().name ? `${g}, ${S().name}` : g;
+}
+let clockTimer;
+function startClock() { clearInterval(clockTimer); tick(); clockTimer = setInterval(tick, S().clock.seconds ? 1000 : 10000); }
+
+/* ---------- Weather (Open-Meteo, free, no key) ---------- */
+const WMO = [
+  [[0], "Ciel dégagé", "sun"], [[1], "Plutôt dégagé", "sun"], [[2], "Partiellement nuageux", "part"], [[3], "Couvert", "cloud"],
+  [[45, 48], "Brouillard", "fog"], [[51, 53, 55, 56, 57], "Bruine", "rain"], [[61, 63, 65, 66, 67], "Pluie", "rain"],
+  [[71, 73, 75, 77], "Neige", "snow"], [[80, 81, 82], "Averses", "rain"], [[85, 86], "Averses de neige", "snow"], [[95, 96, 99], "Orage", "storm"]
+];
+const WICON = {
+  sun: '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/>',
+  part: '<path d="M8 3v1.5M3.5 8H2M4.6 4.6l1 1M12.4 4.6l-1 1"/><path d="M5.3 10.6A4 4 0 1 1 12 6.6"/><path d="M17 20H8a4 4 0 1 1 1-7.9A5 5 0 0 1 18.5 13 3.5 3.5 0 0 1 17 20Z"/>',
+  cloud: '<path d="M17.5 19H7a5 5 0 1 1 1.3-9.8A6 6 0 0 1 19.6 11 4 4 0 0 1 17.5 19Z"/>',
+  fog: '<path d="M4 9h16M3 13h18M5 17h14"/>',
+  rain: '<path d="M17.5 15H7a5 5 0 1 1 1.3-9.8A6 6 0 0 1 19.6 7 4 4 0 0 1 17.5 15Z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/>',
+  snow: '<path d="M17.5 14H7a5 5 0 1 1 1.3-9.8A6 6 0 0 1 19.6 6 4 4 0 0 1 17.5 14Z"/><path d="M8 18h.01M12 20h.01M16 18h.01M10 22h.01M14 22h.01"/>',
+  storm: '<path d="M17.5 14H7a5 5 0 1 1 1.3-9.8A6 6 0 0 1 19.6 6 4 4 0 0 1 17.5 14Z"/><path d="m12 14-2 4h4l-2 4"/>'
+};
+const wsvg = (k, size = 34) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${WICON[k]}</svg>`;
+async function loadWeather(force) {
+  const w = S().weather;
+  if (!w.on) { $("#weather").hidden = true; return; }
+  const sig = `${w.lat},${w.lon},${w.unit}`;
+  let cache = store.get(KEY + "-weather");
+  if (force || !cache || cache.sig !== sig || Date.now() - cache.ts > 30 * 60e3) {
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${w.lat}&longitude=${w.lon}&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min&forecast_days=1&timezone=auto${w.unit === "f" ? "&temperature_unit=fahrenheit" : ""}`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(r.status);
+      cache = { sig, ts: Date.now(), data: await r.json() };
+      store.set(KEY + "-weather", cache);
+    } catch { if (!cache || cache.sig !== sig) { $("#weather").hidden = true; return; } }
+  }
+  const c = cache.data.current, dl = cache.data.daily;
+  const [, desc, icon0] = WMO.find(([codes]) => codes.includes(c.weather_code)) || [0, "Temps variable", "cloud"];
+  const icon = icon0 === "sun" && !c.is_day ? "moon" : icon0;
+  const t = Math.round(c.temperature_2m);
+  $("#wDesc").textContent = `${desc}. Il fait actuellement ${t}°.`;
+  $("#wDesc").hidden = w.display !== "full";
+  $("#wIcon").innerHTML = wsvg(icon);
+  $("#wTemp").textContent = `${t}°`;
+  $("#wRange").textContent = w.display === "full" ? `max ${Math.round(dl.temperature_2m_max[0])}° · min ${Math.round(dl.temperature_2m_min[0])}°` : "";
+  $("#weather").hidden = false;
+}
+async function geocodeCity(name) {
+  const note = $("#note-city");
+  if (!name.trim()) return;
+  note.className = "note"; note.textContent = "Recherche…";
+  try {
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=fr`);
+    const res = (await r.json()).results?.[0];
+    if (!res) { note.className = "note err"; note.textContent = `Aucune ville trouvée pour « ${name} ».`; return; }
+    Object.assign(S().weather, { city: res.name, lat: +res.latitude.toFixed(3), lon: +res.longitude.toFixed(3) });
+    save(); syncPanel();
+    note.className = "note ok"; note.textContent = `${res.name}${res.country ? ", " + res.country : ""}`;
+    loadWeather(true);
+  } catch { note.className = "note err"; note.textContent = "Recherche impossible : pas de connexion ?"; }
+}
+function useMyPosition() {
+  const note = $("#note-city");
+  if (!navigator.geolocation) { note.className = "note err"; note.textContent = "Géolocalisation indisponible dans ce navigateur."; return; }
+  note.className = "note"; note.textContent = "Localisation…";
+  navigator.geolocation.getCurrentPosition(p => {
+    Object.assign(S().weather, { city: "Ma position", lat: +p.coords.latitude.toFixed(3), lon: +p.coords.longitude.toFixed(3) });
+    save(); syncPanel(); loadWeather(true);
+    note.className = "note ok"; note.textContent = "Position utilisée pour la météo.";
+  }, () => { note.className = "note err"; note.textContent = "Safari a refusé la position. Saisis plutôt une ville."; }, { timeout: 10000 });
+}
+
+/* ---------- Background ---------- */
+const bgImg = $("#bgImg");
+let bgToken = 0;
+function setBgImage(src, credit) {
+  const token = ++bgToken;
+  const im = new Image();
+  im.onload = () => {
+    if (token !== bgToken) return;
+    bgImg.classList.remove("ready");
+    setTimeout(() => {
+      bgImg.style.background = `url("${src.replace(/"/g, "%22")}") center/cover no-repeat`;
+      bgImg.classList.add("ready");
+    }, bgImg.classList.contains("ready") ? 250 : 0);
+    showCredit(credit);
+  };
+  im.onerror = () => { if (token === bgToken) { setFlat(); toast("Image de fond introuvable, retour au dégradé"); } };
+  im.src = src;
+}
+function setFlat(color) {
+  ++bgToken;
+  document.body.classList.add("bg-flat");
+  bgImg.style.background = color || "";
+  bgImg.classList.add("ready");
+  showCredit(null);
+}
+function showCredit(c) {
+  const el = $("#credit");
+  el.replaceChildren();
+  el.hidden = !c;
+  if (c) el.append("Photo : ", h("a", { href: c.link, target: "_blank", rel: "noopener" }, c.author));
+}
+async function photoList() {
+  let cache = store.get(KEY + "-photos");
+  if (cache && Date.now() - cache.ts < 7 * 864e5) return cache.list;
+  const page = 1 + Math.floor(Math.random() * 8);
+  const r = await fetch(`https://picsum.photos/v2/list?page=${page}&limit=100`);
+  const list = (await r.json()).filter(p => p.width >= p.height).map(p => ({ id: p.id, author: p.author, link: p.url }));
+  store.set(KEY + "-photos", { ts: Date.now(), list });
+  return list;
+}
+function photoIsStale(b) {
+  if (!b.photo) return true;
+  const then = new Date(b.at), now = new Date();
+  if (b.freq === "tab") return true;
+  if (b.freq === "hour") return now - then > 36e5 || then.getHours() !== now.getHours();
+  if (b.freq === "day") return then.toDateString() !== now.toDateString();
+  return false;
+}
+async function applyBackground(forceNew) {
+  const b = S().bg;
+  document.body.classList.toggle("bg-flat", b.type === "gradient" || b.type === "color");
+  if (b.type === "gradient") return setFlat();
+  if (b.type === "color") return setFlat(b.color);
+  document.body.classList.remove("bg-flat");
+  if (b.type === "url") {
+    const u = normalizeUrl(b.url);
+    return u ? setBgImage(u, null) : setFlat();
+  }
+  if (b.type === "upload") {
+    let data = null;
+    try { data = localStorage.getItem(KEY + "-bgimg"); } catch {}
+    return data ? setBgImage(data, null) : setFlat();
+  }
+  // photo
+  try {
+    if (forceNew || photoIsStale(b)) {
+      const list = await photoList();
+      const choices = list.filter(p => p.id !== b.photo?.id);
+      b.photo = choices[Math.floor(Math.random() * choices.length)];
+      b.at = Date.now();
+      save();
+    }
+    const w = Math.min(2560, Math.round(innerWidth * (devicePixelRatio || 1) / 2) * 2 || 1920);
+    setBgImage(`https://picsum.photos/id/${b.photo.id}/${w}/${Math.round(w * .625)}`, b.photo);
+  } catch { setFlat(); }
+}
+function uploadBg(file) {
+  const note = $("#note-upload");
+  const reader = new FileReader();
+  reader.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      // Downscale so the image fits in localStorage (~5 MB in Safari)
+      const scale = Math.min(1, 2400 / im.width);
+      const cv = h("canvas", { width: Math.round(im.width * scale), height: Math.round(im.height * scale) });
+      cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
+      const data = cv.toDataURL("image/jpeg", .82);
+      try { localStorage.setItem(KEY + "-bgimg", data); }
+      catch { note.className = "note err"; note.textContent = "Image trop lourde pour le stockage de Safari. Essaie une image plus petite."; return; }
+      note.className = "note ok"; note.textContent = `${file.name} enregistrée.`;
+      applyBackground();
+    };
+    im.onerror = () => { note.className = "note err"; note.textContent = "Ce fichier n'est pas une image lisible."; };
+    im.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+$("#bgFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) uploadBg(f); });
+
+/* ---------- Apply settings ---------- */
+function applySettings() {
+  const s = S(), root = document.documentElement, body = document.body;
+  if (s.theme === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", s.theme);
+  root.style.setProperty("--blur", s.bg.blur + "px");
+  root.style.setProperty("--bright", s.bg.bright / 100);
+  root.style.setProperty("--veil", s.bg.veil / 100);
+  root.style.setProperty("--clock-scale", s.clock.size / 100);
+  root.style.setProperty("--radius", s.links.radius + "px");
+  if (s.links.cols === "auto") root.style.removeProperty("--cols");
+  else root.style.setProperty("--cols", `repeat(${s.links.cols}, minmax(0, 1fr))`);
+  body.classList.toggle("cards-solid", s.links.style === "solid");
+  body.classList.toggle("hide-dock", s.hideDock);
+  body.classList.toggle("no-links", !s.links.on);
+  body.classList.toggle("no-clock", !s.clock.on);
+  body.classList.toggle("no-date", s.clock.date === "none");
+  body.classList.toggle("no-greet", !s.greet.on);
+  body.classList.toggle("no-weather", !s.weather.on);
+  body.classList.toggle("no-search", !s.search.on);
+  startClock();
+}
+
+/* ---------- Settings panel (schema-driven) ---------- */
+const bgIsImage = s => ["photo", "url", "upload"].includes(s.bg.type);
+const SCHEMA = [
+  { title: "Général", rows: [
+    { type: "toggle", path: "showAll", label: "Afficher tous les réglages" },
+    { type: "select", path: "theme", label: "Mode sombre", options: [["auto", "Système"], ["light", "Clair"], ["dark", "Sombre"]] },
+    { type: "toggle", path: "hideDock", label: "Discrétiser les boutons flottants", adv: true, note: "Ils réapparaissent au survol. Raccourcis : , pour les réglages, E pour éditer." }
+  ]},
+  { title: "Arrière-plan", rows: [
+    { type: "select", path: "bg.type", label: "Type d'arrière-plan", after: () => applyBackground(),
+      options: [["photo", "Photos"], ["gradient", "Dégradé SteffPoint"], ["color", "Couleur unie"], ["upload", "Ma photo"], ["url", "Image (URL)"]] },
+    { type: "select", path: "bg.freq", label: "Fréquence", when: s => s.bg.type === "photo",
+      options: [["tab", "Chaque onglet"], ["hour", "Chaque heure"], ["day", "Chaque jour"], ["pause", "En pause"]],
+      extra: () => h("button", { class: "pbtn sq", type: "button", title: "Nouvelle photo", "aria-label": "Nouvelle photo", onclick: () => applyBackground(true) }, svg(ICON.refresh)),
+      note: "Photos libres de droits fournies par Picsum (Unsplash)." },
+    { type: "text", path: "bg.url", label: "Adresse de l'image", placeholder: "https://…/image.jpg", when: s => s.bg.type === "url", after: () => applyBackground() },
+    { type: "buttons", label: "Image", when: s => s.bg.type === "upload", noteId: "note-upload",
+      buttons: [["Choisir…", () => $("#bgFile").click()]], note: "Reste sur ce Mac, n'est pas incluse dans l'export." },
+    { type: "color", path: "bg.color", label: "Couleur", when: s => s.bg.type === "color", after: () => applyBackground() },
+    { type: "range", path: "bg.blur", label: "Intensité du flou", min: 0, max: 40, unit: "px", when: bgIsImage },
+    { type: "range", path: "bg.bright", label: "Luminosité", min: 30, max: 100, unit: "%", when: bgIsImage },
+    { type: "range", path: "bg.veil", label: "Voile de couleur", min: 0, max: 80, unit: "%", when: bgIsImage }
+  ]},
+  { title: "Favoris", rows: [
+    { type: "toggle", path: "links.on", label: "Afficher les favoris" },
+    { type: "select", path: "links.style", label: "Style des blocs", options: [["glass", "Verre dépoli"], ["solid", "Opaque"]], when: s => s.links.on },
+    { type: "toggle", path: "links.newTab", label: "Ouvrir dans un nouvel onglet", when: s => s.links.on, after: render },
+    { type: "select", path: "links.max", label: "Liens visibles par bloc", num: true, when: s => s.links.on, after: render,
+      options: [["4", "4"], ["6", "6"], ["8", "8"], ["10", "10"], ["12", "12"], ["16", "16"], ["0", "Tous"]],
+      note: "Au-delà, un bouton « Afficher plus » ouvre le reste. La recherche trouve toujours tous les liens." },
+    { type: "select", path: "links.cols", label: "Colonnes", options: [["auto", "Automatique"], ["2", "2"], ["3", "3"], ["4", "4"]], adv: true, when: s => s.links.on },
+    { type: "range", path: "links.radius", label: "Arrondi", min: 4, max: 24, unit: "px", adv: true, when: s => s.links.on },
+    { type: "select", path: "links.icons", label: "Icônes", options: [["favicon", "Favicons"], ["initials", "Initiales"]], adv: true, when: s => s.links.on, after: render,
+      note: "Les favicons viennent de Google, qui reçoit le domaine de chaque lien. « Initiales » reste 100 % local." },
+    { type: "buttons", label: "Blocs", when: s => s.links.on, buttons: [["+ Nouveau bloc", () => openBlockDrawer()], ["Éditer", () => toggleEdit(true)]] }
+  ]},
+  { title: "Espaces", rows: [
+    { type: "toggle", path: "spaces.auto", label: "Bascule automatique le week-end", after: () => { currentSpace = pickSpace(); render(); },
+      note: "Du lundi au vendredi, l'espace de semaine s'ouvre. Le samedi et le dimanche, celui du week-end. Tu peux toujours changer d'onglet à la main." },
+    { type: "select", path: "spaces.weekday", label: "En semaine", options: () => state.spaces.map(s => [s.id, s.name]), when: s => s.spaces.auto, after: () => { currentSpace = pickSpace(); render(); } },
+    { type: "select", path: "spaces.weekend", label: "Le week-end", options: () => state.spaces.map(s => [s.id, s.name]), when: s => s.spaces.auto, after: () => { currentSpace = pickSpace(); render(); } },
+    { type: "custom", label: "Mes espaces", build: buildSpaceEditor, note: "Touches 1 à 9 pour changer d'espace. Pour déplacer un bloc : menu ⋯ du bloc." }
+  ]},
+  { title: "Environnements", rows: [
+    { type: "select", path: "env.def", label: "Environnement par défaut", options: ENVS.map(([id, label]) => [id, label]),
+      after: () => { if (!S().env.remember) { activeEnv = S().env.def; render(); } } },
+    { type: "toggle", path: "env.remember", label: "Mémoriser le dernier choisi", after: () => { activeEnv = S().env.remember && state.meta.env ? state.meta.env : S().env.def; render(); },
+      note: "Un favori peut avoir une adresse DEV et TEST en plus de son adresse principale (PROD), via « Environnements » quand tu modifies le lien. Le sélecteur DEV | TEST | PROD apparaît dès qu'un favori en a une." }
+  ]},
+  { title: "Tenants", id: "tenants", rows: [
+    { type: "custom", build: buildTenantEditor,
+      note: "Dans l'adresse d'un lien, {tenant} est remplacé par l'identifiant du tenant choisi (client-a → https://client-a.example.com) et {domain} par son domaine (l'identifiant si vide). Touche T pour passer au tenant suivant." }
+  ]},
+  { title: "Date & heure", rows: [
+    { type: "toggle", path: "clock.on", label: "Activer" },
+    { type: "toggle", path: "clock.h24", label: "Format 24 h", when: s => s.clock.on },
+    { type: "toggle", path: "clock.seconds", label: "Afficher les secondes", adv: true, when: s => s.clock.on },
+    { type: "range", path: "clock.size", label: "Taille de l'horloge", min: 60, max: 150, unit: "%", adv: true, when: s => s.clock.on },
+    { type: "select", path: "clock.date", label: "Format de date", options: [["long", "Dimanche 25 octobre"], ["short", "25/10/2026"], ["none", "Masquer"]], when: s => s.clock.on }
+  ]},
+  { title: "Météo & bienvenue", rows: [
+    { type: "toggle", path: "weather.on", label: "Météo", after: () => loadWeather() },
+    { type: "text", path: "weather.city", label: "Ville", placeholder: "ex. Bruxelles", when: s => s.weather.on, noteId: "note-city", commitOnly: true, after: () => geocodeCity(S().weather.city) },
+    { type: "buttons", label: "Géolocalisation", adv: true, when: s => s.weather.on, buttons: [["Utiliser ma position", useMyPosition]] },
+    { type: "select", path: "weather.unit", label: "Unité de température", options: [["c", "Celsius"], ["f", "Fahrenheit"]], when: s => s.weather.on, after: () => loadWeather(true) },
+    { type: "select", path: "weather.display", label: "Affichage", options: [["full", "Description et icône"], ["simple", "Icône et température"]], when: s => s.weather.on, after: () => loadWeather() },
+    { type: "toggle", path: "greet.on", label: "Bienvenue" },
+    { type: "text", path: "name", label: "Nom de bienvenue", placeholder: "Nom", when: s => s.greet.on, after: tick },
+    { type: "text", path: "greet.custom", label: "Message personnalisé", placeholder: "Bonjour / Bonsoir auto", adv: true, when: s => s.greet.on, after: tick }
+  ]},
+  { title: "Recherche", rows: [
+    { type: "toggle", path: "search.on", label: "Barre de recherche" },
+    { type: "select", path: "search.engine", label: "Moteur web", options: Object.entries(ENGINES).map(([k, v]) => [k, v[0]]), when: s => s.search.on, after: updateHint }
+  ]},
+  { title: "Sauvegarde", rows: [
+    { type: "buttons", label: "Données", noteId: "note-backup", buttons: [["Exporter", () => exportData()], ["Importer…", () => $("#importFile").click()]] },
+    { type: "buttons", label: "Signets Safari", noteId: "note-bookmarks", buttons: [["Importer…", () => $("#bookmarkFile").click()]],
+      note: "Dans Safari : Fichier → Exporter → Signets…, puis choisis ce fichier. Chaque dossier devient un bloc dans l'espace affiché." },
+    { type: "buttons", label: "Réinitialiser", adv: true, buttons: [["Revenir aux exemples", () => resetAll(), "danger"]], note: "Remplace tes blocs par les exemples. Annulable quelques secondes." }
+  ]},
+  { title: "Raccourcis", adv: true, html: () => h("div", { class: "keys" },
+      ["/  rechercher", "↑ ↓  choisir un résultat · Entrée ouvrir", "E  éditer les favoris", "1–9  changer d'espace", "T  tenant suivant", "V  environnement suivant (DEV → TEST → PROD)", ",  réglages", "Échap  fermer / vider", "Coller une URL  l'ajoute au bloc survolé"].map(t => h("div", {}, t))) }
+];
+const getP = p => p.split(".").reduce((o, k) => o?.[k], S());
+const setP = (p, v) => { const ks = p.split("."), last = ks.pop(); ks.reduce((o, k) => o[k], S())[last] = v; };
+const rows = [];
+function buildPanel() {
+  const body = $("#panelBody");
+  body.replaceChildren();
+  rows.length = 0;
+  for (const g of SCHEMA) {
+    const groupT = h("div", { class: "group-t", id: g.id ? "grp-" + g.id : null }, g.title);
+    const group = h("div", { class: "group" });
+    if (g.adv) rows.push({ el: groupT, def: { adv: true } }, { el: group, def: { adv: true } });
+    body.append(groupT, group);
+    if (g.html) { group.append(g.html()); continue; }
+    for (const def of g.rows) {
+      const id = "set-" + (def.path || def.label || "custom").replace(/\W+/g, "-");
+      const el = h("div", { class: "row" });
+      const ctl = h("div", { class: "ctl" });
+      let input;
+      const commitVal = v => {
+        setP(def.path, v);
+        save(); applySettings(); def.after?.(); updateRows();
+      };
+      if (def.type === "toggle") {
+        input = h("input", { type: "checkbox", role: "switch", id });
+        input.addEventListener("change", () => commitVal(input.checked));
+        ctl.append(h("label", { class: "switch" }, input, h("span")));
+      } else if (def.type === "select") {
+        const opts = typeof def.options === "function" ? def.options() : def.options;
+        input = h("select", { class: "pill", id }, opts.map(([v, l]) => h("option", { value: v }, l)));
+        input.addEventListener("change", () => commitVal(def.num ? +input.value : input.value));
+        ctl.append(input);
+      } else if (def.type === "range") {
+        input = h("input", { type: "range", min: def.min, max: def.max, step: 1, id });
+        const out = h("span", { class: "val" });
+        input._out = out;
+        input.addEventListener("input", () => { out.textContent = input.value + def.unit; commitVal(+input.value); });
+        ctl.append(input, out);
+      } else if (def.type === "text") {
+        input = h("input", { type: "text", class: "pill-input", id, placeholder: def.placeholder, autocomplete: "off", spellcheck: "false" });
+        if (def.commitOnly) input.addEventListener("change", () => commitVal(input.value.trim()));
+        else input.addEventListener("input", () => commitVal(input.value.trim()));
+        input.addEventListener("keydown", e => { if (e.key === "Enter") input.blur(); });
+        ctl.append(input);
+      } else if (def.type === "color") {
+        input = h("input", { type: "color", id });
+        input.addEventListener("input", () => commitVal(input.value));
+        ctl.append(input);
+      } else if (def.type === "buttons") {
+        def.buttons.forEach(([label, fn, cls]) => ctl.append(h("button", { class: "pbtn" + (cls ? " " + cls : ""), type: "button", onclick: fn }, label)));
+      }
+      if (def.extra) ctl.append(def.extra());
+      if (def.type === "custom") {
+        if (def.label) el.append(h("span", { class: "lbl" }, def.label));
+        el.append(def.build());
+      } else el.append(input ? h("label", { for: id }, def.label) : h("span", { class: "lbl" }, def.label), ctl);
+      if (def.note || def.noteId) el.append(h("p", { class: "note", id: def.noteId || null }, def.note || ""));
+      group.append(el);
+      rows.push({ el, def, input });
+    }
+  }
+  syncPanel();
+}
+function syncPanel() {
+  for (const { def, input } of rows) {
+    if (!input || !def.path) continue;
+    const v = getP(def.path);
+    if (def.type === "toggle") input.checked = !!v;
+    else if (document.activeElement !== input) input.value = v;
+    if (input._out) input._out.textContent = v + def.unit;
+  }
+  const last = state.meta.lastExport;
+  const days = last ? Math.floor((Date.now() - new Date(last)) / 864e5) : null;
+  const note = $("#note-backup");
+  if (note) {
+    note.className = "note" + (days == null || days > 30 ? " err" : "");
+    note.textContent = (storageOk ? "Enregistré dans Safari sur ce Mac. " : "Safari ne conserve pas les données : exporte avant de fermer. ") +
+      (days == null ? "Jamais exporté." : `Dernier export : ${days === 0 ? "aujourd'hui" : `il y a ${days} j`}.`);
+  }
+  updateRows();
+}
+function updateRows() {
+  const s = S();
+  for (const { el, def } of rows) el.hidden = (def.adv && !s.showAll) || (def.when ? !def.when(s) : false);
+  // first visible row in each group has no separator
+  document.querySelectorAll("#panelBody .group").forEach(g => {
+    let first = true;
+    g.querySelectorAll(":scope > .row").forEach(r => { r.classList.toggle("first", first && !r.hidden); if (!r.hidden) first = false; });
+  });
+}
+const panel = $("#panel");
+function togglePanel(open = !panel.classList.contains("open")) {
+  closeMenu();
+  panel.classList.toggle("open", open);
+  panel.inert = !open;
+  panel.setAttribute("aria-hidden", String(!open));
+  $("#settingsBtn").setAttribute("aria-expanded", String(open));
+  if (open) { buildPanel(); setTimeout(() => panel.querySelector("input,select,button")?.focus({ preventScroll: true }), 50); }
+}
+function openPanelAt(groupId) {
+  if (!panel.classList.contains("open")) togglePanel(true);
+  setTimeout(() => $("#grp-" + groupId)?.scrollIntoView({ block: "start", behavior: "smooth" }), 120);
+}
+
+function buildSpaceEditor() {
+  const wrap = h("div", { class: "list-edit" });
+  state.spaces.forEach((sp, i) => {
+    wrap.append(h("div", { class: "le-row" },
+      h("span", { class: "n" }, String(i + 1)),
+      h("input", { class: "pill-input", type: "text", value: sp.name, "aria-label": `Nom de l'espace ${i + 1}`,
+        onchange: e => { const v = e.target.value.trim(); if (!v) { e.target.value = sp.name; return; } sp.name = v; save(); render(); } }),
+      h("button", { class: "pbtn sq danger", type: "button", title: "Supprimer l'espace", "aria-label": `Supprimer ${sp.name}`,
+        disabled: state.spaces.length < 2, onclick: () => deleteSpace(sp.id) }, "✕")));
+  });
+  wrap.append(h("div", {}, h("button", { class: "pbtn", type: "button", onclick: () => {
+    const id = uid();
+    state.spaces.push({ id, name: "Nouvel espace" });
+    save(); buildPanel(); setSpace(id);
+    setTimeout(() => [...document.querySelectorAll("#panelBody .list-edit .pill-input")].find(i => i.value === "Nouvel espace")?.select(), 50);
+  } }, "+ Ajouter un espace")));
+  return wrap;
+}
+function deleteSpace(id) {
+  const sp = state.spaces.find(s => s.id === id);
+  const others = state.spaces.filter(s => s.id !== id);
+  commit(() => {
+    state.spaces = others;
+    state.blocks.forEach(b => { if (b.space === id) b.space = others[0].id; });
+  }, `Espace « ${sp.name} » supprimé, ses blocs sont dans « ${others[0].name} »`);
+  buildPanel();
+}
+function buildTenantEditor() {
+  const wrap = h("div", { class: "list-edit" });
+  if (!state.tenants.length) wrap.append(h("p", { class: "tip" }, "Aucun tenant. Ajoutes-en un pour ouvrir les liens modèles."));
+  for (const t of state.tenants) {
+    const field = (key, ph, label) => h("input", { class: "pill-input", type: "text", value: t[key], placeholder: ph, "aria-label": label, spellcheck: "false", autocomplete: "off",
+      onchange: e => {
+        let v = e.target.value.trim();
+        // Accept a pasted address and keep only its first label as the tenant id
+        if (key === "slug") v = v.toLowerCase().replace(/^https?:\/\//, "").split(/[./]/)[0];
+        if (key !== "domain" && !v) { e.target.value = t[key]; return; }
+        t[key] = v; e.target.value = v;
+        save(); render();
+      } });
+    wrap.append(h("div", { class: "tenant-card" },
+      h("div", { class: "le-row" }, field("name", "Nom affiché", "Nom du tenant"),
+        h("button", { class: "pbtn sq danger", type: "button", title: "Supprimer le tenant", "aria-label": `Supprimer ${t.name}`, onclick: () => deleteTenant(t.id) }, "✕")),
+      h("div", { class: "le-row" }, h("span", { class: "k" }, "{tenant}"), field("slug", "client-a", "Identifiant du tenant")),
+      h("div", { class: "le-row" }, h("span", { class: "k" }, "{domain}"), field("domain", `${t.slug} (par défaut)`, "Domaine"))));
+  }
+  wrap.append(h("div", {}, h("button", { class: "pbtn", type: "button", onclick: () => {
+    const t = { id: uid(), name: "Nouveau tenant", slug: "nouveau", domain: "" };
+    state.tenants.push(t);
+    state.meta.tenant = t.id;
+    save(); buildPanel(); render();
+    setTimeout(() => [...document.querySelectorAll("#panelBody .tenant-card")].pop()?.querySelector("input")?.select(), 50);
+  } }, "+ Ajouter un tenant")));
+  return wrap;
+}
+function deleteTenant(id) {
+  const t = state.tenants.find(x => x.id === id);
+  commit(() => {
+    state.tenants = state.tenants.filter(x => x.id !== id);
+    if (state.meta.tenant === id) state.meta.tenant = state.tenants[0]?.id || null;
+  }, `Tenant « ${t.name} » supprimé`);
+  buildPanel();
+}
+$("#settingsBtn").addEventListener("click", () => togglePanel());
+$("#panelClose").addEventListener("click", () => togglePanel(false));
+
+/* ---------- Search ---------- */
+const q = $("#q");
+q.addEventListener("input", () => { term = q.value.trim(); sel = 0; render(); });
+q.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" && hits.length) { e.preventDefault(); sel = (sel + 1) % hits.length; render(); hits[sel]?.scrollIntoView({ block: "nearest" }); }
+  else if (e.key === "ArrowUp" && hits.length) { e.preventDefault(); sel = (sel - 1 + hits.length) % hits.length; render(); hits[sel]?.scrollIntoView({ block: "nearest" }); }
+  else if (e.key === "Escape") { q.value = ""; term = ""; render(); }
+  else if (e.key === "Enter") { e.preventDefault(); go(e.metaKey || e.ctrlKey, e.shiftKey); }
+});
+$("#searchForm").addEventListener("submit", e => { e.preventDefault(); go(false, false); });
+function go(newTab, forceWeb) {
+  if (!term) return;
+  if (!forceWeb && hits[sel]?.classList.contains("tpl-missing")) { openPanelAt("tenants"); return; }
+  const url = !forceWeb && hits[sel] ? hits[sel].href : ENGINES[S().search.engine][1] + encodeURIComponent(term);
+  if (newTab || (S().links.newTab && !forceWeb && hits[sel])) window.open(url, "_blank", "noopener");
+  else location.href = url;
+}
+
+/* ---------- Block menu ---------- */
+const menu = $("#menu");
+function openMenu(anchor, blockId) {
+  const b = findBlock(blockId);
+  const item = (label, fn, cls) => h("button", { type: "button", role: "menuitem", class: cls, onclick: () => { closeMenu(); fn(); } }, label);
+  const openable = b.links.filter(linkHref).length;
+  menu.replaceChildren(...[
+    openable > 1 ? item(`Ouvrir les ${openable} liens`, () => openAll(b)) : null,
+    item("Ajouter un lien", () => openLinkDrawer(b.id)),
+    item("Modifier le bloc…", () => openBlockDrawer(b.id)),
+    item(b.view === "grid" ? "Afficher en liste" : "Afficher en grille d'icônes", () => { b.view = b.view === "grid" ? "list" : "grid"; save(); render(); }),
+    ...state.spaces.filter(sp => sp.id !== b.space).map(sp => item(`Déplacer vers ${sp.name}`, () => {
+      commit(() => { b.space = sp.id; }, `« ${b.title} » déplacé vers ${sp.name}`);
+    })),
+    h("hr"),
+    item("Supprimer le bloc", () => deleteBlock(b.id), "danger")
+  ].filter(Boolean));
+  menu.hidden = false;
+  const r = anchor.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight;
+  menu.style.left = Math.max(8, Math.min(r.right - mw, innerWidth - mw - 8)) + "px";
+  menu.style.top = (r.bottom + mh + 8 > innerHeight ? r.top - mh - 4 : r.bottom + 4) + "px";
+  menu.querySelector("button").focus();
+}
+function closeMenu() { menu.hidden = true; }
+function openAll(b) {
+  const urls = b.links.map(linkHref).filter(Boolean);
+  let blocked = 0;
+  for (const u of urls) {
+    const w = window.open(u, "_blank");
+    if (w) w.opener = null; else blocked++;
+  }
+  if (blocked) toast(`Safari a bloqué ${blocked} onglet${blocked > 1 ? "s" : ""}. Autorise les fenêtres pop-up pour cette page dans Safari → Réglages → Sites web.`);
+}
+document.addEventListener("click", e => { if (!menu.hidden && !menu.contains(e.target) && !e.target.closest("[aria-haspopup]")) closeMenu(); });
+function deleteBlock(id) {
+  const b = findBlock(id);
+  commit(() => { state.blocks = state.blocks.filter(x => x.id !== id); }, `Bloc « ${b.title} » supprimé`);
+}
+
+/* ---------- Drawers ---------- */
+let openDrawer = null, lastFocus = null;
+function showDrawer(el) {
+  closeMenu();
+  lastFocus = document.activeElement;
+  openDrawer = el; el.hidden = false; $("#scrim").hidden = false;
+  setTimeout(() => el.querySelector("input,select,button")?.focus(), 0);
+}
+function closeDrawer() {
+  if (!openDrawer) return;
+  openDrawer.hidden = true; $("#scrim").hidden = true; openDrawer = null;
+  lastFocus?.focus?.();
+}
+document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", closeDrawer));
+$("#scrim").addEventListener("click", closeDrawer);
+
+let editLinkId = null;
+function openLinkDrawer(blockId, linkId, presetUrl) {
+  editLinkId = linkId || null;
+  const found = linkId ? findLink(linkId) : null;
+  $("#linkTitle").textContent = found ? "Modifier le lien" : "Ajouter un lien";
+  $("#linkUrl").value = found ? found.link.url : (presetUrl || "");
+  $("#linkName").value = found ? found.link.name : "";
+  $("#linkDev").value = found?.link.envs?.dev || "";
+  $("#linkTest").value = found?.link.envs?.test || "";
+  $("#envFields").open = !!found?.link.envs;
+  $("#linkBlock").replaceChildren(...state.blocks.map(b => h("option", { value: b.id, selected: b.id === (found ? found.block.id : blockId) }, b.title)));
+  $("#linkDelete").hidden = !found;
+  $("#linkErr").hidden = true;
+  showDrawer($("#linkDrawer"));
+}
+$("#linkUrl").addEventListener("blur", () => {
+  const u = normalizeLinkUrl($("#linkUrl").value);
+  if (u && !$("#linkName").value.trim()) $("#linkName").placeholder = guessName(fillTpl(u, "tenant", ""));
+});
+$("#linkForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const url = normalizeLinkUrl($("#linkUrl").value);
+  const envs = {};
+  for (const [key, label, id] of [["dev", "DEV", "#linkDev"], ["test", "TEST", "#linkTest"]]) {
+    const raw = $(id).value.trim();
+    if (!raw) continue;
+    envs[key] = normalizeLinkUrl(raw);
+    if (!envs[key]) { $("#envFields").open = true; $("#linkErr").textContent = `L'adresse ${label} n'est pas valide.`; $("#linkErr").hidden = false; return; }
+  }
+  const linkEnvs = envs.dev || envs.test ? { dev: envs.dev || "", test: envs.test || "" } : undefined;
+  if (!url) { $("#linkErr").textContent = "Cette adresse n'est pas valide. Exemple : https://github.com ou https://{tenant}.example.com"; $("#linkErr").hidden = false; return; }
+  if (!state.blocks.length) { $("#linkErr").textContent = "Crée d'abord un bloc pour y ranger ce lien."; $("#linkErr").hidden = false; return; }
+  const name = $("#linkName").value.trim() || guessName(fillTpl(url, "tenant", ""));
+  const target = findBlock($("#linkBlock").value) || state.blocks[0];
+  const wasEdit = !!editLinkId;
+  commit(() => {
+    if (editLinkId) {
+      const f = findLink(editLinkId);
+      Object.assign(f.link, { name, url });
+      if (linkEnvs) f.link.envs = linkEnvs; else delete f.link.envs;
+      if (f.block !== target) { f.block.links.splice(f.index, 1); target.links.push(f.link); }
+    } else {
+      target.links.push(linkEnvs ? { id: uid(), name, url, envs: linkEnvs } : { id: uid(), name, url });
+      target.collapsed = false;
+    }
+  });
+  closeDrawer();
+  toast(wasEdit ? "Lien mis à jour" : `Lien ajouté à « ${target.title} »`);
+});
+$("#linkDelete").addEventListener("click", () => {
+  const f = findLink(editLinkId);
+  closeDrawer();
+  commit(() => f.block.links.splice(f.index, 1), `« ${f.link.name} » supprimé`);
+});
+
+let editBlockId = null;
+$("#swatches").append(...COLORS.map(c => h("label", { title: c }, h("input", { type: "radio", name: "blockColor", value: c }), h("span", { style: `background:var(--${c})` }))));
+function openBlockDrawer(id) {
+  editBlockId = id || null;
+  const b = id ? findBlock(id) : null;
+  $("#blockTitle").textContent = b ? "Modifier le bloc" : "Nouveau bloc";
+  $("#blockName").value = b ? b.title : "";
+  const sp = b ? b.space : currentSpace;
+  $("#blockSpace").replaceChildren(...state.spaces.map(s => h("option", { value: s.id, selected: s.id === sp }, s.name)));
+  const color = b ? b.color : COLORS[state.blocks.length % COLORS.length];
+  document.querySelector(`input[name=blockColor][value=${color}]`).checked = true;
+  document.querySelector(`input[name=blockView][value=${b ? b.view : "list"}]`).checked = true;
+  $("#blockDelete").hidden = !b;
+  $("#blockErr").hidden = true;
+  showDrawer($("#blockDrawer"));
+}
+$("#blockForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const title = $("#blockName").value.trim();
+  if (!title) { $("#blockErr").textContent = "Donne un titre au bloc."; $("#blockErr").hidden = false; return; }
+  const color = document.querySelector("input[name=blockColor]:checked").value;
+  const view = document.querySelector("input[name=blockView]:checked").value;
+  const space = $("#blockSpace").value;
+  commit(() => {
+    if (editBlockId) Object.assign(findBlock(editBlockId), { title, color, view, space });
+    else state.blocks.push({ id: uid(), space, title, color, view, collapsed: false, links: [] });
+  });
+  closeDrawer();
+});
+$("#blockDelete").addEventListener("click", () => { const id = editBlockId; closeDrawer(); deleteBlock(id); });
+
+/* ---------- Export / import / reset ---------- */
+function exportData() {
+  state.meta.lastExport = new Date().toISOString();
+  save();
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const a = h("a", { href: URL.createObjectURL(blob), download: `cockpit-steffpoint-${state.meta.lastExport.slice(0, 10)}.json` });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  syncPanel();
+  toast("Export téléchargé");
+}
+$("#importFile").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  let data;
+  try { data = normalize(JSON.parse(await file.text())); } catch { data = null; }
+  const note = $("#note-backup");
+  if (!data) { note.className = "note err"; note.textContent = "Ce fichier n'est pas un export de Cockpit SteffPoint (il manque la liste des blocs)."; return; }
+  store.set(KEY + "-backup", state);
+  commit(() => { state = data; }, `Import terminé : ${data.blocks.length} blocs`);
+  currentSpace = pickSpace();
+  applySettings(); buildPanel(); render(); applyBackground(); loadWeather();
+});
+
+// Safari bookmarks export (Netscape HTML): each folder becomes a block in the current space
+function parseBookmarks(text) {
+  const doc = new DOMParser().parseFromString(text, "text/html");
+  const groups = new Map();
+  for (const a of doc.querySelectorAll("a[href]")) {
+    const url = normalizeUrl(a.getAttribute("href"));
+    if (!url || !/^https?:/.test(url)) continue;
+    const path = [];
+    let readingList = false;
+    for (let dl = a.closest("dl"); dl; dl = dl.parentElement?.closest("dl")) {
+      const h3 = dl.previousElementSibling?.tagName === "H3" ? dl.previousElementSibling : dl.parentElement?.querySelector(":scope > h3");
+      if (!h3) continue;
+      if (/readinglist/i.test(h3.id) || /^(liste de lecture|reading list)$/i.test(h3.textContent.trim())) readingList = true;
+      path.unshift(h3.textContent.trim());
+    }
+    if (readingList) continue;
+    const key = path.join(" / ") || "Signets Safari";
+    if (!groups.has(key)) groups.set(key, { path, links: [] });
+    groups.get(key).links.push({ id: uid(), name: a.textContent.trim() || guessName(url), url });
+  }
+  const lastNames = [...groups.values()].map(g => g.path.at(-1));
+  return [...groups.entries()].map(([key, g]) => {
+    const last = g.path.at(-1) || key;
+    return { title: lastNames.filter(n => n === last).length > 1 ? key : last, links: g.links };
+  });
+}
+$("#bookmarkFile").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const note = $("#note-bookmarks");
+  let groups = [];
+  try { groups = parseBookmarks(await file.text()); } catch {}
+  if (!groups.length) { note.className = "note err"; note.textContent = "Aucun signet trouvé. Choisis le fichier « Signets.html » exporté par Safari."; return; }
+  const total = groups.reduce((n, g) => n + g.links.length, 0);
+  commit(() => {
+    groups.forEach((g, i) => state.blocks.push({
+      id: uid(), space: currentSpace, title: g.title, color: COLORS[(state.blocks.length + i) % COLORS.length],
+      view: "list", collapsed: g.links.length > 12, links: g.links
+    }));
+  }, `${groups.length} blocs et ${total} liens importés dans ${spaceName(currentSpace)}`);
+  note.className = "note ok"; note.textContent = `${groups.length} blocs importés. Range-les ou supprime ceux en trop en mode édition.`;
+});
+function resetAll() {
+  const { settings, tenants, meta } = state;
+  commit(() => {
+    state = normalize(defaults());
+    Object.assign(state, { settings, tenants });
+    Object.assign(state.meta, { lastExport: meta.lastExport, since: meta.since, tenant: meta.tenant });
+  }, "Exemples restaurés");
+  currentSpace = pickSpace();
+  buildPanel(); render();
+}
+
+/* ---------- Drag & drop ---------- */
+let drag = null;
+const blocksEl = $("#blocks");
+function clearDropMarks() { document.querySelectorAll(".drop-before,.drop-target,.drop-end").forEach(el => el.classList.remove("drop-before", "drop-target", "drop-end")); }
+blocksEl.addEventListener("dragstart", e => {
+  if (!editing) return;
+  const li = e.target.closest?.("li[data-link]");
+  const head = e.target.closest?.(".block-h");
+  if (li) drag = { type: "link", id: li.dataset.link, el: li };
+  else if (head) drag = { type: "block", id: head.parentElement.dataset.block, el: head.parentElement };
+  else return;
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", drag.id);
+  requestAnimationFrame(() => drag?.el.classList.add("dragging"));
+});
+blocksEl.addEventListener("dragend", () => { drag?.el.classList.remove("dragging"); drag = null; clearDropMarks(); });
+const isExternalUrlDrag = e => !drag && [...e.dataTransfer.types].some(t => t === "text/uri-list" || t === "text/plain");
+blocksEl.addEventListener("dragover", e => {
+  const block = e.target.closest(".block");
+  if (!block) return;
+  if (drag?.type === "block") {
+    e.preventDefault(); clearDropMarks();
+    if (block !== drag.el) block.classList.add("drop-target");
+  } else if (drag?.type === "link" || isExternalUrlDrag(e)) {
+    e.preventDefault(); clearDropMarks();
+    e.dataTransfer.dropEffect = drag ? "move" : "copy";
+    const li = e.target.closest("li[data-link]");
+    if (li && li !== drag?.el) li.classList.add("drop-before");
+    else if (!li) block.querySelector(".links").classList.add("drop-end");
+    if (!drag) block.classList.add("drop-target");
+  }
+});
+blocksEl.addEventListener("dragleave", e => { if (!blocksEl.contains(e.relatedTarget)) clearDropMarks(); });
+blocksEl.addEventListener("drop", e => {
+  const block = e.target.closest(".block");
+  clearDropMarks();
+  if (!block) return;
+  e.preventDefault();
+  const targetBlock = findBlock(block.dataset.block);
+  if (drag?.type === "block") {
+    if (block === drag.el) return;
+    const moving = findBlock(drag.id);
+    commit(() => {
+      state.blocks = state.blocks.filter(b => b !== moving);
+      state.blocks.splice(state.blocks.indexOf(targetBlock), 0, moving);
+    });
+  } else if (drag?.type === "link") {
+    const beforeId = e.target.closest("li[data-link]")?.dataset.link;
+    if (beforeId === drag.id) return;
+    const src = findLink(drag.id);
+    commit(() => {
+      src.block.links.splice(src.index, 1);
+      const i = beforeId ? targetBlock.links.findIndex(l => l.id === beforeId) : -1;
+      targetBlock.links.splice(i > -1 ? i : targetBlock.links.length, 0, src.link);
+    });
+  } else {
+    const raw = (e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain")).split("\n").find(s => s && !s.startsWith("#"));
+    addUrlTo(targetBlock, raw);
+  }
+});
+function addUrlTo(block, raw) {
+  const url = normalizeUrl(raw);
+  if (!url || !block) return false;
+  commit(() => { block.links.push({ id: uid(), name: guessName(url), url }); block.collapsed = false; }, `Lien ajouté à « ${block.title} »`);
+  return true;
+}
+
+/* ---------- Paste anywhere ---------- */
+let hoverBlockId = null;
+blocksEl.addEventListener("mouseover", e => { hoverBlockId = e.target.closest(".block")?.dataset.block || hoverBlockId; });
+document.addEventListener("paste", e => {
+  if (e.target.closest?.("input,textarea,select") || openDrawer) return;
+  const text = e.clipboardData.getData("text").trim();
+  if (!looksUrl(text)) return;
+  e.preventDefault();
+  const hovered = findBlock(hoverBlockId);
+  const target = hovered?.space === currentSpace ? hovered : state.blocks.find(b => b.space === currentSpace);
+  if (!target) { openBlockDrawer(); return; }
+  addUrlTo(target, text);
+});
+
+/* ---------- Keyboard ---------- */
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    if (!menu.hidden) closeMenu();
+    else if (openDrawer) closeDrawer();
+    else if (panel.classList.contains("open")) togglePanel(false);
+    else if (editing) toggleEdit(false);
+    return;
+  }
+  if (openDrawer || e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.("input,textarea,select")) return;
+  if (e.key === "/") { e.preventDefault(); q.focus(); q.select(); }
+  else if (e.key === "e" || e.key === "E") toggleEdit();
+  else if (e.key === ",") togglePanel();
+  else if (e.key === "t" || e.key === "T") cycleTenant();
+  else if (e.key === "v" || e.key === "V") cycleEnv();
+  else if (/^[1-9]$/.test(e.key) && state.spaces[e.key - 1]) setSpace(state.spaces[e.key - 1].id);
+});
+addEventListener("scroll", () => document.body.classList.toggle("scrolled", scrollY > 60), { passive: true });
+function toggleEdit(on = !editing) {
+  editing = on;
+  $("#editBtn").setAttribute("aria-pressed", String(on));
+  render();
+}
+$("#editBtn").addEventListener("click", () => toggleEdit());
+
+/* ---------- Boot ---------- */
+applySettings();
+save();
+render();
+buildPanel();
+applyBackground();
+loadWeather();
+setInterval(() => { if (S().bg.type === "photo" && photoIsStale(S().bg) && S().bg.freq !== "tab") applyBackground(); loadWeather(); }, 10 * 60e3);
+</script>
+</body>
+</html>
