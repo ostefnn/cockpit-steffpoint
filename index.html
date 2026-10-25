@@ -151,6 +151,7 @@ body.no-date .date{display:none}
 /* ---------- Floating dock + credit ---------- */
 .dock{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;z-index:45}
 .fab{width:48px;height:48px;border-radius:15px;border:1px solid var(--glass-line);background:var(--glass);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);color:var(--fg);display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s}
+a.fab{text-decoration:none}
 .fab:hover{transform:translateY(-1px)}
 .fab[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .fab svg{transition:transform .4s}
@@ -317,6 +318,8 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
 <div class="credit" id="credit" hidden></div>
 
 <div class="dock">
+  <a class="fab" id="helpBtn" href="aide.html" title="Aide (?)" aria-label="Aide">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.4M12 17h.01"/></svg></a>
   <button class="fab" id="editBtn" aria-pressed="false" title="Éditer les favoris (E)" aria-label="Éditer les favoris">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/></svg></button>
   <button class="fab gear" id="settingsBtn" aria-expanded="false" aria-controls="panel" title="Réglages (,)" aria-label="Réglages">
@@ -324,7 +327,7 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
 </div>
 
 <aside class="panel" id="panel" aria-label="Réglages" aria-hidden="true" inert>
-  <div class="panel-top"><h2>Réglages</h2><button class="icon-btn" id="panelClose" aria-label="Fermer les réglages">✕</button></div>
+  <div class="panel-top"><h2>Réglages</h2><a class="pbtn" href="aide.html" style="margin-left:auto;margin-right:8px;text-decoration:none;color:inherit">Aide</a><button class="icon-btn" id="panelClose" aria-label="Fermer les réglages">✕</button></div>
   <div id="panelBody"></div>
   <input type="file" id="importFile" accept="application/json,.json" hidden>
   <input type="file" id="bgFile" accept="image/*" hidden>
@@ -1043,7 +1046,7 @@ const SCHEMA = [
     { type: "buttons", label: "Réinitialiser", adv: true, buttons: [["Revenir aux exemples", () => resetAll(), "danger"]], note: "Remplace tes blocs par les exemples. Annulable quelques secondes." }
   ]},
   { title: "Raccourcis", adv: true, html: () => h("div", { class: "keys" },
-      ["/  rechercher", "↑ ↓  choisir un résultat · Entrée ouvrir", "E  éditer les favoris", "1–9  changer d'espace", "T  tenant suivant", "V  environnement suivant (DEV → TEST → PROD)", ",  réglages", "Échap  fermer / vider", "Coller une URL  l'ajoute au bloc survolé"].map(t => h("div", {}, t))) }
+      ["/  rechercher", "↑ ↓  choisir un résultat · Entrée ouvrir", "E  éditer les favoris", "?  aide", "1–9  changer d'espace", "T  tenant suivant", "V  environnement suivant (DEV → TEST → PROD)", ",  réglages", "Échap  fermer / vider", "Coller une URL  l'ajoute au bloc survolé"].map(t => h("div", {}, t))) }
 ];
 const getP = p => p.split(".").reduce((o, k) => o?.[k], S());
 const setP = (p, v) => { const ks = p.split("."), last = ks.pop(); ks.reduce((o, k) => o[k], S())[last] = v; };
@@ -1546,6 +1549,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "/") { e.preventDefault(); q.focus(); q.select(); }
   else if (e.key === "e" || e.key === "E") toggleEdit();
   else if (e.key === ",") togglePanel();
+  else if (e.key === "?") location.href = "aide.html";
   else if (e.key === "t" || e.key === "T") cycleTenant();
   else if (e.key === "v" || e.key === "V") cycleEnv();
   else if (/^[1-9]$/.test(e.key) && state.spaces[e.key - 1]) setSpace(state.spaces[e.key - 1].id);
