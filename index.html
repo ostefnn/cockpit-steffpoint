@@ -108,7 +108,7 @@ body.cards-solid .block,body.cards-solid .search,body.cards-solid .no-hit{backgr
 body.editing .lk-del{display:grid}
 body.editing .links:not(.grid) .lk{padding-right:38px}
 .links.grid .lk-del{top:2px;right:2px;transform:none}
-.ico{width:28px;height:28px;border-radius:calc(var(--radius) * .55);display:grid;place-items:center;flex:none;font:500 .74rem var(--f-display);color:#fff;overflow:hidden}
+.ico{width:28px;height:28px;border-radius:calc(var(--radius) * .55);display:grid;place-items:center;flex:none;font:500 .74rem var(--f-display);color:var(--on-accent);overflow:hidden}
 .ico img{width:20px;height:20px;display:block}
 .ico.img{background:var(--surface)!important;box-shadow:inset 0 0 0 1px var(--line)}
 .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -372,6 +372,150 @@ body.l-lanceur .links.grid .lk{height:96px;justify-content:center}
 
 @media (max-width:560px){.dm{display:none}.pill{min-width:120px}input[type=range]{width:130px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---------- Onboarding ---------- */
+.onb{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px 16px;overflow:auto;
+  background:rgb(6 30 38 / .32);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}
+.onb-card{width:100%;max-width:1080px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  border-radius:22px;overflow:hidden;background:color-mix(in srgb,var(--surface) 94%,transparent);
+  -webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);border:1px solid var(--glass-line);
+  box-shadow:0 30px 80px rgb(6 30 38 / .35);animation:onbIn .35s ease;color:var(--fg)}
+@keyframes onbIn{from{opacity:0;transform:translateY(12px) scale(.98)}}
+.onb-main{display:flex;flex-direction:column;min-height:620px;min-width:0}
+.onb-bars{display:flex;gap:8px;padding:22px 32px 0}
+.onb-bars i{flex:1;height:4px;border-radius:2px;background:var(--line);transition:background .3s}
+.onb-bars i.on{background:var(--accent)}
+.onb-top{display:flex;justify-content:space-between;align-items:center;padding:10px 32px 0;font-size:.82rem;color:var(--muted)}
+.onb-body{flex:1;padding:28px 32px 20px;display:flex;flex-direction:column;gap:22px;animation:onbStep .25s ease}
+@keyframes onbStep{from{opacity:0;transform:translateX(8px)}}
+.onb-foot{display:flex;align-items:center;gap:12px;padding:16px 32px 24px;border-top:1px solid var(--row-line)}
+.onb-sp{flex:1}
+.onb-foot button{white-space:nowrap}
+
+.onb-h1{margin:0;font:300 2.75rem/1.08 var(--f-display);letter-spacing:-.02em}
+.onb-h2{margin:0;font:400 1.9rem/1.15 var(--f-display)}
+.onb-lead{margin:6px 0 0;font-size:1.05rem;color:var(--muted);max-width:480px;text-wrap:pretty}
+.onb-lead b{color:var(--fg)}
+.onb-field{display:flex;flex-direction:column;gap:8px;max-width:480px}
+.onb-field>span{font-weight:600;font-size:.95rem}
+.onb-input{font-size:1.1rem;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);outline:none;min-width:0}
+.onb-input:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent)}
+.onb-affix{display:flex;align-items:stretch;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.onb-affix:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent)}
+.onb-affix .onb-input{flex:1;border:0;border-radius:0;box-shadow:none}
+.onb-affix span{display:grid;place-items:center;padding:0 14px;background:var(--panel-bg);color:var(--muted);border-left:1px solid var(--line)}
+.onb-row{display:flex;gap:8px}
+.onb-row .onb-input{flex:1}
+.onb-note{margin:0;font-size:.82rem;color:var(--muted);min-height:1.2em}
+.onb-note.ok{color:var(--accent-strong)} .onb-note.err{color:var(--danger)}
+.onb-callout{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:var(--tint);max-width:480px}
+.onb-callout span{flex:1}
+
+.onb-btn{border:0;border-radius:12px;padding:11px 18px;font-weight:700;font-size:.95rem;cursor:pointer}
+.onb-btn.primary{background:var(--accent);color:var(--on-accent);box-shadow:0 6px 16px color-mix(in srgb,var(--accent) 30%,transparent)}
+.onb-btn.primary:hover{filter:brightness(1.08)}
+.onb-btn.ghost{background:transparent;border:1.5px solid var(--line);font-weight:600}
+.onb-btn.ghost:hover{background:var(--tint)}
+.onb-btn.soft{background:var(--surface);color:var(--accent-strong);border:1px solid var(--line);padding:7px 12px;font-size:.88rem;white-space:nowrap}
+.onb-link{border:0;background:none;color:var(--muted);cursor:pointer;padding:8px 6px;font-size:inherit;text-decoration:underline;text-underline-offset:3px}
+.onb-link:hover{color:var(--accent-strong)}
+
+.onb-chips{display:flex;flex-wrap:wrap;gap:10px}
+.onb-chip{display:flex;align-items:center;gap:10px;padding:11px 16px 11px 12px;border-radius:12px;font-weight:600;cursor:pointer;
+  background:var(--surface);border:1.5px solid var(--line)}
+.onb-chip:disabled{cursor:default;opacity:.75}
+.onb-chip[aria-pressed="true"],.onb-card-opt[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--surface));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent)}
+.onb-check{width:20px;height:20px;flex:none;border-radius:6px;border:1.5px solid var(--muted);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--on-accent)}
+[aria-pressed="true"] .onb-check{background:var(--accent);border-color:var(--accent)}
+[aria-pressed="true"] .onb-check::before{content:"✓"}
+.onb-add{display:flex;align-items:center;gap:6px;border:1.5px dashed var(--muted);border-radius:12px;padding:4px 4px 4px 12px}
+.onb-add input{border:0;outline:none;background:none;width:130px}
+.onb-add:focus-within{border-color:var(--accent)}
+.onb-add button{border:0;background:var(--tint);color:var(--accent-strong);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer}
+
+.onb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.onb-grid.layouts{grid-template-columns:repeat(4,minmax(0,1fr))}
+.onb-card-opt{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;text-align:left;cursor:pointer;background:var(--surface);border:1.5px solid var(--line)}
+.onb-card-opt .hd{display:flex;align-items:center;gap:10px}
+.onb-card-opt .t{font:500 .95rem var(--f-display)}
+.onb-card-opt .hd .t{flex:1}
+.onb-card-opt .d{font-size:.82rem;color:var(--muted);line-height:1.35}
+.onb-card-opt .mono{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;font:500 .74rem var(--f-display);color:var(--on-accent)}
+.onb-drop{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1.5px dashed var(--muted);background:none;text-align:left;cursor:pointer}
+.onb-drop:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 4%,transparent)}
+.onb-drop .i{width:32px;height:32px;border-radius:9px;background:var(--tint);color:var(--accent-strong);display:grid;place-items:center;font-weight:700}
+.onb-drop small{display:block;color:var(--muted)}
+
+.onb-wf{height:74px;border-radius:8px;background:var(--tint);padding:8px;display:flex;gap:5px}
+.onb-wf .side{width:30%;border-radius:4px;background:color-mix(in srgb,var(--accent) 25%,var(--tint))}
+.onb-wf .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.onb-wf .hd{width:40%;height:8px;border-radius:3px;background:var(--accent);opacity:.8}
+.onb-wf .sr{width:70%;height:7px;border-radius:3px;background:var(--surface)}
+.onb-wf .bk{flex:1;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.onb-wf .bk i{border-radius:3px;background:var(--surface)}
+.onb-wf.classic .hd{width:34%;height:16px}
+.onb-wf.accueil .hd{width:60%;height:12px}
+.onb-wf.lanceur .hd{width:85%}
+.onb-wf.lanceur .bk{grid-template-columns:1fr}
+.onb-wf.cockpit .hd{opacity:.35}
+
+.onb-seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--tint);border-radius:12px;align-self:flex-start}
+.onb-seg button{border:0;border-radius:9px;padding:7px 14px;font-weight:600;font-size:.88rem;background:transparent;color:var(--muted);cursor:pointer}
+.onb-seg button[aria-pressed="true"]{background:var(--surface);color:var(--accent-strong);box-shadow:0 1px 3px rgb(12 74 92 / .15)}
+.onb-switch{display:flex;align-items:center;gap:10px;cursor:pointer;border:0;background:none;padding:0;font-size:.95rem;align-self:flex-start}
+.onb-switch i{width:40px;height:24px;border-radius:12px;background:var(--switch-off);padding:2px;display:flex;transition:background .2s;box-shadow:inset 0 0 0 1px var(--muted)}
+.onb-switch i::after{content:"";width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgb(0 0 0 / .2);transition:transform .2s}
+.onb-switch[aria-checked="true"] i{background:var(--accent);box-shadow:none}
+.onb-switch[aria-checked="true"] i::after{transform:translateX(16px)}
+
+.onb-done{width:52px;height:52px;border-radius:16px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:26px}
+.onb-recap{border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.onb-recap div{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--row-line)}
+.onb-recap div:first-child{border-top:0}
+.onb-recap .k{width:120px;flex:none;color:var(--muted)}
+.onb-recap .v{flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.onb-recap button{border:0;background:none;color:var(--accent-strong);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.onb-keys{display:flex;flex-wrap:wrap;gap:16px;font-size:.88rem;color:var(--muted)}
+
+.onb-side{background:var(--panel-bg);border-left:1px solid var(--line);padding:22px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.onb-kicker{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.onb-tip{margin:0;font-size:.85rem;color:var(--muted);line-height:1.4}
+.onb-pv{flex:1;min-height:300px;position:relative;border-radius:14px;overflow:hidden;padding:16px;display:flex;gap:10px;
+  box-shadow:0 8px 24px rgb(12 74 92 / .15);background:linear-gradient(160deg,#7d97a1,#2f5866 60%,#173a46);transition:background .4s;color:var(--fg)}
+.onb-pv.gradient{background:linear-gradient(135deg,var(--hero-a),var(--hero-b))}
+.onb-pv.color{background:#2a3d45}
+.onb-pv .side{width:34%;border-radius:10px;background:var(--glass);padding:10px;display:flex;flex-direction:column;gap:6px;font:400 .8rem/1.15 var(--f-display)}
+.onb-pv .side s{height:24px;border-radius:6px;background:var(--tint)}
+.onb-pv .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
+.onb-pv .greet{color:#fff;text-align:center;text-shadow:0 1px 8px rgb(0 0 0 / .25);font:300 1.25rem/1.1 var(--f-display);padding-top:8px}
+.onb-pv.classic .greet{font-size:1.9rem;font-weight:200}
+.onb-pv.lanceur .greet{text-align:left;font-size:.8rem;padding:0}
+.onb-pv .meta{color:#fff;opacity:.9;font-size:.62rem;text-align:center;margin-top:3px}
+.onb-pv.lanceur .meta{text-align:left}
+.onb-pv .sr{height:18px;border-radius:6px;background:var(--glass);display:flex;align-items:center;padding:0 7px;font-size:.56rem;color:var(--muted)}
+.onb-pv .tabs{display:flex;flex-wrap:wrap;gap:4px;background:none;border:0;box-shadow:none;padding:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+.onb-pv .tabs span{font-size:.56rem;font-weight:700;padding:3px 7px;border-radius:5px;background:var(--glass)}
+.onb-pv .tabs span:first-child{background:var(--accent);color:var(--on-accent)}
+.onb-pv .bks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.onb-pv.lanceur .bks{grid-template-columns:1fr}
+.onb-pv .bk{border-radius:7px;background:var(--glass);padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.onb-pv .bk b{display:flex;align-items:center;gap:4px;font:500 .56rem var(--f-display);white-space:nowrap;overflow:hidden}
+.onb-pv .bk b i{width:6px;height:6px;border-radius:2px;flex:none}
+.onb-pv .bk s{height:4px;border-radius:2px;background:var(--line)}
+.onb-pv .bk s:nth-of-type(2){width:75%} .onb-pv .bk s:nth-of-type(3){width:55%}
+.onb-pv .empty{border:1px dashed rgb(255 255 255 / .6);color:#fff;font-size:.62rem;padding:12px;border-radius:7px}
+
+@media (max-width:900px){.onb-grid.layouts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){
+  .onb-main{min-height:0}
+  .onb-body,.onb-foot,.onb-top,.onb-bars{padding-left:20px;padding-right:20px}
+  .onb-h1{font-size:2.1rem}
+  .onb-foot{gap:6px}
+  .onb-btn{padding:10px 14px}
+  .onb-side{border-left:0;border-top:1px solid var(--line)}
+}
+@media (prefers-reduced-motion:reduce){.onb-card,.onb-body{animation:none}}
 </style>
 </head>
 <body>
@@ -483,6 +627,33 @@ body.l-lanceur .links.grid .lk{height:96px;justify-content:center}
 
 <div class="toast" id="toast" role="status" hidden><span id="toastMsg"></span><button id="toastUndo" type="button">Annuler</button></div>
 
+<div class="onb" id="onb" hidden role="dialog" aria-modal="true" aria-labelledby="onbTitle">
+  <div class="onb-card">
+    <div class="onb-main">
+      <div class="onb-bars" id="onbBars" aria-hidden="true"></div>
+      <div class="onb-top">
+        <span id="onbStep" aria-live="polite"></span>
+        <button class="onb-link" id="onbSkipAll" type="button">Passer la configuration</button>
+      </div>
+      <div class="onb-body" id="onbBody"></div>
+      <p class="sr-only" id="onbLive" role="status"></p>
+      <div class="onb-foot">
+        <button class="onb-btn ghost" id="onbBack" type="button">← Retour</button>
+        <span class="onb-sp"></span>
+        <button class="onb-link" id="onbLater" type="button">Plus tard</button>
+        <button class="onb-btn primary" id="onbNext" type="button">Continuer →</button>
+      </div>
+    </div>
+    <aside class="onb-side" aria-hidden="true">
+      <div class="onb-kicker">Aperçu</div>
+      <div class="onb-pv" id="onbPv"></div>
+      <p class="onb-tip" id="onbTip"></p>
+    </aside>
+  </div>
+  <input type="file" id="onbJson" accept="application/json,.json" hidden>
+  <input type="file" id="onbBookmarks" accept=".html,.htm,text/html" hidden>
+</div>
+
 <script>
 "use strict";
 const KEY = "cockpit-steffpoint";
@@ -588,6 +759,7 @@ function normalize(d) {
     settings: merge(DEFAULT_SETTINGS, migrateSettings(d.settings)),
     meta: {
       lastExport: m.lastExport || null, since: +m.since || Date.now(), snooze: +m.snooze || 0,
+      onboarded: +m.onboarded || 0,
       space: spaceIds.has(m.space) ? m.space : spaces[0].id,
       tenant: tenants.some(t => t.id === m.tenant) ? m.tenant : tenants[0]?.id || null,
       env: ["dev", "test", "prod"].includes(m.env) ? m.env : null,
@@ -614,7 +786,10 @@ function save() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { storageOk = false; }
   $("#storageBanner").hidden = storageOk;
 }
+const HAD_DATA = (() => { try { return !!localStorage.getItem(KEY); } catch { return true; } })();
 let state = load();
+// People who already use the page never see the first-run assistant
+if (HAD_DATA && !state.meta.onboarded) state.meta.onboarded = state.meta.since;
 const S = () => state.settings;
 
 /* ---------- Helpers ---------- */
@@ -1179,6 +1354,8 @@ const SCHEMA = [
     { type: "select", path: "theme", label: "Mode sombre", options: [["auto", "Système"], ["light", "Clair"], ["dark", "Sombre"]] },
     { type: "select", path: "layout", label: "Disposition", options: LAYOUTS, after: render,
       note: "Accueil : grande salutation et fréquents. Cockpit : colonne d'infos à gauche, tout tient à l'écran. Lanceur : grande recherche et tuiles d'icônes." },
+    { type: "buttons", label: "Assistant", buttons: [["Relancer l'assistant", () => { togglePanel(false); openOnboarding({ rerun: true }); }]],
+      note: "Ajoute des espaces et des blocs sans toucher à l'existant." },
     { type: "toggle", path: "keys", label: "Raccourcis à une touche",
       note: "/ E T V ? , et 1 à 9. Désactive-les si tu dictes ou utilises une aide technique : une lettre ne déclenchera plus rien. Les boutons restent disponibles." },
     { type: "toggle", path: "hideDock", label: "Discrétiser les boutons flottants", adv: true, note: "Ils réapparaissent au survol. Raccourcis : , pour les réglages, E pour éditer." }
@@ -1828,6 +2005,8 @@ document.addEventListener("paste", e => {
 
 /* ---------- Keyboard ---------- */
 document.addEventListener("keydown", e => {
+  // The onboarding dialog handles its own keys
+  if (!$("#onb").hidden) return;
   if (e.key === "Escape") {
     if (!menu.hidden) closeMenu();
     else if (openDrawer) closeDrawer();
@@ -1860,6 +2039,358 @@ function toggleEdit(on = !editing) {
 }
 $("#editBtn").addEventListener("click", () => toggleEdit());
 
+/* ---------- Onboarding ---------- */
+const ONB_STEPS = ["Bienvenue", "Espaces", "Favoris", "Style", "Infos", "Récap"];
+const ONB_TIPS = [
+  "Ton prénom sert seulement à la salutation. Rien ne quitte ton navigateur.",
+  "Commence avec 2 ou 3 espaces. Tu en ajouteras quand le besoin viendra.",
+  "Les blocs SharePoint et OneDrive utilisent ton tenant pour construire les bons liens.",
+  "Tu pourras changer de disposition à tout moment dans les réglages.",
+  "La météo vient d'Open-Meteo. Ni compte ni clé API à fournir.",
+  "Pense à exporter ta configuration (.json) pour la retrouver sur un autre poste."
+];
+const ONB_LAYOUTS = [
+  ["classic", "Classique", "Grande horloge, la vue d'origine"],
+  ["accueil", "Accueil", "Grande salutation, fréquents en avant"],
+  ["cockpit", "Cockpit", "Colonne d'infos, tout visible d'un coup"],
+  ["lanceur", "Lanceur", "Recherche au centre, tuiles d'icônes"]
+];
+const ONB_BGS = [["photo", "Photo floutée"], ["gradient", "Dégradé"], ["color", "Uni"]];
+// Links with {tenant} are resolved by resolveUrl() for the active tenant
+const PRESETS = [
+  { id: "m365", title: "Microsoft 365", color: "c4", mono: "M", desc: "Teams, Outlook, Planner, OneDrive, Power Automate", links: [
+    ["Teams", "https://teams.microsoft.com"], ["Outlook", "https://outlook.office.com/mail/"],
+    ["Planner", "https://planner.cloud.microsoft"], ["OneDrive", "https://{tenant}-my.sharepoint.com"],
+    ["Power Automate", "https://make.powerautomate.com"]] },
+  { id: "sp", title: "SharePoint", color: "c2", mono: "SP", desc: "Accueil du tenant, sites suivis, admin SharePoint", links: [
+    ["Accueil SharePoint", "https://{tenant}.sharepoint.com"],
+    ["Mes sites", "https://{tenant}.sharepoint.com/_layouts/15/sharepoint.aspx"],
+    ["Admin SharePoint", "https://{tenant}-admin.sharepoint.com"]] },
+  { id: "pp", title: "Power Platform", color: "c5", mono: "PP", desc: "Power Apps, Automate, BI, centre d'admin", links: [
+    ["Power Apps", "https://make.powerapps.com"], ["Power Automate", "https://make.powerautomate.com"],
+    ["Power BI", "https://app.powerbi.com"], ["Admin Power Platform", "https://admin.powerplatform.microsoft.com"]] },
+  { id: "gh", title: "GitHub", color: "c3", mono: "GH", desc: "Tableau de bord, PR, issues, notifications", links: [
+    ["Tableau de bord", "https://github.com"], ["Pull requests", "https://github.com/pulls"],
+    ["Issues", "https://github.com/issues"], ["Notifications", "https://github.com/notifications"]] },
+  { id: "az", title: "Azure", color: "c1", mono: "AZ", desc: "Portail, Entra ID, DevOps", links: [
+    ["Portail Azure", "https://portal.azure.com"], ["Entra ID", "https://entra.microsoft.com"],
+    ["Azure DevOps", "https://dev.azure.com"]] },
+  { id: "adm", title: "Admin M365", color: "c6", mono: "AD", desc: "Centre d'admin, Exchange, Teams, sécurité", links: [
+    ["Centre d'admin", "https://admin.microsoft.com"], ["Exchange", "https://admin.exchange.microsoft.com"],
+    ["Admin Teams", "https://admin.teams.microsoft.com"], ["Sécurité", "https://security.microsoft.com"]] }
+];
+const presetNeedsTenant = p => p.links.some(([, url]) => TPL.test(url));
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const slugify = n => n.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || uid();
+// Same cleanup as the tenant editor: "https://contoso-admin.sharepoint.com" or "contoso.onmicrosoft.com" → "contoso"
+const tenantSlug = v => v.trim().toLowerCase().replace(/^https?:\/\//, "").split(/[./]/)[0].replace(/-(admin|my)$/, "");
+let W = null; // wizard draft, nothing is written until the last step
+
+function openOnboarding({ rerun = false } = {}) {
+  const s = S(), t = currentTenant();
+  W = {
+    rerun, step: 0, note: "",
+    name: s.name,
+    spaces: rerun ? state.spaces.map(x => ({ name: x.name, on: true, locked: true }))
+                  : [{ name: "Pro", on: true }, { name: "Perso", on: true }, { name: "Administration", on: false }],
+    newSpace: "",
+    tenant: rerun && t ? t.slug : "",
+    presets: new Set(),
+    imported: [],
+    layout: s.layout, bg: ["photo", "gradient", "color"].includes(s.bg.type) ? s.bg.type : "photo",
+    weather: s.weather.on, city: s.weather.city, lat: s.weather.lat, lon: s.weather.lon, cityOk: true,
+    engine: s.search.engine
+  };
+  $("#onb").hidden = false;
+  // Real modal: the page behind can't be reached with Tab or a screen reader
+  for (const el of document.body.children) if (el.id !== "onb" && el.tagName !== "SCRIPT") el.inert = true;
+  document.body.style.overflow = "hidden";
+  onbRender();
+}
+function onbClose() {
+  $("#onb").hidden = true;
+  for (const el of document.body.children) if (el.id !== "panel") el.inert = false;
+  document.body.style.overflow = "";
+  W = null;
+  q.focus({ preventScroll: true });
+}
+
+function onbStepHtml() {
+  const firstSpace = W.spaces.find(x => x.on)?.name || "Pro";
+  const needTenant = PRESETS.some(p => W.presets.has(p.id) && presetNeedsTenant(p));
+  switch (W.step) {
+    case 0: return `
+      <h1 class="onb-h1" id="onbTitle">${W.rerun ? "On reprend la configuration" : "Bienvenue sur ton cockpit"}</h1>
+      <p class="onb-lead">Quelques questions pour préparer ta page. Ça prend une minute, et tout reste modifiable ensuite dans les réglages.</p>
+      <label class="onb-field"><span>Comment veux-tu qu'on t'appelle ?</span>
+        <input class="onb-input" data-field="name" value="${esc(W.name)}" placeholder="Ton prénom" autocomplete="given-name"></label>
+      ${W.rerun ? "" : `<div class="onb-callout"><span>Tu as déjà une configuration ?</span>
+        <button class="onb-btn soft" type="button" data-act="json">Importer un .json</button></div>`}
+      <p class="onb-note ${W.noteCls || ""}">${esc(W.note)}</p>`;
+    case 1: return `
+      <div><h2 class="onb-h2" id="onbTitle">Tes espaces</h2>
+        <p class="onb-lead">Chaque espace est un onglet avec ses propres favoris. Les touches 1 à 9 permettent de passer de l'un à l'autre.</p></div>
+      <div class="onb-chips" role="group" aria-label="Espaces">
+        ${W.spaces.map((x, i) => `<button class="onb-chip" type="button" data-act="space" data-i="${i}" aria-pressed="${x.on}" ${x.locked ? "disabled" : ""}>
+          <span class="onb-check" aria-hidden="true"></span>${esc(x.name)}</button>`).join("")}
+        <div class="onb-add"><input data-field="newSpace" value="${esc(W.newSpace)}" placeholder="Autre espace…" aria-label="Nouvel espace">
+          <button type="button" data-act="addSpace">Ajouter</button></div>
+      </div>`;
+    case 2: return `
+      <div><h2 class="onb-h2" id="onbTitle">De quoi partir ?</h2>
+        <p class="onb-lead">Choisis des blocs prêts à l'emploi. Ils arrivent dans l'espace <b>${esc(firstSpace)}</b>.</p></div>
+      <div class="onb-grid" role="group" aria-label="Blocs prêts à l'emploi">
+        ${PRESETS.map(p => `<button class="onb-card-opt" type="button" data-act="preset" data-id="${p.id}" aria-pressed="${W.presets.has(p.id)}">
+          <span class="hd"><span class="mono" style="background:var(--${p.color})" aria-hidden="true">${p.mono}</span><span class="t">${p.title}</span><span class="onb-check" aria-hidden="true"></span></span>
+          <span class="d">${p.desc}</span></button>`).join("")}
+      </div>
+      ${needTenant ? `<div class="onb-field"><label for="onbTenant"><span>Ton tenant Microsoft 365</span></label>
+        <div class="onb-affix"><input class="onb-input" id="onbTenant" data-field="tenant" value="${esc(W.tenant)}" placeholder="monentreprise" autocapitalize="off" spellcheck="false" aria-describedby="onbTenantNote"><span aria-hidden="true">.sharepoint.com</span></div>
+        <p class="onb-note" id="onbTenantNote">Facultatif. Sert à construire les liens SharePoint et OneDrive. Tu pourras en ajouter d'autres ensuite.</p></div>` : ""}
+      <button class="onb-drop" type="button" data-act="bookmarks"><span class="i" aria-hidden="true">↥</span>
+        <span><b>Importer les favoris du navigateur</b><small>${W.imported.length
+          ? `${W.imported.length} dossiers, ${W.imported.reduce((n, g) => n + g.links.length, 0)} liens prêts à importer`
+          : "Fichier .html exporté depuis Safari, Chrome, Edge ou Firefox"}</small></span></button>
+      <p class="onb-note ${W.noteCls || ""}">${esc(W.note)}</p>`;
+    case 3: return `
+      <div><h2 class="onb-h2" id="onbTitle">Ton style</h2>
+        <p class="onb-lead">La disposition change l'organisation de la page. L'aperçu se met à jour.</p></div>
+      <div class="onb-grid layouts" role="group" aria-label="Disposition">
+        ${ONB_LAYOUTS.map(([id, n, d]) => `<button class="onb-card-opt" type="button" data-act="layout" data-id="${id}" aria-pressed="${W.layout === id}">
+          <span class="onb-wf ${id}" aria-hidden="true">${id === "cockpit" ? '<span class="side"></span>' : ""}<span class="col"><span class="hd"></span><span class="sr"></span><span class="bk"><i></i><i></i><i></i></span></span></span>
+          <span class="t">${n}</span><span class="d">${d}</span></button>`).join("")}
+      </div>
+      <div class="onb-field"><span id="onbBgLabel">Fond d'écran</span>
+        <div class="onb-seg" role="group" aria-labelledby="onbBgLabel">${ONB_BGS.map(([id, n]) => `<button type="button" data-act="bg" data-id="${id}" aria-pressed="${W.bg === id}">${n}</button>`).join("")}</div>
+        <p class="onb-note">${W.bg === "photo" ? "Une nouvelle photo chaque heure. Ta propre image, le flou et la luminosité se règlent ensuite."
+          : W.bg === "gradient" ? "Un dégradé basé sur la couleur d'accent." : "Un fond sobre, sans distraction."}</p></div>`;
+    case 4: return `
+      <div><h2 class="onb-h2" id="onbTitle">Météo et recherche</h2>
+        <p class="onb-lead">Pour la ligne d'infos sous la salutation.</p></div>
+      <div class="onb-field"><label for="onbCity"><span>Ville</span></label>
+        <div class="onb-row"><input class="onb-input" id="onbCity" data-field="city" value="${esc(W.city)}" placeholder="Bruxelles">
+          <button class="onb-btn soft" type="button" data-act="geo">◎ Ma position</button></div>
+        <p class="onb-note ${W.noteCls || ""}">${esc(W.note)}</p>
+        <button class="onb-switch" type="button" role="switch" data-act="weather" aria-checked="${W.weather}"><i aria-hidden="true"></i>Afficher la météo</button></div>
+      <div class="onb-field"><span id="onbEngineLabel">Moteur de recherche par défaut</span>
+        <div class="onb-seg" role="group" aria-labelledby="onbEngineLabel">${Object.entries(ENGINES).map(([id, [n]]) => `<button type="button" data-act="engine" data-id="${id}" aria-pressed="${W.engine === id}">${n}</button>`).join("")}</div></div>`;
+    case 5: {
+      const nm = W.name.trim(), sp = W.spaces.filter(x => x.on).map(x => x.name);
+      const blocks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => p.title), ...(W.imported.length ? [`${W.imported.length} dossiers importés`] : [])];
+      const rows = [
+        ["Prénom", nm || "—", 0], ["Espaces", sp.join(", ") || "—", 1],
+        ...(needTenant || W.tenant ? [["Tenant", tenantSlug(W.tenant) ? tenantSlug(W.tenant) + ".sharepoint.com" : "—", 2]] : []),
+        ["Blocs", blocks.join(", ") || "Aucun", 2],
+        ["Style", ONB_LAYOUTS.find(l => l[0] === W.layout)[1] + " · " + ONB_BGS.find(b => b[0] === W.bg)[1], 3],
+        ["Infos", (W.weather ? W.city || "—" : "Météo masquée") + " · " + ENGINES[W.engine][0], 4]
+      ];
+      return `
+      <div><div class="onb-done" aria-hidden="true">✓</div></div>
+      <div><h1 class="onb-h1" id="onbTitle">${nm ? `C'est prêt, ${esc(nm)}.` : "C'est prêt."}</h1>
+        <p class="onb-lead">Voici ce qui a été configuré. Tout reste modifiable via ⚙ en bas à droite.</p></div>
+      <div class="onb-recap">${rows.map(([k, v, st]) => `<div><span class="k">${k}</span><span class="v">${esc(v)}</span>
+        <button type="button" data-act="goto" data-step="${st}" aria-label="Modifier : ${k}">Modifier</button></div>`).join("")}</div>
+      ${S().keys ? `<div class="onb-keys"><span><kbd>/</kbd> rechercher</span><span><kbd>1–9</kbd> changer d'espace</span><span><kbd>E</kbd> mode édition</span></div>` : ""}`;
+    }
+  }
+}
+
+function onbPreview() {
+  const nm = W.name.trim(), greet = nm ? `Bonjour, ${esc(nm)}` : "Bonjour";
+  const tabs = W.spaces.filter(x => x.on).map(x => `<span>${esc(x.name)}</span>`).join("");
+  const bks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => [p.title, `var(--${p.color})`]),
+               ...W.imported.slice(0, 4).map((g, i) => [g.title, `var(--${COLORS[i % COLORS.length]})`])];
+  const time = new Date().toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit" });
+  const meta = [time, W.weather && W.city ? W.city : ""].filter(Boolean).join(" · ");
+  const pv = $("#onbPv");
+  pv.className = `onb-pv ${W.layout} ${W.bg}`;
+  pv.innerHTML = `
+    ${W.layout === "cockpit" ? `<div class="side">${greet}<s></s></div>` : ""}
+    <div class="col">
+      ${W.layout === "classic" ? `<div><div class="greet">${time}</div><div class="meta">${greet}</div></div>` : ""}
+      ${W.layout === "accueil" || W.layout === "lanceur" ? `<div><div class="greet">${greet}</div><div class="meta">${esc(meta)}</div></div>` : ""}
+      <div class="sr">Rechercher avec ${ENGINES[W.engine][0]}</div>
+      <div class="tabs">${tabs}</div>
+      ${bks.length ? `<div class="bks">${bks.map(([t, c]) => `<div class="bk"><b><i style="background:${c}"></i>${esc(t)}</b><s></s><s></s><s></s></div>`).join("")}</div>`
+                   : `<div class="empty">Aucun bloc pour l'instant</div>`}
+    </div>`;
+}
+
+// Selector that finds the same control again after a re-render (keeps keyboard focus in place)
+function onbFocusKey(el) {
+  if (!el || !$("#onb").contains(el)) return null;
+  const d = el.dataset;
+  if (d.field) return `[data-field="${d.field}"]`;
+  if (d.act) return `[data-act="${d.act}"]` + (d.id ? `[data-id="${d.id}"]` : "") + (d.i ? `[data-i="${d.i}"]` : "") + (d.step ? `[data-step="${d.step}"]` : "");
+  return el.id ? "#" + el.id : null;
+}
+function onbRender(focus = true) {
+  const st = W.step, last = ONB_STEPS.length - 1;
+  const keep = focus ? null : onbFocusKey(document.activeElement);
+  $("#onbBars").innerHTML = ONB_STEPS.map((_, i) => `<i class="${i <= st ? "on" : ""}"></i>`).join("");
+  $("#onbStep").textContent = `Étape ${st + 1} sur ${ONB_STEPS.length} · ${ONB_STEPS[st]}`;
+  $("#onbSkipAll").hidden = st === last;
+  $("#onbBack").hidden = st === 0;
+  $("#onbLater").hidden = st === 0 || st === last;
+  const nm = W.name.trim();
+  $("#onbNext").textContent = st === 0 ? (nm ? `Commencer, ${nm} →` : "Commencer →") : st === last ? "Ouvrir mon tableau de bord" : "Continuer →";
+  $("#onbBody").innerHTML = onbStepHtml();
+  $("#onbTip").textContent = ONB_TIPS[st];
+  onbPreview();
+  if (focus) ($("#onbBody input") || $("#onbTitle") || $("#onbNext")).focus({ preventScroll: true });
+  else if (keep) $("#onb").querySelector(keep)?.focus({ preventScroll: true });
+}
+
+const onbNote = (msg, cls = "") => { W.note = msg; W.noteCls = cls; $("#onbLive").textContent = msg; onbRender(false); };
+function onbGo(step) { W.step = step; W.note = ""; onbRender(); }
+
+async function onbNext() {
+  if (W.step === 4 && W.weather && !W.cityOk && W.city.trim()) {
+    const ok = await onbGeocode();
+    if (!ok) return;
+  }
+  if (W.step === ONB_STEPS.length - 1) return onbFinish(false);
+  onbGo(W.step + 1);
+}
+
+async function onbGeocode() {
+  onbNote("Recherche de la ville…");
+  try {
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(W.city)}&count=1&language=fr`);
+    const res = (await r.json()).results?.[0];
+    if (!res) { onbNote(`Aucune ville trouvée pour « ${W.city} ».`, "err"); return false; }
+    Object.assign(W, { city: res.name, lat: +res.latitude.toFixed(3), lon: +res.longitude.toFixed(3), cityOk: true });
+    onbNote(`${res.name}${res.country ? ", " + res.country : ""}`, "ok");
+    return true;
+  } catch { onbNote("Recherche impossible : pas de connexion ?", "err"); return false; }
+}
+
+function onbAddSpace() {
+  const n = W.newSpace.trim();
+  if (!n || W.spaces.some(x => x.name.toLowerCase() === n.toLowerCase())) return;
+  W.spaces.push({ name: n, on: true });
+  W.newSpace = "";
+  onbRender(false);
+  $('[data-field="newSpace"]').focus();
+  $("#onbLive").textContent = `Espace « ${n} » ajouté`;
+}
+
+function onbFinish(skip) {
+  if (!skip) {
+    const s = S();
+    // Spaces
+    const used = new Set(), spaces = [];
+    for (const x of W.spaces.filter(x => x.on)) {
+      const existing = state.spaces.find(e => e.name === x.name);
+      let id = existing?.id || slugify(x.name);
+      while (used.has(id)) id += "-2";
+      used.add(id); spaces.push({ id, name: x.name });
+    }
+    if (!spaces.length) spaces.push({ id: "pro", name: "Pro" });
+    const ids = spaces.map(x => x.id), first = ids[0];
+    // Tenant, only when a block needs one or one was typed
+    const slug = tenantSlug(W.tenant);
+    let tenants = W.rerun ? state.tenants : [];
+    if (slug && !tenants.some(t => t.slug === slug))
+      tenants = [...tenants, { id: "t-" + slug, name: slug.charAt(0).toUpperCase() + slug.slice(1), slug, domain: "", color: COLORS[tenants.length % COLORS.length] }];
+    // Blocks
+    const fresh = [
+      ...PRESETS.filter(p => W.presets.has(p.id)).map(p => ({
+        id: uid(), space: first, title: p.title, color: p.color, view: "list", collapsed: false,
+        links: p.links.map(([name, url]) => ({ id: uid(), name, url })) })),
+      ...W.imported.map((g, i) => ({
+        id: uid(), space: first, title: g.title, color: COLORS[i % COLORS.length], view: "list",
+        collapsed: g.links.length > 12, links: g.links }))
+    ];
+    // Write everything at once
+    s.name = W.name.trim();
+    s.layout = W.layout;
+    s.bg.type = W.bg;
+    Object.assign(s.weather, { on: W.weather, city: W.city, lat: W.lat, lon: W.lon });
+    s.search.engine = W.engine;
+    s.spaces.weekday = ids.includes("pro") ? "pro" : first;
+    s.spaces.weekend = ids.includes("perso") ? "perso" : first;
+    state.spaces = spaces;
+    state.tenants = tenants;
+    state.meta.tenant = tenants.find(t => t.slug === slug)?.id || tenants[0]?.id || null;
+    state.meta.space = first;
+    state.blocks = W.rerun ? [...state.blocks.filter(b => ids.includes(b.space)), ...fresh] : fresh;
+  }
+  state.meta.onboarded = Date.now();
+  save();
+  currentSpace = pickSpace();
+  onbClose();
+  applySettings(); render(); buildPanel(); applyBackground(); loadWeather(true);
+  if (!skip) toast("Tableau de bord prêt");
+}
+
+$("#onb").addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b || !W || b.disabled) return;
+  const { act, id, i, step } = b.dataset;
+  switch (act) {
+    case "space": W.spaces[i].on = !W.spaces[i].on; break;
+    case "addSpace": return onbAddSpace();
+    case "preset": W.presets.has(id) ? W.presets.delete(id) : W.presets.add(id); break;
+    case "layout": W.layout = id; break;
+    case "bg": W.bg = id; break;
+    case "engine": W.engine = id; break;
+    case "weather": W.weather = !W.weather; break;
+    case "goto": return onbGo(+step);
+    case "json": return $("#onbJson").click();
+    case "bookmarks": return $("#onbBookmarks").click();
+    case "geo":
+      if (!navigator.geolocation) return onbNote("Géolocalisation indisponible dans ce navigateur.", "err");
+      onbNote("Localisation…");
+      return navigator.geolocation.getCurrentPosition(
+        p => { Object.assign(W, { city: "Ma position", lat: +p.coords.latitude.toFixed(3), lon: +p.coords.longitude.toFixed(3), cityOk: true }); onbNote("Position utilisée pour la météo.", "ok"); },
+        () => onbNote("Position refusée. Saisis plutôt une ville.", "err"), { timeout: 10000 });
+    default: return;
+  }
+  onbRender(false);
+});
+$("#onb").addEventListener("input", e => {
+  const f = e.target.dataset.field;
+  if (!f || !W) return;
+  W[f] = f === "tenant" ? e.target.value.replace(/\s|\.sharepoint\.com.*$/gi, "") : e.target.value;
+  if (f === "city") W.cityOk = false;
+  if (f === "name") { const nm = W.name.trim(); $("#onbNext").textContent = nm ? `Commencer, ${nm} →` : "Commencer →"; }
+  onbPreview();
+});
+$("#onb").addEventListener("keydown", e => {
+  if (!W) return;
+  if (e.key === "Escape") { e.preventDefault(); return onbFinish(true); }
+  if (e.key === "Enter" && !e.isComposing) {
+    if (e.target.dataset.field === "newSpace") { e.preventDefault(); return onbAddSpace(); }
+    if (e.target.tagName === "INPUT") { e.preventDefault(); onbNext(); }
+  }
+});
+$("#onbNext").addEventListener("click", onbNext);
+$("#onbLater").addEventListener("click", () => onbGo(W.step + 1));
+$("#onbBack").addEventListener("click", () => onbGo(W.step - 1));
+$("#onbSkipAll").addEventListener("click", () => W.step === 0 && !W.rerun ? onbFinish(true) : onbGo(ONB_STEPS.length - 1));
+
+$("#onbJson").addEventListener("change", async e => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  let data = null;
+  try { data = normalize(JSON.parse(await file.text())); } catch {}
+  if (!data) return onbNote("Ce fichier n'est pas un export de Cockpit SteffPoint.", "err");
+  data.meta.onboarded = Date.now();
+  state = data; save();
+  location.reload();
+});
+$("#onbBookmarks").addEventListener("change", async e => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  let groups = [];
+  try { groups = parseBookmarks(await file.text()); } catch {}
+  if (!groups.length) return onbNote("Aucun signet trouvé dans ce fichier.", "err");
+  W.imported = groups;
+  onbNote(`${groups.length} dossiers trouvés. Ils seront ajoutés à la fin.`, "ok");
+});
+
 /* ---------- Boot ---------- */
 applySettings();
 save();
@@ -1867,6 +2398,7 @@ render();
 buildPanel();
 applyBackground();
 loadWeather();
+if (!state.meta.onboarded) openOnboarding();
 setInterval(() => { if (S().bg.type === "photo" && photoIsStale(S().bg) && S().bg.freq !== "tab") applyBackground(); loadWeather(); }, 10 * 60e3);
 </script>
 </body>
