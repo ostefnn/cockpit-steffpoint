@@ -1,6 +1,6 @@
 # Cockpit SteffPoint
 
-Page d'accueil personnelle pour Safari (et tout navigateur) : horloge, météo, recherche et favoris rangés par blocs, avec des tenants et des environnements DEV / TEST / PROD.
+Page d'accueil personnelle pour Safari (et tout navigateur) : horloge, météo, recherche et favoris rangés par blocs, avec des environnements DEV / TEST / PROD et des tenants Microsoft 365 pour ceux qui en gèrent.
 
 Un seul fichier `index.html`, sans dépendance ni serveur. Inspiré de [Bonjourr](https://bonjourr.fr).
 
@@ -9,14 +9,19 @@ Un seul fichier `index.html`, sans dépendance ni serveur. Inspiré de [Bonjourr
 ## Fonctionnalités
 
 - **Accueil** : horloge, date, salutation, météo ([Open-Meteo](https://open-meteo.com), sans clé).
-- **Fond** : photo floutée qui change chaque onglet, heure ou jour ([Picsum](https://picsum.photos)), dégradé, couleur unie, image par URL ou photo locale. Flou, luminosité et voile réglables.
-- **Recherche unifiée** : filtre les favoris en direct, Entrée ouvre le premier résultat, sinon recherche web (Bing, Google, DuckDuckGo, Ecosia).
-- **Blocs de favoris** : couleur, liste ou grille d'icônes, repli, « Afficher plus » au-delà de N liens, glisser-déposer, ajout par collage d'URL, annulation des suppressions.
+- **Dispositions** : Classique (grande horloge, par défaut), Accueil (grande salutation et liens fréquents), Cockpit (colonne d'infos à gauche, tout tient à l'écran) ou Lanceur (grande recherche et tuiles d'icônes).
+- **Fond** : photo floutée qui change à chaque onglet, chaque heure ou chaque jour ([Picsum](https://picsum.photos)), dégradé, couleur unie, image par URL ou photo locale. Flou, luminosité et voile réglables (voile d'au moins 20 % sur une photo pour garder le texte lisible).
+- **Recherche unifiée** : filtre les favoris en direct, Entrée ouvre le premier résultat, sinon lance une recherche web (Bing, Google, DuckDuckGo, Ecosia).
+- **Blocs de favoris** : couleur, liste ou grille d'icônes, repli, « Afficher plus » au-delà de N liens, glisser-déposer, ajout par collage d'URL. Quand tous les liens d'un bloc sont sur le même domaine, celui-ci s'affiche une seule fois dans l'en-tête.
+- **Icônes** : favicon demandé au site lui-même (fonctionne aussi pour les sites internes), puis à Google, sinon initiales. Une icône personnalisée par lien est possible.
+- **Liens fréquents** : les 6 liens les plus ouverts, en dispositions Accueil et Cockpit, avec `⌥1`–`⌥6`.
+- **Édition rapide** : en mode édition, le ✕ d'un lien le supprime tout de suite, avec annulation.
 - **Espaces** (Pro / Perso…) avec bascule automatique le week-end.
-- **Tenants** : dans une adresse, `{tenant}` et `{domain}` sont remplacés par le tenant choisi.
 - **Environnements** : chaque favori peut avoir une adresse DEV et TEST en plus de l'adresse principale (PROD). Hors PROD, la capsule s'entoure d'un liseré et le titre de l'onglet est préfixé `[DEV]` ou `[TEST]`.
+- **Tenants** (facultatif) : dans une adresse, `{tenant}` et `{domain}` sont remplacés par le tenant choisi. Rien n'apparaît tant qu'aucun lien n'en utilise.
 - **Réglages** façon Bonjourr, thème clair / sombre / système.
 - **Sauvegarde** : export / import JSON, import des signets Safari, rappel d'export.
+- **Accessibilité** : vise le niveau WCAG 2.2 AA. Raccourcis à une touche désactivables, alternative au glisser-déposer, contrastes vérifiés avec axe-core.
 
 ## Installation dans Safari
 
@@ -25,7 +30,7 @@ Un seul fichier `index.html`, sans dépendance ni serveur. Inspiré de [Bonjourr
 1. Safari → Réglages → Général → **Page d'accueil** : `https://ostefnn.github.io/cockpit-steffpoint/`.
 2. Choisir « Page d'accueil » pour les nouvelles fenêtres et les nouveaux onglets.
 
-**Version locale** (fonctionne hors ligne, sauf météo, photos et polices)
+**Version locale** (fonctionne hors ligne, sauf météo, photos, favicons et polices)
 
 ```bash
 git clone https://github.com/ostefnn/cockpit-steffpoint.git
@@ -48,8 +53,10 @@ Dans le stockage local (`localStorage`) du navigateur, pour l'adresse de la page
 - Elles restent d'une visite à l'autre, y compris après une mise à jour du code.
 - Elles ne suivent pas d'une adresse à l'autre (fichier local ↔ GitHub Pages), ni d'un Mac à l'autre : utilise **Réglages → Sauvegarde → Exporter**, puis **Importer**.
 - Effacer les données de sites web dans Safari les supprime : exporte régulièrement (la page te le rappelle après 14 jours).
+- Le compte des liens fréquents reste dans ce navigateur.
+- À l'import, les liens dont l'adresse n'est pas en `http`, `https`, `file`, `mailto` ou `ftp` (par exemple `javascript:`) sont écartés.
 
-Services externes appelés : Open-Meteo (météo), Picsum (photos), Google (favicons, désactivable : Réglages → Favoris → Icônes → Initiales), Google Fonts.
+Services externes appelés : Open-Meteo (météo), Picsum (photos), Google Fonts, et pour les favicons le site du lien puis Google en secours. Pour ne rien envoyer à Google, choisis Réglages → Favoris → Icônes → Initiales.
 
 ## Raccourcis
 
@@ -57,22 +64,34 @@ Services externes appelés : Open-Meteo (météo), Picsum (photos), Google (favi
 | --- | --- |
 | `/` | Rechercher |
 | `↑` `↓`, `Entrée` | Choisir et ouvrir un résultat (`⌘ Entrée` : nouvel onglet, `Maj Entrée` : recherche web) |
+| `⌥1`–`⌥6` | Ouvrir un lien fréquent (dispositions Accueil et Cockpit) |
 | `E` | Mode édition |
 | `,` | Réglages |
+| `?` | Aide |
 | `1`–`9` | Changer d'espace |
 | `T` | Tenant suivant |
 | `V` | Environnement suivant |
 | `Échap` | Fermer / vider |
 
+Les raccourcis à une touche se désactivent dans **Réglages → Général → Raccourcis à une touche** (utile avec la dictée vocale ou une aide technique).
+
+## Tenants Microsoft 365
+
+Le plus rapide : **+ Nouveau bloc** → Modèle **Admin Microsoft 365** → nom du tenant (`contoso`, ou une adresse comme `contoso.sharepoint.com`). Le bloc est créé avec SharePoint, Admin SharePoint, OneDrive, le portail Azure et les centres d'admin, et le tenant est ajouté s'il n'existe pas.
+
+Seuls SharePoint, OneDrive et Azure suivent le tenant choisi. Les centres d'admin (Microsoft 365, Entra, Teams, Exchange…) ouvrent le tenant du compte connecté.
+
+Chaque tenant a une couleur, qui entoure le sélecteur, et son nom s'ajoute au titre de l'onglet (`[CONTOSO]`) pour éviter de travailler sur le mauvais tenant.
+
 ## Liens modèles
 
 ```
-https://{tenant}.example.com          → https://client-a.example.com
-https://console.example.com/{tenant}  → https://console.example.com/client-a
-https://mail.{domain}                 → https://mail.client-a.com (si le domaine est client-a.com)
+https://{tenant}.sharepoint.com       → https://contoso.sharepoint.com
+https://console.example.com/{tenant}  → https://console.example.com/contoso
+https://mail.{domain}                 → https://mail.contoso.com (si le domaine est contoso.com)
 ```
 
-Les tenants se gèrent dans **Réglages → Tenants**. Les exemples « Client A » et « Client B » peuvent être supprimés.
+Les tenants se gèrent dans **Réglages → Tenants**. Ce groupe n'apparaît que si un tenant existe ou si un lien utilise `{tenant}`. Le sélecteur ne s'affiche que dans les espaces qui contiennent un lien modèle.
 
 ## Licence
 

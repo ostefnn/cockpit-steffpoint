@@ -47,6 +47,7 @@ body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--f-body);min-height
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 [hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .gutter{max-width:1120px;margin:0 auto;width:100%;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
 
 /* ---------- Background ---------- */
@@ -90,6 +91,7 @@ body.cards-solid .block,body.cards-solid .search,body.cards-solid .no-hit{backgr
 .sw{width:10px;height:10px;border-radius:3px;flex:none}
 .block-h h2{flex:1;min-width:0;margin:0;font:500 1rem var(--f-display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .count{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.count.host{max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .icon-btn{border:0;background:transparent;color:var(--muted);cursor:pointer;width:30px;height:30px;border-radius:7px;display:grid;place-items:center;flex:none}
 .icon-btn:hover{background:var(--tint);color:var(--fg)}
 .chev svg{transition:transform .15s}
@@ -100,6 +102,12 @@ body.cards-solid .block,body.cards-solid .search,body.cards-solid .no-hit{backgr
 .links.grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:4px}
 .lk{display:flex;align-items:center;gap:11px;padding:7px 9px;border-radius:calc(var(--radius) * .66);text-decoration:none;color:var(--fg);position:relative;min-width:0}
 .lk:hover{background:var(--tint)}
+.links li{position:relative}
+.lk-del{display:none;position:absolute;top:50%;right:6px;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;border:0;background:var(--surface);color:var(--danger);box-shadow:0 0 0 1px var(--line);cursor:pointer;place-items:center;font-size:.72rem;line-height:1}
+.lk-del:hover,.lk-del:focus-visible{background:var(--danger);color:#fff}
+body.editing .lk-del{display:grid}
+body.editing .links:not(.grid) .lk{padding-right:38px}
+.links.grid .lk-del{top:2px;right:2px;transform:none}
 .ico{width:28px;height:28px;border-radius:calc(var(--radius) * .55);display:grid;place-items:center;flex:none;font:500 .74rem var(--f-display);color:#fff;overflow:hidden}
 .ico img{width:20px;height:20px;display:block}
 .ico.img{background:var(--surface)!important;box-shadow:inset 0 0 0 1px var(--line)}
@@ -122,6 +130,7 @@ body.searching .links li:not(:has(.hit)){display:none}
 body.searching .block:not(.has-hit){display:none}
 body.searching .block.collapsed .links{display:grid}
 .lk.sel{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.lk.sel .dm{color:var(--accent-strong)}
 .lk.sel::after{content:"↵";font-size:.8rem;color:var(--accent-strong);margin-left:4px}
 .links.grid .lk.sel::after{display:none}
 .no-hit{background:var(--glass);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px dashed var(--glass-line);border-radius:var(--radius);padding:20px;text-align:center;color:var(--fg)}
@@ -158,7 +167,7 @@ a.fab{text-decoration:none}
 .fab.gear[aria-expanded="true"] svg{transform:rotate(90deg)}
 body.hide-dock .dock .fab:not([aria-expanded="true"]):not([aria-pressed="true"]){opacity:0}
 body.hide-dock .dock .fab:hover,body.hide-dock .dock .fab:focus-visible{opacity:1}
-.credit{position:fixed;left:calc(20px + env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));font-size:.8rem;color:#fff;background:rgb(0 0 0 / .3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:4px 11px;border-radius:999px;z-index:5;transition:opacity .2s}
+.credit{position:fixed;left:calc(20px + env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));font-size:.8rem;color:#fff;background:rgb(0 0 0 / .6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:4px 11px;border-radius:999px;z-index:5;transition:opacity .2s}
 body.scrolled .credit{opacity:0;pointer-events:none}
 
 /* ---------- Spaces, tenant, reminder ---------- */
@@ -169,7 +178,6 @@ body.cards-solid .tabs,body.cards-solid .context,body.cards-solid .reminder{back
 .tabs button{border:0;background:transparent;padding:6px 14px;border-radius:9px;font-weight:600;font-size:.92rem;cursor:pointer;display:flex;gap:7px;align-items:center}
 .tabs button:hover{background:var(--tint)}
 .tabs button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
-.tabs .n{font-size:.75rem;opacity:.7;font-variant-numeric:tabular-nums}
 [data-env="dev"]{--envc:var(--c6)} [data-env="test"]{--envc:var(--c5)} [data-env="prod"]{--envc:var(--accent)}
 .context{display:flex;align-items:center;gap:4px;padding:4px;margin-left:auto;flex-wrap:wrap;transition:box-shadow .2s}
 .context.off-prod{box-shadow:0 0 0 2px var(--envc),var(--shadow)}
@@ -204,7 +212,12 @@ body.cards-solid .tabs,body.cards-solid .context,body.cards-solid .reminder{back
 .le-row .n,.le-row .k{color:var(--muted);flex:none}
 .le-row .k{width:66px}
 .tenant-card{display:grid;gap:6px;padding:10px;border:1px solid var(--row-line);border-radius:12px}
+.mini-swatches{display:flex;gap:6px}
+.mini-swatches button{width:22px;height:22px;border-radius:6px;border:2px solid transparent;cursor:pointer;padding:0}
+.mini-swatches button[aria-checked="true"]{border-color:var(--fg)}
+.context .tenant-pill{box-shadow:inset 0 0 0 2px var(--tc)}
 .credit a{color:inherit}
+.panel-sig{margin:28px 0 0;text-align:center;font-size:.78rem;color:var(--muted)}
 
 /* ---------- Settings panel ---------- */
 .panel{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:var(--panel-bg);z-index:40;overflow-y:auto;overscroll-behavior:contain;padding:24px max(18px,env(safe-area-inset-right,0px)) 110px 18px;transform:translateX(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);box-shadow:-12px 0 40px rgb(0 0 0 / .18);color:var(--fg)}
@@ -277,6 +290,86 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
 .toast button{border:0;background:transparent;color:var(--accent-soft);font-weight:700;cursor:pointer;padding:4px 6px}
 .banner{position:relative;z-index:6;background:var(--warn);color:#fff;padding:8px 16px;text-align:center;font-weight:600;font-size:.9rem}
 
+/* ---------- Layouts (Classique = no class) ---------- */
+.topline{display:contents}
+.meta-line,.side-ctx,.freq{display:none}
+.side-h{font:600 .72rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.freq .side-h{display:none}
+.fq{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:999px;background:var(--glass);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid var(--glass-line);box-shadow:var(--shadow);color:var(--fg);text-decoration:none;font-size:.9rem;text-shadow:none;min-width:0}
+.fq:hover{background:var(--surface)}
+.fq .ico{width:24px;height:24px;border-radius:50%;font-size:.62rem}
+.fq .ico img{width:16px;height:16px}
+.fq .nm{max-width:16ch}
+.fq kbd{display:none}
+body.cards-solid .fq{background:var(--surface);border-color:var(--line);-webkit-backdrop-filter:none;backdrop-filter:none}
+
+body.l-accueil .hero{min-height:auto;padding-block:64px 28px;gap:22px}
+body.l-accueil .timebox,body.l-accueil .weather{display:none}
+body.l-accueil .greet{font:300 clamp(48px,6vw,76px)/1.05 var(--f-display);letter-spacing:-.02em}
+body.l-accueil .meta-line{display:block;font-size:1.15rem;opacity:.95}
+body.l-accueil .freq:not(:empty){display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:760px}
+
+body.l-cockpit .page{display:grid;grid-template-columns:340px minmax(0,1fr);gap:24px;align-items:start;max-width:1440px;margin:0 auto;padding:24px max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px))}
+body.l-cockpit .gutter{max-width:none;padding-left:0;padding-right:0}
+body.l-cockpit .hero{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;min-height:0;padding:22px;gap:20px;align-items:stretch;justify-content:flex-start;text-align:left;color:var(--fg);text-shadow:none;background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);border:1px solid var(--glass-line);border-radius:var(--radius);box-shadow:var(--shadow)}
+body.cards-solid.l-cockpit .hero{background:var(--surface);border-color:var(--line);-webkit-backdrop-filter:none;backdrop-filter:none}
+body.l-cockpit .clock{font-size:calc(3.4rem * var(--clock-scale))}
+body.l-cockpit .date{font-size:1rem;color:var(--muted)}
+body.l-cockpit .welcome{justify-items:stretch;gap:14px}
+body.l-cockpit .greet{font-size:1.5rem}
+body.l-cockpit .weather{background:var(--tint);border-radius:calc(var(--radius) * .8);padding:12px 14px}
+body.l-cockpit .w-desc{font-size:1rem}
+body.l-cockpit .w-now svg{filter:none}
+body.l-cockpit .side-ctx:not(:empty){display:grid;gap:8px}
+body.l-cockpit .side-ctx .context{margin:0;padding:0;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+body.l-cockpit .side-ctx .context.off-prod{box-shadow:0 0 0 2px var(--envc);border-radius:10px;padding:4px}
+body.l-cockpit .freq:not(:empty){display:grid;gap:2px}
+body.l-cockpit .freq .side-h{display:block;margin-bottom:6px}
+body.l-cockpit .fq{background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:8px;padding:5px 6px}
+body.l-cockpit .fq:hover{background:var(--tint)}
+body.l-cockpit .fq .ico{border-radius:calc(var(--radius) * .5)}
+body.l-cockpit .fq .nm{flex:1;max-width:none}
+body.l-cockpit .fq kbd{display:inline}
+body.l-cockpit .topline{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+body.l-cockpit .search-wrap{flex:1 1 360px;max-width:none}
+body.l-cockpit .search-hint{color:#fff;text-shadow:0 1px 10px rgb(0 0 0 / .35)}
+body.l-cockpit .search-hint:empty{display:none}
+body.l-cockpit .spacebar{flex:0 1 auto}
+body.l-cockpit .blocks{grid-template-columns:var(--cols,repeat(2,minmax(0,1fr)))}
+body.l-cockpit .links:not(.grid){grid-template-columns:repeat(2,minmax(0,1fr))}
+body.l-cockpit .links:not(.grid) .dm{display:none}
+@media (max-width:900px){
+  body.l-cockpit .page{grid-template-columns:1fr}
+  body.l-cockpit .hero{position:static;max-height:none}
+  body.l-cockpit .links:not(.grid){grid-template-columns:1fr}
+}
+@media (max-width:700px){body.l-cockpit .blocks{grid-template-columns:1fr}}
+
+body.l-lanceur .hero{min-height:auto;padding-block:28px 24px;gap:28px}
+body.l-lanceur .timebox,body.l-lanceur .weather{display:none}
+body.l-lanceur .welcome{width:100%;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px 20px;text-align:left}
+body.l-lanceur .greet{font-size:clamp(1.6rem,3vw,2.2rem)}
+body.l-lanceur .meta-line{display:block;font:300 1.4rem var(--f-display)}
+body.l-lanceur .search-wrap{max-width:760px}
+body.l-lanceur .search{background:color-mix(in srgb,var(--surface) 92%,transparent);padding-block:8px}
+body.l-lanceur .search input{font-size:1.2rem}
+body.l-lanceur .tabs{background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;gap:18px;padding:0}
+body.l-lanceur .tabs button,body.l-lanceur .tabs button[aria-selected="true"]{background:none;color:#fff;border-radius:0;padding:6px 2px;border-bottom:2px solid transparent;text-shadow:0 1px 8px rgb(0 0 0 / .35)}
+body.l-lanceur .tabs button[aria-selected="true"]{border-bottom-color:currentColor;font-weight:700}
+body.l-lanceur .tabs button:not([aria-selected="true"]){font-weight:400}
+body.l-lanceur .blocks{grid-template-columns:minmax(0,1fr)}
+body.l-lanceur .block{display:grid;grid-template-columns:270px minmax(0,1fr);align-items:stretch}
+body.l-lanceur .block-h{border-bottom:0;border-right:1px solid var(--line);align-items:flex-start;padding-top:16px;gap:6px}
+body.l-lanceur .block-h .sw{margin-top:7px}
+body.l-lanceur .block-h h2{white-space:normal;overflow-wrap:break-word;hyphens:auto;margin-right:4px}
+body.l-lanceur .block-h .count{display:none}
+body.l-lanceur .links.grid{grid-template-columns:repeat(auto-fill,96px)}
+body.l-lanceur .links.grid .lk{height:96px;justify-content:center}
+@media (max-width:700px){
+  body.l-lanceur .block{grid-template-columns:minmax(0,1fr)}
+  body.l-lanceur .block-h{border-right:0;border-bottom:1px solid var(--line);padding-top:12px}
+}
+
 @media (max-width:560px){.dm{display:none}.pill{min-width:120px}input[type=range]{width:130px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -285,19 +378,23 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
 <div class="bg" aria-hidden="true"><div class="bg-img" id="bgImg"></div><div class="bg-veil"></div></div>
 <div class="banner" id="storageBanner" hidden>Safari ne conserve pas les données de cette page. Exporte tes favoris (Réglages → Sauvegarde) pour ne rien perdre.</div>
 
+<div class="page">
 <header class="hero gutter">
+  <h1 class="sr-only">Cockpit SteffPoint</h1>
   <div class="timebox">
     <div class="clock" id="clock">--:--</div>
     <div class="date" id="date"></div>
   </div>
   <div class="welcome">
     <div class="greet" id="greet"></div>
+    <div class="meta-line" id="metaLine"></div>
     <div class="weather" id="weather" hidden>
       <p class="w-desc" id="wDesc"></p>
       <div class="w-now"><span id="wIcon"></span><span id="wTemp"></span><span class="w-range" id="wRange"></span></div>
     </div>
   </div>
-  <div class="search-wrap">
+  <div class="side-ctx" id="sideCtx"></div>
+  <div class="search-wrap" id="searchWrap">
     <form class="search" id="searchForm" role="search">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Filtrer les favoris ou chercher sur le web" autocomplete="off" spellcheck="false" aria-label="Recherche" autofocus>
@@ -306,14 +403,16 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
     </form>
     <div class="search-hint" id="hint"></div>
   </div>
+  <nav class="freq" id="freq" aria-label="Fréquents"></nav>
 </header>
 
 <main class="gutter board">
-  <div class="spacebar" id="spacebar"></div>
+  <div class="topline" id="topline"><div class="spacebar" id="spacebar"></div></div>
   <div class="reminder" id="reminder" role="status" hidden></div>
   <div class="blocks" id="blocks"></div>
   <div class="no-hit" id="noHit" hidden>Aucun favori ne correspond. <b>Entrée</b> lance la recherche web.</div>
 </main>
+</div>
 
 <div class="credit" id="credit" hidden></div>
 
@@ -329,6 +428,7 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
 <aside class="panel" id="panel" aria-label="Réglages" aria-hidden="true" inert>
   <div class="panel-top"><h2>Réglages</h2><a class="pbtn" href="aide.html" style="margin-left:auto;margin-right:8px;text-decoration:none;color:inherit">Aide</a><button class="icon-btn" id="panelClose" aria-label="Fermer les réglages">✕</button></div>
   <div id="panelBody"></div>
+  <p class="panel-sig">Cockpit SteffPoint · O. Steffen</p>
   <input type="file" id="importFile" accept="application/json,.json" hidden>
   <input type="file" id="bgFile" accept="image/*" hidden>
   <input type="file" id="bookmarkFile" accept=".html,.htm,text/html" hidden>
@@ -341,7 +441,7 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
   <header><h3 id="linkTitle">Ajouter un lien</h3><button class="icon-btn" data-close aria-label="Fermer">✕</button></header>
   <form id="linkForm" novalidate>
     <div class="field"><label for="linkUrl">Adresse principale <span class="env-tag" data-env="prod">PROD</span></label><input id="linkUrl" type="text" inputmode="url" placeholder="https://…" required spellcheck="false" autocomplete="off">
-      <p class="tip">Lien modèle : <code>{tenant}</code> devient l'identifiant du tenant choisi, <code>{domain}</code> son domaine. Ex. <code>https://{tenant}.example.com</code></p></div>
+      <p class="tip" id="linkTplTip">Lien modèle : <code>{tenant}</code> devient l'identifiant du tenant choisi, <code>{domain}</code> son domaine. Ex. <code>https://{tenant}.example.com</code></p></div>
     <details class="env-fields" id="envFields">
       <summary>Environnements DEV / TEST</summary>
       <div class="field"><label for="linkDev"><span class="env-tag" data-env="dev">DEV</span> Adresse</label><input id="linkDev" type="text" inputmode="url" placeholder="Facultatif" spellcheck="false" autocomplete="off"></div>
@@ -349,7 +449,10 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
       <p class="tip">Sans adresse pour l'environnement actif, le lien ouvre l'adresse principale.</p>
     </details>
     <div class="field"><label for="linkName">Nom</label><input id="linkName" type="text" placeholder="Deviné depuis l'adresse si vide"></div>
+    <div class="field"><label for="linkIcon">Icône</label><input id="linkIcon" type="text" inputmode="url" placeholder="Facultatif : adresse d'une image" spellcheck="false" autocomplete="off">
+      <p class="tip">Sans icône, le favicon du site est utilisé, sinon les initiales.</p></div>
     <div class="field"><label for="linkBlock">Bloc</label><select id="linkBlock"></select></div>
+    <div class="field"><label for="linkPos">Position dans le bloc</label><select id="linkPos"></select></div>
     <p class="err" id="linkErr" hidden></p>
   </form>
   <div class="actions">
@@ -361,6 +464,9 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
 <aside class="drawer" id="blockDrawer" role="dialog" aria-modal="true" aria-labelledby="blockTitle" hidden>
   <header><h3 id="blockTitle">Nouveau bloc</h3><button class="icon-btn" data-close aria-label="Fermer">✕</button></header>
   <form id="blockForm" novalidate>
+    <div class="field" id="blockTplField"><label for="blockTpl">Modèle</label><select id="blockTpl"><option value="">Bloc vide</option><option value="m365">Admin Microsoft 365</option></select></div>
+    <div class="field" id="blockTenantField" hidden><label for="blockTenant">Tenant</label><input id="blockTenant" type="text" placeholder="ex. contoso (de contoso.onmicrosoft.com)" spellcheck="false" autocomplete="off">
+      <p class="tip">Crée le tenant s'il n'existe pas. SharePoint, OneDrive et Azure suivent ensuite le tenant choisi au-dessus des blocs.</p></div>
     <div class="field"><label for="blockName">Titre</label><input id="blockName" type="text" placeholder="ex. Outils" required></div>
     <div class="field"><label for="blockSpace">Espace</label><select id="blockSpace"></select></div>
     <div class="field"><span class="legend">Couleur</span><div class="swatches" id="swatches"></div></div>
@@ -381,6 +487,7 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
 "use strict";
 const KEY = "cockpit-steffpoint";
 const COLORS = ["c1","c2","c3","c4","c5","c6"];
+const COLOR_NAMES = { c1: "Turquoise", c2: "Bleu", c3: "Ardoise", c4: "Violet", c5: "Orange", c6: "Vert" };
 const ENGINES = {
   bing: ["Bing", "https://www.bing.com/search?q="],
   google: ["Google", "https://www.google.com/search?q="],
@@ -391,7 +498,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const $ = s => document.querySelector(s);
 
 const DEFAULT_SETTINGS = {
-  name: "", theme: "auto", showAll: false, hideDock: false,
+  name: "", theme: "auto", layout: "classic", showAll: false, hideDock: false, keys: true,
   bg: { type: "photo", freq: "hour", blur: 12, bright: 85, veil: 35, color: "#0e7490", url: "", photo: null, at: 0 },
   links: { on: true, style: "glass", cols: "auto", radius: 12, newTab: false, icons: "favicon", max: 8 },
   clock: { on: true, h24: true, seconds: false, size: 100, date: "long" },
@@ -408,9 +515,9 @@ function defaults() {
   return {
     version: 1,
     settings: structuredClone(DEFAULT_SETTINGS),
-    meta: { lastExport: null, since: Date.now(), snooze: 0, space: "pro", tenant: "demo-a" },
+    meta: { lastExport: null, since: Date.now(), snooze: 0, space: "pro", tenant: null },
     spaces: DEFAULT_SPACES(),
-    tenants: [{ id: "demo-a", name: "Client A", slug: "client-a", domain: "" }, { id: "demo-b", name: "Client B", slug: "client-b", domain: "" }],
+    tenants: [],
     blocks: [
       { id: uid(), space: "perso", title: "Perso", color: "c6", view: "grid", collapsed: false, links: [
         L("YouTube", "https://www.youtube.com"), L("Wikipédia", "https://fr.wikipedia.org"),
@@ -423,11 +530,11 @@ function defaults() {
         L("GitHub", "https://github.com"), L("Stack Overflow", "https://stackoverflow.com"),
         L("MDN Web Docs", "https://developer.mozilla.org/fr/"), L("Can I use", "https://caniuse.com"),
         L("Regex101", "https://regex101.com")] },
-      { id: uid(), title: "Exemple · tenants et environnements", color: "c1", view: "list", collapsed: false, links: [
-        { id: uid(), name: "Application", url: "https://{tenant}.example.com",
-          envs: { dev: "https://dev-{tenant}.example.com", test: "https://test-{tenant}.example.com" } },
-        { id: uid(), name: "Console", url: "https://console.example.com/{tenant}",
-          envs: { dev: "https://console-dev.example.com/{tenant}", test: "" } },
+      { id: uid(), title: "Exemple · environnements", color: "c1", view: "list", collapsed: false, links: [
+        { id: uid(), name: "Application", url: "https://app.example.com",
+          envs: { dev: "https://dev-app.example.com", test: "https://test-app.example.com" } },
+        { id: uid(), name: "Console", url: "https://console.example.com",
+          envs: { dev: "https://console-dev.example.com", test: "" } },
         L("Documentation", "https://docs.example.com")] }
     ]
   };
@@ -473,7 +580,8 @@ function normalize(d) {
   if (!spaces.length) spaces = DEFAULT_SPACES();
   const spaceIds = new Set(spaces.map(s => s.id));
   const tenants = (Array.isArray(d.tenants) ? d.tenants : []).filter(t => t && t.slug)
-    .map(t => ({ id: String(t.id || uid()), name: String(t.name || t.slug), slug: String(t.slug).trim(), domain: String(t.domain || "") }));
+    .map((t, i) => ({ id: String(t.id || uid()), name: String(t.name || t.slug), slug: String(t.slug).trim(), domain: String(t.domain || ""),
+      color: COLORS.includes(t.color) ? t.color : COLORS[i % COLORS.length] }));
   const m = d.meta || {};
   return {
     version: 1,
@@ -482,17 +590,21 @@ function normalize(d) {
       lastExport: m.lastExport || null, since: +m.since || Date.now(), snooze: +m.snooze || 0,
       space: spaceIds.has(m.space) ? m.space : spaces[0].id,
       tenant: tenants.some(t => t.id === m.tenant) ? m.tenant : tenants[0]?.id || null,
-      env: ["dev", "test", "prod"].includes(m.env) ? m.env : null
+      env: ["dev", "test", "prod"].includes(m.env) ? m.env : null,
+      hits: Object.fromEntries(Object.entries(m.hits && typeof m.hits === "object" ? m.hits : {}).filter(([, n]) => +n > 0).map(([id, n]) => [id, +n]))
     },
     spaces, tenants,
     blocks: d.blocks.map(b => ({
       id: b.id || uid(), space: spaceIds.has(b.space) ? b.space : spaces[0].id,
       title: String(b.title || "Sans titre"), color: COLORS.includes(b.color) ? b.color : "c1",
       view: b.view === "grid" ? "grid" : "list", collapsed: !!b.collapsed,
-      links: (Array.isArray(b.links) ? b.links : []).filter(l => l && l.url).map(l => {
-        const link = { id: l.id || uid(), name: String(l.name || guessName(l.url)), url: String(l.url) };
-        const envs = { dev: String(l.envs?.dev || ""), test: String(l.envs?.test || "") };
+      // Imported files may come from someone else: drop javascript: and other unsafe schemes
+      links: (Array.isArray(b.links) ? b.links : []).filter(l => l && safeScheme(l.url)).map(l => {
+        const link = { id: l.id || uid(), name: String(l.name || guessName(l.url)), url: String(l.url).trim() };
+        const env = v => safeScheme(v) ? String(v).trim() : "";
+        const envs = { dev: env(l.envs?.dev), test: env(l.envs?.test) };
         if (envs.dev || envs.test) link.envs = envs;
+        if (safeScheme(l.icon) || /^data:image\//.test(l.icon)) link.icon = String(l.icon);
         return link;
       })
     }))
@@ -525,6 +637,8 @@ const ICON = {
   grip: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
   refresh: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>'
 };
+// Allow-list, so tricks like "java\tscript:" or a leading space never pass
+function safeScheme(u) { return typeof u === "string" && /^(https?|file|mailto|ftp):/i.test(u.trim()); }
 function normalizeUrl(raw) {
   let s = String(raw || "").trim();
   if (!s || /\s/.test(s)) return null;
@@ -550,6 +664,9 @@ const looksUrl = s => /^(https?:\/\/|www\.)\S+$/i.test(s.trim()) || /^[\w-]+(\.[
 /* ---------- Tenants: {tenant} / {domain} link templates ---------- */
 const TPL = /\{(tenant|domain)\}/;
 const fillTpl = (url, slug, domain) => url.replaceAll("{tenant}", slug).replaceAll("{domain}", domain || slug);
+const usesTpl = l => TPL.test(l.url) || TPL.test(l.envs?.dev || "") || TPL.test(l.envs?.test || "");
+const tenantsInUse = () => state.blocks.some(b => b.space === currentSpace && b.links.some(usesTpl));
+const tenantsAnywhere = () => state.tenants.length > 0 || state.blocks.some(b => b.links.some(usesTpl));
 const currentTenant = () => state.tenants.find(t => t.id === state.meta.tenant) || state.tenants[0] || null;
 // Returns the real address, or null when the link needs a tenant and none exists
 function resolveUrl(url) {
@@ -564,7 +681,7 @@ function normalizeLinkUrl(raw) {
   return normalizeUrl(fillTpl(withScheme, "tenant", "")) ? withScheme : null;
 }
 function cycleTenant() {
-  if (state.tenants.length < 2) return;
+  if (!tenantsInUse() || state.tenants.length < 2) return;
   const i = state.tenants.indexOf(currentTenant());
   state.meta.tenant = state.tenants[(i + 1) % state.tenants.length].id;
   save(); render();
@@ -578,7 +695,7 @@ const hasEnvLinks = () => state.blocks.some(b => b.links.some(l => l.envs));
 // Address for the active environment, falling back to the main one
 const envUrl = l => (activeEnv !== "prod" && l.envs?.[activeEnv]) || l.url;
 const usesEnvUrl = l => activeEnv !== "prod" && !!l.envs?.[activeEnv];
-const linkHref = l => resolveUrl(envUrl(l));
+const linkHref = l => { const u = resolveUrl(envUrl(l)); return safeScheme(u) ? u.trim() : null; };
 function setEnv(env) {
   activeEnv = env; state.meta.env = env;
   save(); render();
@@ -618,7 +735,13 @@ function toast(msg, undo) {
   btn.onclick = () => { $("#toast").hidden = true; undo && undo(); };
   $("#toast").hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => $("#toast").hidden = true, undo ? 7000 : 2500);
+  toastTimer = setTimeout(hideToast, undo ? 7000 : 2500);
+}
+// The toast stays while the pointer or focus is on it, so "Annuler" never vanishes mid-read
+function hideToast() {
+  const el = $("#toast");
+  if (el.matches(":hover, :focus-within")) { toastTimer = setTimeout(hideToast, 1500); return; }
+  el.hidden = true;
 }
 
 /* ---------- Favorites render ---------- */
@@ -627,10 +750,23 @@ const expanded = new Set(); // blocks opened with "Afficher plus" during this vi
 function iconFor(link, color, href) {
   const box = h("span", { class: "ico", style: `background:var(--${color})` }, initials(link.name));
   const host = href ? hostOf(href) : "";
+  // Custom icon first, then the site's own favicon (reachable on intranets), then Google
+  const srcs = link.icon ? [link.icon] : [];
+  const google = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
   if (S().links.icons === "favicon" && host) {
-    const img = h("img", { alt: "", loading: "lazy", src: `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64` });
-    img.onload = () => { if (img.naturalWidth > 1) { box.textContent = ""; box.append(img); box.classList.add("img"); } };
+    if (/^https?:/.test(href)) srcs.push(new URL(href).origin + "/favicon.ico");
+    srcs.push(google);
   }
+  const next = () => {
+    const src = srcs.shift();
+    if (!src) return;
+    // No loading="lazy": Chrome never loads a lazy image that isn't in the page yet
+    const img = h("img", { alt: "", referrerpolicy: "no-referrer", src });
+    // Google answers unknown domains with a 16 px globe: keep the initials instead
+    img.onload = () => { if (img.naturalWidth > (src === google ? 16 : 1)) { box.textContent = ""; box.append(img); box.classList.add("img"); } else next(); };
+    img.onerror = next;
+  };
+  next();
   return box;
 }
 function render() {
@@ -643,12 +779,16 @@ function render() {
   // Search looks through every space
   const visible = t ? state.blocks : state.blocks.filter(b => b.space === currentSpace);
   for (const b of visible) {
-    const list = h("ul", { class: "links" + (b.view === "grid" ? " grid" : ""), "data-block": b.id });
+    // Lanceur shows every block as a row of tiles
+    const list = h("ul", { class: "links" + (b.view === "grid" || S().layout === "lanceur" ? " grid" : ""), "data-block": b.id });
     let blockHit = false;
     // Search and edit mode always show every link
     const max = S().links.max;
     const capped = !t && !editing && max > 0 && b.links.length > max;
     const shown = capped && !expanded.has(b.id) ? b.links.slice(0, max) : b.links;
+    // When every link shares one host, show it once in the header instead of on each line
+    const hosts = new Set(b.links.map(l => hostOf(linkHref(l) || "")));
+    const commonHost = b.links.length > 1 && hosts.size === 1 ? [...hosts][0] : "";
     for (const l of shown) {
       const match = !!t && (l.name.toLowerCase().includes(t) || envUrl(l).toLowerCase().includes(t));
       const href = linkHref(l);
@@ -660,11 +800,13 @@ function render() {
         onclick: e => {
           if (editing) { e.preventDefault(); openLinkDrawer(b.id, l.id); }
           else if (!href) { e.preventDefault(); openPanelAt("tenants"); }
+          else countHit(l.id);
         }
       }, h("span", { class: "grip", "aria-hidden": "true" }, svg(ICON.grip)), iconFor(l, b.color, href), h("span", { class: "nm" }, l.name), envTag,
-        h("span", { class: "dm" }, href ? hostOf(href) : "{tenant}"));
+        commonHost ? null : h("span", { class: "dm" }, href ? hostOf(href) : "{tenant}"));
       if (match) { hits.push(a); blockHit = true; }
-      list.append(h("li", { "data-link": l.id, draggable: editing ? "true" : null }, a));
+      const del = editing ? h("button", { class: "lk-del", type: "button", title: "Supprimer", "aria-label": `Supprimer ${l.name}`, onclick: () => deleteLink(l.id) }, "✕") : null;
+      list.append(h("li", { "data-link": l.id, draggable: editing ? "true" : null }, a, del));
     }
     if (capped) {
       const open = expanded.has(b.id);
@@ -680,7 +822,7 @@ function render() {
       h("span", { class: "grip", "aria-hidden": "true" }, svg(ICON.grip)),
       h("span", { class: "sw", style: `background:var(--${b.color})` }),
       h("h2", {}, b.title),
-      h("span", { class: "count" }, String(b.links.length)),
+      commonHost ? h("span", { class: "count host", title: commonHost }, commonHost) : null,
       h("button", { class: "icon-btn chev", type: "button", "aria-label": (b.collapsed ? "Déplier " : "Replier ") + b.title, "aria-expanded": String(!b.collapsed),
         onclick: () => { b.collapsed = !b.collapsed; save(); render(); } }, svg(ICON.chev)),
       h("button", { class: "icon-btn", type: "button", "aria-label": "Options du bloc " + b.title, "aria-haspopup": "menu", onclick: e => openMenu(e.currentTarget, b.id) }, svg(ICON.more))
@@ -700,6 +842,7 @@ function render() {
   root.append(h("button", { class: "new-block", type: "button", onclick: () => openBlockDrawer() }, "+ Nouveau bloc"));
   renderSpacebar();
   renderReminder();
+  renderFreq();
 
   document.body.classList.toggle("searching", !!t);
   document.body.classList.toggle("editing", editing);
@@ -716,23 +859,26 @@ function updateHint() {
                 : `Entrée cherche « ${term} » sur ${eng}`;
 }
 
+const blockCount = id => { const n = state.blocks.filter(b => b.space === id).length; return `${n} bloc${n > 1 ? "s" : ""}`; };
 function renderSpacebar() {
   const bar = $("#spacebar");
   bar.replaceChildren();
   bar.append(state.spaces.length > 1
     ? h("div", { class: "tabs", role: "tablist", "aria-label": "Espaces" }, state.spaces.map((sp, i) =>
-        h("button", { type: "button", role: "tab", "aria-selected": String(sp.id === currentSpace && !term), title: `Touche ${i + 1}`, onclick: () => setSpace(sp.id) },
-          sp.name, h("span", { class: "n" }, String(state.blocks.filter(b => b.space === sp.id).length)))))
+        h("button", { type: "button", role: "tab", "aria-selected": String(sp.id === currentSpace && !term), title: `Touche ${i + 1} · ${blockCount(sp.id)}`, onclick: () => setSpace(sp.id) }, sp.name)))
     : h("span"));
   // One "where do my links point" capsule: tenant picker + environment switch
   const ctx = h("div", { class: "context", "data-env": activeEnv });
-  const usesTpl = state.blocks.some(b => b.links.some(l => TPL.test(l.url) || TPL.test(l.envs?.dev || "") || TPL.test(l.envs?.test || "")));
-  if (state.tenants.length) {
+  // The tenant picker only shows where it matters: spaces holding {tenant} / {domain} links
+  const showTenant = tenantsInUse();
+  if (!showTenant) {
+    // nothing to pick
+  } else if (state.tenants.length) {
     const cur = currentTenant();
-    ctx.append(h("select", { id: "tenantSel", class: "pill", title: "Tenant (touche T)", "aria-label": "Tenant",
+    ctx.append(h("select", { id: "tenantSel", class: "pill tenant-pill", style: `--tc:var(--${cur.color})`, title: "Tenant (touche T)", "aria-label": "Tenant",
       onchange: e => { state.meta.tenant = e.target.value; save(); render(); toast(`Tenant : ${currentTenant().name}`); } },
       state.tenants.map(t => h("option", { value: t.id, selected: t.id === cur.id }, t.name))));
-  } else if (usesTpl) {
+  } else {
     ctx.append(h("button", { class: "pbtn", type: "button", onclick: () => openPanelAt("tenants") }, "+ Ajouter un tenant"));
   }
   const showEnv = hasEnvLinks();
@@ -742,9 +888,16 @@ function renderSpacebar() {
       h("button", { type: "button", "data-env": id, "aria-pressed": String(activeEnv === id), title: `Ouvrir les favoris en ${label} (touche V)`, onclick: () => setEnv(id) }, label))));
   }
   ctx.classList.toggle("off-prod", showEnv && activeEnv !== "prod");
-  if (ctx.childNodes.length) bar.append(ctx);
-  // Safari tab title warns when links don't point to PROD
-  document.title = (showEnv && activeEnv !== "prod" ? `[${activeEnv.toUpperCase()}] ` : "") + "Cockpit SteffPoint";
+  // Cockpit keeps tenant + environment in the left column
+  const side = $("#sideCtx");
+  side.replaceChildren();
+  if (ctx.childNodes.length) {
+    if (S().layout === "cockpit") side.append(h("div", { class: "side-h" }, "Contexte"), ctx);
+    else bar.append(ctx);
+  }
+  // Safari tab title warns when links don't point to PROD, and names the active tenant
+  const tenantTag = showTenant && currentTenant() ? `[${currentTenant().name.toUpperCase()}] ` : "";
+  document.title = (showEnv && activeEnv !== "prod" ? `[${activeEnv.toUpperCase()}] ` : "") + tenantTag + "Cockpit SteffPoint";
 }
 function cycleEnv() {
   if (!hasEnvLinks()) return;
@@ -752,6 +905,38 @@ function cycleEnv() {
   setEnv(ids[(ids.indexOf(activeEnv) + 1) % ids.length]);
   toast(`Environnement : ${activeEnv.toUpperCase()}`);
 }
+/* ---------- Frequent links (click counts stay in this browser) ---------- */
+const FREQ_MAX = 6;
+function countHit(id) {
+  state.meta.hits[id] = (state.meta.hits[id] || 0) + 1;
+  save();
+}
+function topLinks() {
+  return Object.entries(state.meta.hits).sort((a, b) => b[1] - a[1])
+    .map(([id]) => findLink(id)).filter(Boolean).slice(0, FREQ_MAX);
+}
+function openLink(l) {
+  const href = linkHref(l);
+  if (!href) return;
+  countHit(l.id);
+  if (S().links.newTab) window.open(href, "_blank", "noopener"); else location.href = href;
+}
+function renderFreq() {
+  const nav = $("#freq");
+  nav.replaceChildren();
+  if (!["accueil", "cockpit"].includes(S().layout) || !S().links.on) return;
+  const top = topLinks();
+  if (!top.length) return;
+  const newTab = S().links.newTab;
+  nav.append(h("div", { class: "side-h" }, "Fréquents"), ...top.map(({ link: l, block: b }, i) => {
+    const href = linkHref(l);
+    return h("a", { class: "fq", href: href || "#", title: `${l.name} (⌥${i + 1})`,
+      target: newTab && href ? "_blank" : null, rel: newTab && href ? "noopener" : null,
+      onclick: e => { if (!href) { e.preventDefault(); openPanelAt("tenants"); } else countHit(l.id); } },
+      iconFor(l, b.color, href), h("span", { class: "nm" }, l.name), h("kbd", {}, `⌥${i + 1}`));
+  }));
+}
+
 function renderReminder() {
   const m = state.meta, el = $("#reminder");
   const days = Math.floor((Date.now() - (m.lastExport ? new Date(m.lastExport).getTime() : m.since)) / 864e5);
@@ -773,6 +958,19 @@ function tick() {
   const auto = hr < 5 ? "Bonne nuit" : hr < 12 ? "Bonjour" : hr < 18 ? "Bon après-midi" : "Bonsoir";
   const g = S().greet.custom.trim() || auto;
   $("#greet").textContent = S().name ? `${g}, ${S().name}` : g;
+  renderMetaLine();
+}
+// Accueil and Lanceur fold time, date and weather into one line
+let weatherLine = "";
+function renderMetaLine() {
+  const c = S().clock, parts = [];
+  if (c.on) {
+    parts.push($("#clock").textContent);
+    const date = $("#date").textContent;
+    if (c.date !== "none") parts.push(date.charAt(0).toUpperCase() + date.slice(1));
+  }
+  if (S().weather.on && weatherLine) parts.push(weatherLine);
+  $("#metaLine").textContent = parts.join(" · ");
 }
 let clockTimer;
 function startClock() { clearInterval(clockTimer); tick(); clockTimer = setInterval(tick, S().clock.seconds ? 1000 : 10000); }
@@ -812,12 +1010,14 @@ async function loadWeather(force) {
   const [, desc, icon0] = WMO.find(([codes]) => codes.includes(c.weather_code)) || [0, "Temps variable", "cloud"];
   const icon = icon0 === "sun" && !c.is_day ? "moon" : icon0;
   const t = Math.round(c.temperature_2m);
-  $("#wDesc").textContent = `${desc}. Il fait actuellement ${t}°.`;
+  $("#wDesc").textContent = desc;
   $("#wDesc").hidden = w.display !== "full";
   $("#wIcon").innerHTML = wsvg(icon);
   $("#wTemp").textContent = `${t}°`;
   $("#wRange").textContent = w.display === "full" ? `max ${Math.round(dl.temperature_2m_max[0])}° · min ${Math.round(dl.temperature_2m_min[0])}°` : "";
   $("#weather").hidden = false;
+  weatherLine = `${desc} ${t}°` + (w.display === "full" ? ` ${Math.round(dl.temperature_2m_max[0])}°/${Math.round(dl.temperature_2m_min[0])}°` : "");
+  renderMetaLine();
 }
 async function geocodeCity(name) {
   const note = $("#note-city");
@@ -949,7 +1149,8 @@ function applySettings() {
   if (s.theme === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", s.theme);
   root.style.setProperty("--blur", s.bg.blur + "px");
   root.style.setProperty("--bright", s.bg.bright / 100);
-  root.style.setProperty("--veil", s.bg.veil / 100);
+  // Photos keep a minimum veil so the white hero text stays readable on light images
+  root.style.setProperty("--veil", (bgIsImage(s) ? Math.max(s.bg.veil, 20) : s.bg.veil) / 100);
   root.style.setProperty("--clock-scale", s.clock.size / 100);
   root.style.setProperty("--radius", s.links.radius + "px");
   if (s.links.cols === "auto") root.style.removeProperty("--cols");
@@ -962,15 +1163,24 @@ function applySettings() {
   body.classList.toggle("no-greet", !s.greet.on);
   body.classList.toggle("no-weather", !s.weather.on);
   body.classList.toggle("no-search", !s.search.on);
+  for (const l of LAYOUTS) body.classList.toggle("l-" + l[0], s.layout === l[0]);
+  // Cockpit puts the search next to the space tabs; the others keep it in the hero
+  if (s.layout === "cockpit") $("#topline").prepend($("#searchWrap"));
+  else $(".hero").insertBefore($("#searchWrap"), $("#freq"));
   startClock();
 }
 
 /* ---------- Settings panel (schema-driven) ---------- */
 const bgIsImage = s => ["photo", "url", "upload"].includes(s.bg.type);
+const LAYOUTS = [["classic", "Classique"], ["accueil", "Accueil"], ["cockpit", "Cockpit"], ["lanceur", "Lanceur"]];
 const SCHEMA = [
   { title: "Général", rows: [
     { type: "toggle", path: "showAll", label: "Afficher tous les réglages" },
     { type: "select", path: "theme", label: "Mode sombre", options: [["auto", "Système"], ["light", "Clair"], ["dark", "Sombre"]] },
+    { type: "select", path: "layout", label: "Disposition", options: LAYOUTS, after: render,
+      note: "Accueil : grande salutation et fréquents. Cockpit : colonne d'infos à gauche, tout tient à l'écran. Lanceur : grande recherche et tuiles d'icônes." },
+    { type: "toggle", path: "keys", label: "Raccourcis à une touche",
+      note: "/ E T V ? , et 1 à 9. Désactive-les si tu dictes ou utilises une aide technique : une lettre ne déclenchera plus rien. Les boutons restent disponibles." },
     { type: "toggle", path: "hideDock", label: "Discrétiser les boutons flottants", adv: true, note: "Ils réapparaissent au survol. Raccourcis : , pour les réglages, E pour éditer." }
   ]},
   { title: "Arrière-plan", rows: [
@@ -998,8 +1208,11 @@ const SCHEMA = [
     { type: "select", path: "links.cols", label: "Colonnes", options: [["auto", "Automatique"], ["2", "2"], ["3", "3"], ["4", "4"]], adv: true, when: s => s.links.on },
     { type: "range", path: "links.radius", label: "Arrondi", min: 4, max: 24, unit: "px", adv: true, when: s => s.links.on },
     { type: "select", path: "links.icons", label: "Icônes", options: [["favicon", "Favicons"], ["initials", "Initiales"]], adv: true, when: s => s.links.on, after: render,
-      note: "Les favicons viennent de Google, qui reçoit le domaine de chaque lien. « Initiales » reste 100 % local." },
-    { type: "buttons", label: "Blocs", when: s => s.links.on, buttons: [["+ Nouveau bloc", () => openBlockDrawer()], ["Éditer", () => toggleEdit(true)]] }
+      note: "Le favicon est d'abord demandé au site lui-même, puis à Google, qui reçoit alors le domaine du lien. « Initiales » reste 100 % local (sauf icônes perso)." },
+    { type: "buttons", label: "Blocs", when: s => s.links.on, buttons: [["+ Nouveau bloc", () => openBlockDrawer()], ["Éditer", () => toggleEdit(true)]] },
+    { type: "buttons", label: "Fréquents", adv: true, when: s => s.links.on && ["accueil", "cockpit"].includes(s.layout),
+      buttons: [["Remettre à zéro", () => commit(() => { state.meta.hits = {}; }, "Fréquents remis à zéro")]],
+      note: "Les dispositions Accueil et Cockpit montrent tes 6 liens les plus ouverts (⌥1 à ⌥6). Le compte reste dans ce navigateur." }
   ]},
   { title: "Espaces", rows: [
     { type: "toggle", path: "spaces.auto", label: "Bascule automatique le week-end", after: () => { currentSpace = pickSpace(); render(); },
@@ -1014,7 +1227,8 @@ const SCHEMA = [
     { type: "toggle", path: "env.remember", label: "Mémoriser le dernier choisi", after: () => { activeEnv = S().env.remember && state.meta.env ? state.meta.env : S().env.def; render(); },
       note: "Un favori peut avoir une adresse DEV et TEST en plus de son adresse principale (PROD), via « Environnements » quand tu modifies le lien. Le sélecteur DEV | TEST | PROD apparaît dès qu'un favori en a une." }
   ]},
-  { title: "Tenants", id: "tenants", rows: [
+  // Only shown once tenants exist or a link uses {tenant}; a Microsoft 365 block is the usual way in
+  { title: "Tenants", id: "tenants", when: () => tenantsAnywhere(), rows: [
     { type: "custom", build: buildTenantEditor,
       note: "Dans l'adresse d'un lien, {tenant} est remplacé par l'identifiant du tenant choisi (client-a → https://client-a.example.com) et {domain} par son domaine (l'identifiant si vide). Touche T pour passer au tenant suivant." }
   ]},
@@ -1046,7 +1260,7 @@ const SCHEMA = [
     { type: "buttons", label: "Réinitialiser", adv: true, buttons: [["Revenir aux exemples", () => resetAll(), "danger"]], note: "Remplace tes blocs par les exemples. Annulable quelques secondes." }
   ]},
   { title: "Raccourcis", adv: true, html: () => h("div", { class: "keys" },
-      ["/  rechercher", "↑ ↓  choisir un résultat · Entrée ouvrir", "E  éditer les favoris", "?  aide", "1–9  changer d'espace", "T  tenant suivant", "V  environnement suivant (DEV → TEST → PROD)", ",  réglages", "Échap  fermer / vider", "Coller une URL  l'ajoute au bloc survolé"].map(t => h("div", {}, t))) }
+      ["/  rechercher", "↑ ↓  choisir un résultat · Entrée ouvrir", "⌥1–⌥6  ouvrir un fréquent (Accueil, Cockpit)", "E  éditer les favoris", "?  aide", "1–9  changer d'espace", "T  tenant suivant", "V  environnement suivant (DEV → TEST → PROD)", ",  réglages", "Échap  fermer / vider", "Coller une URL  l'ajoute au bloc survolé"].map(t => h("div", {}, t))) }
 ];
 const getP = p => p.split(".").reduce((o, k) => o?.[k], S());
 const setP = (p, v) => { const ks = p.split("."), last = ks.pop(); ks.reduce((o, k) => o[k], S())[last] = v; };
@@ -1059,6 +1273,7 @@ function buildPanel() {
     const groupT = h("div", { class: "group-t", id: g.id ? "grp-" + g.id : null }, g.title);
     const group = h("div", { class: "group" });
     if (g.adv) rows.push({ el: groupT, def: { adv: true } }, { el: group, def: { adv: true } });
+    if (g.when) rows.push({ el: groupT, def: { when: g.when } }, { el: group, def: { when: g.when } });
     body.append(groupT, group);
     if (g.html) { group.append(g.html()); continue; }
     for (const def of g.rows) {
@@ -1195,10 +1410,13 @@ function buildTenantEditor() {
       h("div", { class: "le-row" }, field("name", "Nom affiché", "Nom du tenant"),
         h("button", { class: "pbtn sq danger", type: "button", title: "Supprimer le tenant", "aria-label": `Supprimer ${t.name}`, onclick: () => deleteTenant(t.id) }, "✕")),
       h("div", { class: "le-row" }, h("span", { class: "k" }, "{tenant}"), field("slug", "client-a", "Identifiant du tenant")),
-      h("div", { class: "le-row" }, h("span", { class: "k" }, "{domain}"), field("domain", `${t.slug} (par défaut)`, "Domaine"))));
+      h("div", { class: "le-row" }, h("span", { class: "k" }, "{domain}"), field("domain", `${t.slug} (par défaut)`, "Domaine")),
+      h("div", { class: "le-row" }, h("span", { class: "k" }, "Couleur"), h("div", { class: "mini-swatches", role: "radiogroup", "aria-label": `Couleur de ${t.name}` },
+        COLORS.map(c => h("button", { type: "button", role: "radio", "aria-checked": String(t.color === c), "aria-label": COLOR_NAMES[c], title: COLOR_NAMES[c], style: `background:var(--${c})`,
+          onclick: () => { t.color = c; save(); buildPanel(); render(); } }))))));
   }
   wrap.append(h("div", {}, h("button", { class: "pbtn", type: "button", onclick: () => {
-    const t = { id: uid(), name: "Nouveau tenant", slug: "nouveau", domain: "" };
+    const t = { id: uid(), name: "Nouveau tenant", slug: "nouveau", domain: "", color: COLORS[state.tenants.length % COLORS.length] };
     state.tenants.push(t);
     state.meta.tenant = t.id;
     save(); buildPanel(); render();
@@ -1231,6 +1449,7 @@ function go(newTab, forceWeb) {
   if (!term) return;
   if (!forceWeb && hits[sel]?.classList.contains("tpl-missing")) { openPanelAt("tenants"); return; }
   const url = !forceWeb && hits[sel] ? hits[sel].href : ENGINES[S().search.engine][1] + encodeURIComponent(term);
+  if (!forceWeb && hits[sel]) countHit(hits[sel].dataset.link);
   if (newTab || (S().links.newTab && !forceWeb && hits[sel])) window.open(url, "_blank", "noopener");
   else location.href = url;
 }
@@ -1246,6 +1465,9 @@ function openMenu(anchor, blockId) {
     item("Ajouter un lien", () => openLinkDrawer(b.id)),
     item("Modifier le bloc…", () => openBlockDrawer(b.id)),
     item(b.view === "grid" ? "Afficher en liste" : "Afficher en grille d'icônes", () => { b.view = b.view === "grid" ? "list" : "grid"; save(); render(); }),
+    // Pointer-free alternative to dragging blocks (WCAG 2.5.7)
+    blockNeighbor(b, -1) ? item("Placer avant", () => moveBlock(b, -1)) : null,
+    blockNeighbor(b, 1) ? item("Placer après", () => moveBlock(b, 1)) : null,
     ...state.spaces.filter(sp => sp.id !== b.space).map(sp => item(`Déplacer vers ${sp.name}`, () => {
       commit(() => { b.space = sp.id; }, `« ${b.title} » déplacé vers ${sp.name}`);
     })),
@@ -1259,6 +1481,15 @@ function openMenu(anchor, blockId) {
   menu.querySelector("button").focus();
 }
 function closeMenu() { menu.hidden = true; }
+const blockNeighbor = (b, dir) => { const same = state.blocks.filter(x => x.space === b.space); return same[same.indexOf(b) + dir]; };
+function moveBlock(b, dir) {
+  const other = blockNeighbor(b, dir);
+  commit(() => {
+    const i = state.blocks.indexOf(b), j = state.blocks.indexOf(other);
+    [state.blocks[i], state.blocks[j]] = [other, b];
+  });
+  document.querySelector(`.block[data-block="${b.id}"] .block-h button[aria-haspopup]`)?.focus();
+}
 function openAll(b) {
   const urls = b.links.map(linkHref).filter(Boolean);
   let blocked = 0;
@@ -1297,14 +1528,27 @@ function openLinkDrawer(blockId, linkId, presetUrl) {
   $("#linkTitle").textContent = found ? "Modifier le lien" : "Ajouter un lien";
   $("#linkUrl").value = found ? found.link.url : (presetUrl || "");
   $("#linkName").value = found ? found.link.name : "";
+  $("#linkIcon").value = found?.link.icon || "";
+  $("#linkTplTip").hidden = !tenantsAnywhere();
   $("#linkDev").value = found?.link.envs?.dev || "";
   $("#linkTest").value = found?.link.envs?.test || "";
   $("#envFields").open = !!found?.link.envs;
   $("#linkBlock").replaceChildren(...state.blocks.map(b => h("option", { value: b.id, selected: b.id === (found ? found.block.id : blockId) }, b.title)));
+  fillLinkPos(found ? found.index : null);
   $("#linkDelete").hidden = !found;
   $("#linkErr").hidden = true;
   showDrawer($("#linkDrawer"));
 }
+// Pointer-free alternative to drag-and-drop (WCAG 2.5.7): pick the slot from a list
+function fillLinkPos(current) {
+  const b = findBlock($("#linkBlock").value);
+  if (!b) { $("#linkPos").replaceChildren(); return; }
+  const others = b.links.filter(l => l.id !== editLinkId);
+  const at = current ?? others.length;
+  $("#linkPos").replaceChildren(...others.map((l, i) => h("option", { value: i, selected: i === at }, `Avant « ${l.name} »`)),
+    h("option", { value: others.length, selected: at >= others.length }, others.length ? "À la fin" : "Premier lien"));
+}
+$("#linkBlock").addEventListener("change", () => fillLinkPos(null));
 $("#linkUrl").addEventListener("blur", () => {
   const u = normalizeLinkUrl($("#linkUrl").value);
   if (u && !$("#linkName").value.trim()) $("#linkName").placeholder = guessName(fillTpl(u, "tenant", ""));
@@ -1321,32 +1565,41 @@ $("#linkForm").addEventListener("submit", e => {
   }
   const linkEnvs = envs.dev || envs.test ? { dev: envs.dev || "", test: envs.test || "" } : undefined;
   if (!url) { $("#linkErr").textContent = "Cette adresse n'est pas valide. Exemple : https://github.com ou https://{tenant}.example.com"; $("#linkErr").hidden = false; return; }
+  const rawIcon = $("#linkIcon").value.trim();
+  const icon = /^data:image\//.test(rawIcon) ? rawIcon : rawIcon && normalizeUrl(rawIcon);
+  if (rawIcon && !icon) { $("#linkErr").textContent = "L'adresse de l'icône n'est pas valide."; $("#linkErr").hidden = false; return; }
   if (!state.blocks.length) { $("#linkErr").textContent = "Crée d'abord un bloc pour y ranger ce lien."; $("#linkErr").hidden = false; return; }
   const name = $("#linkName").value.trim() || guessName(fillTpl(url, "tenant", ""));
   const target = findBlock($("#linkBlock").value) || state.blocks[0];
+  const pos = +$("#linkPos").value;
   const wasEdit = !!editLinkId;
   commit(() => {
     if (editLinkId) {
       const f = findLink(editLinkId);
       Object.assign(f.link, { name, url });
       if (linkEnvs) f.link.envs = linkEnvs; else delete f.link.envs;
-      if (f.block !== target) { f.block.links.splice(f.index, 1); target.links.push(f.link); }
+      if (icon) f.link.icon = icon; else delete f.link.icon;
+      f.block.links.splice(f.index, 1);
+      target.links.splice(pos, 0, f.link);
     } else {
-      target.links.push(linkEnvs ? { id: uid(), name, url, envs: linkEnvs } : { id: uid(), name, url });
+      const link = { id: uid(), name, url };
+      if (linkEnvs) link.envs = linkEnvs;
+      if (icon) link.icon = icon;
+      target.links.splice(pos, 0, link);
       target.collapsed = false;
     }
   });
   closeDrawer();
   toast(wasEdit ? "Lien mis à jour" : `Lien ajouté à « ${target.title} »`);
 });
-$("#linkDelete").addEventListener("click", () => {
-  const f = findLink(editLinkId);
-  closeDrawer();
+function deleteLink(id) {
+  const f = findLink(id);
   commit(() => f.block.links.splice(f.index, 1), `« ${f.link.name} » supprimé`);
-});
+}
+$("#linkDelete").addEventListener("click", () => { const id = editLinkId; closeDrawer(); deleteLink(id); });
 
 let editBlockId = null;
-$("#swatches").append(...COLORS.map(c => h("label", { title: c }, h("input", { type: "radio", name: "blockColor", value: c }), h("span", { style: `background:var(--${c})` }))));
+$("#swatches").append(...COLORS.map(c => h("label", { title: COLOR_NAMES[c] }, h("input", { type: "radio", name: "blockColor", value: c, "aria-label": COLOR_NAMES[c] }), h("span", { style: `background:var(--${c})` }))));
 function openBlockDrawer(id) {
   editBlockId = id || null;
   const b = id ? findBlock(id) : null;
@@ -1359,8 +1612,31 @@ function openBlockDrawer(id) {
   document.querySelector(`input[name=blockView][value=${b ? b.view : "list"}]`).checked = true;
   $("#blockDelete").hidden = !b;
   $("#blockErr").hidden = true;
+  $("#blockTplField").hidden = !!b;
+  $("#blockTpl").value = "";
+  $("#blockTenant").value = state.tenants.length ? currentTenant().slug : "";
+  $("#blockTenantField").hidden = true;
   showDrawer($("#blockDrawer"));
 }
+// Links whose address follows the chosen tenant; the admin centers open the signed-in account's tenant
+const M365_LINKS = [
+  ["SharePoint", "https://{tenant}.sharepoint.com"],
+  ["Admin SharePoint", "https://{tenant}-admin.sharepoint.com"],
+  ["OneDrive", "https://{tenant}-my.sharepoint.com"],
+  ["Portail Azure", "https://portal.azure.com/#@{tenant}.onmicrosoft.com"],
+  ["Admin Microsoft 365", "https://admin.microsoft.com"],
+  ["Entra ID", "https://entra.microsoft.com"],
+  ["Admin Teams", "https://admin.teams.microsoft.com"],
+  ["Admin Exchange", "https://admin.exchange.microsoft.com"],
+  ["Purview", "https://purview.microsoft.com"],
+  ["Admin Power Platform", "https://admin.powerplatform.microsoft.com"]
+];
+$("#blockTpl").addEventListener("change", e => {
+  const m365 = e.target.value === "m365";
+  $("#blockTenantField").hidden = !m365;
+  if (m365 && !$("#blockName").value.trim()) $("#blockName").value = "Microsoft 365";
+  if (m365) $("#blockTenant").focus();
+});
 $("#blockForm").addEventListener("submit", e => {
   e.preventDefault();
   const title = $("#blockName").value.trim();
@@ -1368,11 +1644,25 @@ $("#blockForm").addEventListener("submit", e => {
   const color = document.querySelector("input[name=blockColor]:checked").value;
   const view = document.querySelector("input[name=blockView]:checked").value;
   const space = $("#blockSpace").value;
+  const m365 = !editBlockId && $("#blockTpl").value === "m365";
+  // Same cleanup as the tenant editor: "https://contoso.sharepoint.com" or "contoso.onmicrosoft.com" → "contoso"
+  const slug = $("#blockTenant").value.trim().toLowerCase().replace(/^https?:\/\//, "").split(/[./]/)[0].replace(/-(admin|my)$/, "");
+  if (m365 && !slug) { $("#blockErr").textContent = "Indique le nom du tenant, par exemple contoso."; $("#blockErr").hidden = false; return; }
   commit(() => {
     if (editBlockId) Object.assign(findBlock(editBlockId), { title, color, view, space });
+    else if (m365) {
+      let t = state.tenants.find(x => x.slug === slug);
+      if (!t) {
+        t = { id: uid(), name: slug.charAt(0).toUpperCase() + slug.slice(1), slug, domain: "", color: COLORS[state.tenants.length % COLORS.length] };
+        state.tenants.push(t);
+      }
+      state.meta.tenant = t.id;
+      state.blocks.push({ id: uid(), space, title, color, view, collapsed: false, links: M365_LINKS.map(([name, url]) => ({ id: uid(), name, url })) });
+    }
     else state.blocks.push({ id: uid(), space, title, color, view, collapsed: false, links: [] });
   });
   closeDrawer();
+  if (m365) toast(`Bloc Microsoft 365 créé pour « ${currentTenant().name} »`);
 });
 $("#blockDelete").addEventListener("click", () => { const id = editBlockId; closeDrawer(); deleteBlock(id); });
 
@@ -1545,7 +1835,15 @@ document.addEventListener("keydown", e => {
     else if (editing) toggleEdit(false);
     return;
   }
+  // ⌥1–6 opens the frequent links shown by Accueil and Cockpit
+  if (!openDrawer && e.altKey && !e.metaKey && !e.ctrlKey && /^Digit[1-9]$/.test(e.code) && $("#freq").childNodes.length) {
+    const f = topLinks()[+e.code.slice(5) - 1];
+    if (f) { e.preventDefault(); openLink(f.link); }
+    return;
+  }
   if (openDrawer || e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.("input,textarea,select")) return;
+  // WCAG 2.1.4: single-character shortcuts can be turned off
+  if (!S().keys) return;
   if (e.key === "/") { e.preventDefault(); q.focus(); q.select(); }
   else if (e.key === "e" || e.key === "E") toggleEdit();
   else if (e.key === ",") togglePanel();
