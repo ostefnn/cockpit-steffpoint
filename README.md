@@ -8,6 +8,7 @@ Un seul fichier `index.html`, sans dépendance ni serveur. Inspiré de [Bonjourr
 
 ## Fonctionnalités
 
+- **Assistant de démarrage** : à la première ouverture, 6 étapes pour choisir prénom, espaces, blocs prêts à l'emploi (Microsoft 365, SharePoint, Power Platform, GitHub, Azure, Admin M365) ou import de signets, disposition, fond, météo et moteur de recherche. Relançable depuis les réglages, sans rien supprimer.
 - **Accueil** : horloge, date, salutation, météo ([Open-Meteo](https://open-meteo.com), sans clé).
 - **Dispositions** : Classique (grande horloge, par défaut), Accueil (grande salutation et liens fréquents), Cockpit (colonne d'infos à gauche, tout tient à l'écran) ou Lanceur (grande recherche et tuiles d'icônes).
 - **Fond** : photo floutée qui change à chaque onglet, chaque heure ou chaque jour ([Picsum](https://picsum.photos)), dégradé, couleur unie, image par URL ou photo locale. Flou, luminosité et voile réglables (voile d'au moins 20 % sur une photo pour garder le texte lisible).
