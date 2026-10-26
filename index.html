@@ -669,7 +669,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const $ = s => document.querySelector(s);
 
 const DEFAULT_SETTINGS = {
-  name: "", theme: "auto", layout: "classic", showAll: false, hideDock: false, keys: true,
+  name: "", lang: "auto", theme: "auto", layout: "classic", showAll: false, hideDock: false, keys: true,
   bg: { type: "photo", freq: "hour", blur: 12, bright: 85, veil: 35, color: "#0e7490", url: "", photo: null, at: 0 },
   links: { on: true, style: "glass", cols: "auto", radius: 12, newTab: false, icons: "favicon", max: 8 },
   clock: { on: true, h24: true, seconds: false, size: 100, date: "long" },
@@ -679,7 +679,7 @@ const DEFAULT_SETTINGS = {
   spaces: { auto: true, weekday: "pro", weekend: "perso" },
   env: { def: "prod", remember: true }
 };
-const DEFAULT_SPACES = () => [{ id: "pro", name: "Pro" }, { id: "perso", name: "Perso" }];
+const DEFAULT_SPACES = () => [{ id: "pro", name: tr("Pro") }, { id: "perso", name: tr("Perso") }];
 
 function defaults() {
   const L = (name, url) => ({ id: uid(), name, url });
@@ -690,25 +690,492 @@ function defaults() {
     spaces: DEFAULT_SPACES(),
     tenants: [],
     blocks: [
-      { id: uid(), space: "perso", title: "Perso", color: "c6", view: "grid", collapsed: false, links: [
-        L("YouTube", "https://www.youtube.com"), L("Wikipédia", "https://fr.wikipedia.org"),
-        L("Actualités", "https://news.google.com"), L("Musique", "https://music.youtube.com")] },
-      { id: uid(), title: "Quotidien", color: "c4", view: "grid", collapsed: false, links: [
-        L("Messagerie", "https://mail.google.com"), L("Agenda", "https://calendar.google.com"),
-        L("Documents", "https://drive.google.com"), L("Traduction", "https://www.deepl.com/translator"),
-        L("Cartes", "https://maps.google.com")] },
-      { id: uid(), title: "Développement", color: "c3", view: "list", collapsed: false, links: [
+      { id: uid(), space: "perso", title: tr("Perso"), color: "c6", view: "grid", collapsed: false, links: [
+        L("YouTube", "https://www.youtube.com"), L(tr("Wikipédia"), `https://${lang}.wikipedia.org`),
+        L(tr("Actualités"), "https://news.google.com"), L(tr("Musique"), "https://music.youtube.com")] },
+      { id: uid(), title: tr("Quotidien"), color: "c4", view: "grid", collapsed: false, links: [
+        L(tr("Messagerie"), "https://mail.google.com"), L(tr("Agenda"), "https://calendar.google.com"),
+        L(tr("Documents"), "https://drive.google.com"), L(tr("Traduction"), "https://www.deepl.com/translator"),
+        L(tr("Cartes"), "https://maps.google.com")] },
+      { id: uid(), title: tr("Développement"), color: "c3", view: "list", collapsed: false, links: [
         L("GitHub", "https://github.com"), L("Stack Overflow", "https://stackoverflow.com"),
         L("MDN Web Docs", "https://developer.mozilla.org/fr/"), L("Can I use", "https://caniuse.com"),
         L("Regex101", "https://regex101.com")] },
-      { id: uid(), title: "Exemple · environnements", color: "c1", view: "list", collapsed: false, links: [
+      { id: uid(), title: tr("Exemple · environnements"), color: "c1", view: "list", collapsed: false, links: [
         { id: uid(), name: "Application", url: "https://app.example.com",
           envs: { dev: "https://dev-app.example.com", test: "https://test-app.example.com" } },
         { id: uid(), name: "Console", url: "https://console.example.com",
           envs: { dev: "https://console-dev.example.com", test: "" } },
-        L("Documentation", "https://docs.example.com")] }
+        L(tr("Documentation"), "https://docs.example.com")] }
     ]
   };
+}
+
+/* ---------- Languages: French is the source text, each entry gives [English, Dutch (Belgium)] ---------- */
+const LANG_IDS = ["fr", "en", "nl"];
+const LANGS = [["auto", "Automatique (navigateur)"], ["fr", "Français"], ["en", "English"], ["nl", "Nederlands"]];
+const I18N = {
+  // Page, search, dock
+  "Safari ne conserve pas les données de cette page. Exporte tes favoris (Réglages → Sauvegarde) pour ne rien perdre.": ["Safari doesn't keep this page's data. Export your favorites (Settings → Backup) so nothing gets lost.", "Safari bewaart de gegevens van deze pagina niet. Exporteer je favorieten (Instellingen → Back-up) zodat je niets kwijtraakt."],
+  "Filtrer les favoris ou chercher sur le web": ["Filter favorites or search the web", "Favorieten filteren of op het web zoeken"],
+  "Recherche": ["Search", "Zoeken"],
+  "Fréquents": ["Frequent", "Vaak gebruikt"],
+  "Aucun favori ne correspond.": ["No favorite matches.", "Geen enkele favoriet komt overeen."],
+  "Entrée": ["Enter", "Enter"],
+  "lance la recherche web.": ["searches the web.", "zoekt op het web."],
+  "Aide (?)": ["Help (?)", "Help (?)"],
+  "Aide": ["Help", "Help"],
+  "Éditer les favoris (E)": ["Edit favorites (E)", "Favorieten bewerken (E)"],
+  "Éditer les favoris": ["Edit favorites", "Favorieten bewerken"],
+  "Réglages (,)": ["Settings (,)", "Instellingen (,)"],
+  "Réglages": ["Settings", "Instellingen"],
+  "Fermer les réglages": ["Close settings", "Instellingen sluiten"],
+  "Fermer": ["Close", "Sluiten"],
+  "Ouvrir": ["Open", "Openen"],
+  "{n} favori · ↑↓ pour choisir · Entrée ouvre · ⌘ Entrée nouvel onglet · Maj Entrée cherche sur {eng}": ["{n} favorite · ↑↓ to choose · Enter opens · ⌘ Enter new tab · Shift Enter searches {eng}", "{n} favoriet · ↑↓ om te kiezen · Enter opent · ⌘ Enter nieuw tabblad · Shift Enter zoekt op {eng}"],
+  "{n} favoris · ↑↓ pour choisir · Entrée ouvre · ⌘ Entrée nouvel onglet · Maj Entrée cherche sur {eng}": ["{n} favorites · ↑↓ to choose · Enter opens · ⌘ Enter new tab · Shift Enter searches {eng}", "{n} favorieten · ↑↓ om te kiezen · Enter opent · ⌘ Enter nieuw tabblad · Shift Enter zoekt op {eng}"],
+  "Entrée cherche « {term} » sur {eng}": ["Enter searches “{term}” on {eng}", "Enter zoekt „{term}” op {eng}"],
+
+  // Blocks and links
+  "Ajoute un tenant pour ouvrir ce lien": ["Add a tenant to open this link", "Voeg een tenant toe om deze link te openen"],
+  "Supprimer": ["Delete", "Verwijderen"],
+  "Supprimer {name}": ["Delete {name}", "{name} verwijderen"],
+  "Afficher moins": ["Show less", "Minder tonen"],
+  "Afficher plus ({n})": ["Show more ({n})", "Meer tonen ({n})"],
+  "Glisse un lien ici, colle une URL, ou passe en mode édition.": ["Drag a link here, paste a URL, or switch to edit mode.", "Sleep hier een link naartoe, plak een URL of schakel over naar bewerkmodus."],
+  "+ Ajouter un lien": ["+ Add a link", "+ Link toevoegen"],
+  "Déplier {name}": ["Expand {name}", "{name} openklappen"],
+  "Replier {name}": ["Collapse {name}", "{name} dichtklappen"],
+  "Options du bloc {name}": ["Options for block {name}", "Opties voor blok {name}"],
+  "Aucun bloc dans « {name} » pour l'instant.": ["No blocks in “{name}” yet.", "Nog geen blokken in „{name}”."],
+  "Cet espace s'ouvre automatiquement le week-end.": ["This space opens automatically at the weekend.", "Deze ruimte opent automatisch in het weekend."],
+  "Cet espace s'ouvre automatiquement en semaine.": ["This space opens automatically on weekdays.", "Deze ruimte opent automatisch op weekdagen."],
+  "+ Nouveau bloc": ["+ New block", "+ Nieuw blok"],
+  "Voir {name}": ["View {name}", "{name} bekijken"],
+  "{n} bloc": ["{n} block", "{n} blok"],
+  "{n} blocs": ["{n} blocks", "{n} blokken"],
+  "Espaces": ["Spaces", "Ruimtes"],
+  "Touche {k}": ["Key {k}", "Toets {k}"],
+  "Tenant (touche T)": ["Tenant (T key)", "Tenant (toets T)"],
+  "Tenant": ["Tenant", "Tenant"],
+  "Tenant : {name}": ["Tenant: {name}", "Tenant: {name}"],
+  "+ Ajouter un tenant": ["+ Add a tenant", "+ Tenant toevoegen"],
+  "Environnement (touche V)": ["Environment (V key)", "Omgeving (toets V)"],
+  "Ouvrir les favoris en {env} (touche V)": ["Open favorites in {env} (V key)", "Favorieten openen in {env} (toets V)"],
+  "Environnement : {env}": ["Environment: {env}", "Omgeving: {env}"],
+  "Contexte": ["Context", "Context"],
+  "Modification annulée": ["Change undone", "Wijziging ongedaan gemaakt"],
+  "Dernière sauvegarde il y a {n} jours.": ["Last backup {n} days ago.", "Laatste back-up {n} dagen geleden."],
+  "Tes favoris n'ont encore jamais été exportés.": ["Your favorites have never been exported.", "Je favorieten zijn nog nooit geëxporteerd."],
+  "Un export les protège si Safari efface ses données.": ["An export protects them if Safari clears its data.", "Een export beschermt ze als Safari zijn gegevens wist."],
+  "Exporter": ["Export", "Exporteren"],
+  "Dans 7 jours": ["In 7 days", "Over 7 dagen"],
+
+  // Greeting and weather
+  "Bonne nuit": ["Good night", "Goedenacht"],
+  "Bonjour": ["Good morning", "Goedemorgen"],
+  "Bon après-midi": ["Good afternoon", "Goedemiddag"],
+  "Bonsoir": ["Good evening", "Goedenavond"],
+  "Ciel dégagé": ["Clear sky", "Onbewolkt"],
+  "Plutôt dégagé": ["Mostly clear", "Overwegend helder"],
+  "Partiellement nuageux": ["Partly cloudy", "Gedeeltelijk bewolkt"],
+  "Couvert": ["Overcast", "Bewolkt"],
+  "Brouillard": ["Fog", "Mist"],
+  "Bruine": ["Drizzle", "Motregen"],
+  "Pluie": ["Rain", "Regen"],
+  "Neige": ["Snow", "Sneeuw"],
+  "Averses": ["Showers", "Buien"],
+  "Averses de neige": ["Snow showers", "Sneeuwbuien"],
+  "Orage": ["Thunderstorm", "Onweer"],
+  "Temps variable": ["Changeable weather", "Wisselvallig weer"],
+  "Recherche…": ["Searching…", "Zoeken…"],
+  "Aucune ville trouvée pour « {name} ».": ["No city found for “{name}”.", "Geen stad gevonden voor „{name}”."],
+  "Recherche impossible : pas de connexion ?": ["Search failed: no connection?", "Zoeken mislukt: geen verbinding?"],
+  "Géolocalisation indisponible dans ce navigateur.": ["Geolocation isn't available in this browser.", "Geolocatie is niet beschikbaar in deze browser."],
+  "Localisation…": ["Locating…", "Locatie bepalen…"],
+  "Ma position": ["My location", "Mijn locatie"],
+  "Position utilisée pour la météo.": ["Location used for the weather.", "Locatie gebruikt voor het weer."],
+  "Safari a refusé la position. Saisis plutôt une ville.": ["Safari refused the location. Type a city instead.", "Safari weigerde de locatie. Typ liever een stad."],
+
+  // Background
+  "Image de fond introuvable, retour au dégradé": ["Background image not found, back to the gradient", "Achtergrondafbeelding niet gevonden, terug naar het verloop"],
+  "Photo : ": ["Photo: ", "Foto: "],
+  "Image trop lourde pour le stockage de Safari. Essaie une image plus petite.": ["Image too large for Safari's storage. Try a smaller one.", "Afbeelding te groot voor de opslag van Safari. Probeer een kleinere."],
+  "{name} enregistrée.": ["{name} saved.", "{name} opgeslagen."],
+  "Ce fichier n'est pas une image lisible.": ["This file isn't a readable image.", "Dit bestand is geen leesbare afbeelding."],
+
+  // Settings panel
+  "Général": ["General", "Algemeen"],
+  "Afficher tous les réglages": ["Show all settings", "Alle instellingen tonen"],
+  "Langue": ["Language", "Taal"],
+  "Automatique (navigateur)": ["Automatic (browser)", "Automatisch (browser)"],
+  "Mode sombre": ["Dark mode", "Donkere modus"],
+  "Système": ["System", "Systeem"],
+  "Clair": ["Light", "Licht"],
+  "Sombre": ["Dark", "Donker"],
+  "Disposition": ["Layout", "Indeling"],
+  "Classique": ["Classic", "Klassiek"],
+  "Accueil": ["Welcome", "Welkom"],
+  "Cockpit": ["Cockpit", "Cockpit"],
+  "Lanceur": ["Launcher", "Starter"],
+  "Accueil : grande salutation et fréquents. Cockpit : colonne d'infos à gauche, tout tient à l'écran. Lanceur : grande recherche et tuiles d'icônes.": ["Welcome: big greeting and frequent links. Cockpit: info column on the left, everything fits on screen. Launcher: big search and icon tiles.", "Welkom: grote begroeting en vaak gebruikte links. Cockpit: infokolom links, alles past op het scherm. Starter: grote zoekbalk en icoontegels."],
+  "Assistant": ["Assistant", "Assistent"],
+  "Relancer l'assistant": ["Run the assistant again", "Assistent opnieuw starten"],
+  "Ajoute des espaces et des blocs sans toucher à l'existant.": ["Adds spaces and blocks without touching what you have.", "Voegt ruimtes en blokken toe zonder aan het bestaande te raken."],
+  "Raccourcis à une touche": ["Single-key shortcuts", "Sneltoetsen met één toets"],
+  "/ E T V ? , et 1 à 9. Désactive-les si tu dictes ou utilises une aide technique : une lettre ne déclenchera plus rien. Les boutons restent disponibles.": ["/ E T V ? , and 1 to 9. Turn them off if you dictate or use assistive technology: a letter will no longer trigger anything. The buttons stay available.", "/ E T V ? , en 1 tot 9. Schakel ze uit als je dicteert of hulptechnologie gebruikt: een letter doet dan niets meer. De knoppen blijven beschikbaar."],
+  "Discrétiser les boutons flottants": ["Tone down the floating buttons", "Zwevende knoppen minder opvallend"],
+  "Ils réapparaissent au survol. Raccourcis : , pour les réglages, E pour éditer.": ["They reappear on hover. Shortcuts: , for settings, E to edit.", "Ze verschijnen opnieuw bij aanwijzen. Sneltoetsen: , voor instellingen, E om te bewerken."],
+  "Arrière-plan": ["Background", "Achtergrond"],
+  "Type d'arrière-plan": ["Background type", "Soort achtergrond"],
+  "Photos": ["Photos", "Foto's"],
+  "Dégradé SteffPoint": ["SteffPoint gradient", "SteffPoint-verloop"],
+  "Couleur unie": ["Solid color", "Effen kleur"],
+  "Ma photo": ["My photo", "Mijn foto"],
+  "Image (URL)": ["Image (URL)", "Afbeelding (URL)"],
+  "Fréquence": ["Frequency", "Frequentie"],
+  "Chaque onglet": ["Every tab", "Elk tabblad"],
+  "Chaque heure": ["Every hour", "Elk uur"],
+  "Chaque jour": ["Every day", "Elke dag"],
+  "En pause": ["Paused", "Gepauzeerd"],
+  "Nouvelle photo": ["New photo", "Nieuwe foto"],
+  "Photos libres de droits fournies par Picsum (Unsplash).": ["Royalty-free photos provided by Picsum (Unsplash).", "Rechtenvrije foto's van Picsum (Unsplash)."],
+  "Adresse de l'image": ["Image address", "Adres van de afbeelding"],
+  "Image": ["Image", "Afbeelding"],
+  "Choisir…": ["Choose…", "Kiezen…"],
+  "Reste sur ce Mac, n'est pas incluse dans l'export.": ["Stays on this Mac, not included in the export.", "Blijft op deze Mac, zit niet in de export."],
+  "Couleur": ["Color", "Kleur"],
+  "Intensité du flou": ["Blur strength", "Vervaging"],
+  "Luminosité": ["Brightness", "Helderheid"],
+  "Voile de couleur": ["Color overlay", "Kleurfilter"],
+  "Favoris": ["Favorites", "Favorieten"],
+  "Afficher les favoris": ["Show favorites", "Favorieten tonen"],
+  "Style des blocs": ["Block style", "Stijl van de blokken"],
+  "Verre dépoli": ["Frosted glass", "Matglas"],
+  "Opaque": ["Opaque", "Ondoorzichtig"],
+  "Ouvrir dans un nouvel onglet": ["Open in a new tab", "Openen in een nieuw tabblad"],
+  "Liens visibles par bloc": ["Visible links per block", "Zichtbare links per blok"],
+  "Tous": ["All", "Alle"],
+  "Au-delà, un bouton « Afficher plus » ouvre le reste. La recherche trouve toujours tous les liens.": ["Beyond that, a “Show more” button opens the rest. Search always finds every link.", "Daarboven opent een knop „Meer tonen” de rest. Zoeken vindt altijd alle links."],
+  "Colonnes": ["Columns", "Kolommen"],
+  "Automatique": ["Automatic", "Automatisch"],
+  "Arrondi": ["Corner radius", "Afronding"],
+  "Icônes": ["Icons", "Pictogrammen"],
+  "Favicons": ["Favicons", "Favicons"],
+  "Initiales": ["Initials", "Initialen"],
+  "Le favicon est d'abord demandé au site lui-même, puis à Google, qui reçoit alors le domaine du lien. « Initiales » reste 100 % local (sauf icônes perso).": ["The favicon is first requested from the site itself, then from Google, which then receives the link's domain. “Initials” stays 100% local (except custom icons).", "Het favicon wordt eerst bij de site zelf opgevraagd, daarna bij Google, dat dan het domein van de link ontvangt. „Initialen” blijft 100% lokaal (behalve eigen pictogrammen)."],
+  "Blocs": ["Blocks", "Blokken"],
+  "Éditer": ["Edit", "Bewerken"],
+  "Remettre à zéro": ["Reset", "Op nul zetten"],
+  "Fréquents remis à zéro": ["Frequent links reset", "Vaak gebruikte links op nul gezet"],
+  "Les dispositions Accueil et Cockpit montrent tes 6 liens les plus ouverts (⌥1 à ⌥6). Le compte reste dans ce navigateur.": ["The Welcome and Cockpit layouts show your 6 most opened links (⌥1 to ⌥6). The count stays in this browser.", "De indelingen Welkom en Cockpit tonen je 6 meest geopende links (⌥1 tot ⌥6). De telling blijft in deze browser."],
+  "Bascule automatique le week-end": ["Switch automatically at the weekend", "Automatisch wisselen in het weekend"],
+  "Du lundi au vendredi, l'espace de semaine s'ouvre. Le samedi et le dimanche, celui du week-end. Tu peux toujours changer d'onglet à la main.": ["Monday to Friday, the weekday space opens. On Saturday and Sunday, the weekend one. You can always switch tabs by hand.", "Van maandag tot vrijdag opent de weekruimte, op zaterdag en zondag die van het weekend. Je kunt altijd zelf van tabblad wisselen."],
+  "En semaine": ["On weekdays", "Op weekdagen"],
+  "Le week-end": ["At the weekend", "In het weekend"],
+  "Mes espaces": ["My spaces", "Mijn ruimtes"],
+  "Touches 1 à 9 pour changer d'espace. Pour déplacer un bloc : menu ⋯ du bloc.": ["Keys 1 to 9 switch spaces. To move a block: the block's ⋯ menu.", "Toetsen 1 tot 9 om van ruimte te wisselen. Een blok verplaatsen: menu ⋯ van het blok."],
+  "Environnements": ["Environments", "Omgevingen"],
+  "Environnement par défaut": ["Default environment", "Standaardomgeving"],
+  "Mémoriser le dernier choisi": ["Remember the last one chosen", "Laatst gekozen onthouden"],
+  "Un favori peut avoir une adresse DEV et TEST en plus de son adresse principale (PROD), via « Environnements » quand tu modifies le lien. Le sélecteur DEV | TEST | PROD apparaît dès qu'un favori en a une.": ["A favorite can have a DEV and TEST address on top of its main address (PROD), via “Environments” when you edit the link. The DEV | TEST | PROD switch appears as soon as one favorite has one.", "Een favoriet kan naast zijn hoofdadres (PROD) een DEV- en TEST-adres hebben, via „Omgevingen” wanneer je de link bewerkt. De keuze DEV | TEST | PROD verschijnt zodra een favoriet er een heeft."],
+  "Tenants": ["Tenants", "Tenants"],
+  "Dans l'adresse d'un lien, {tenant} est remplacé par l'identifiant du tenant choisi (client-a → https://client-a.example.com) et {domain} par son domaine (l'identifiant si vide). Touche T pour passer au tenant suivant.": ["In a link's address, {tenant} is replaced by the chosen tenant's ID (client-a → https://client-a.example.com) and {domain} by its domain (the ID if empty). T key switches to the next tenant.", "In het adres van een link wordt {tenant} vervangen door de ID van de gekozen tenant (client-a → https://client-a.example.com) en {domain} door het domein (de ID als het leeg is). Toets T gaat naar de volgende tenant."],
+  "Date & heure": ["Date & time", "Datum & tijd"],
+  "Activer": ["Turn on", "Inschakelen"],
+  "Format 24 h": ["24-hour format", "24-uursnotatie"],
+  "Afficher les secondes": ["Show seconds", "Seconden tonen"],
+  "Taille de l'horloge": ["Clock size", "Grootte van de klok"],
+  "Format de date": ["Date format", "Datumnotatie"],
+  "Dimanche 25 octobre": ["Sunday 25 October", "Zondag 25 oktober"],
+  "Masquer": ["Hide", "Verbergen"],
+  "Météo & bienvenue": ["Weather & welcome", "Weer & welkom"],
+  "Météo": ["Weather", "Weer"],
+  "Ville": ["City", "Stad"],
+  "ex. Bruxelles": ["e.g. Brussels", "bv. Brussel"],
+  "Géolocalisation": ["Geolocation", "Geolocatie"],
+  "Utiliser ma position": ["Use my location", "Mijn locatie gebruiken"],
+  "Unité de température": ["Temperature unit", "Temperatuureenheid"],
+  "Affichage": ["Display", "Weergave"],
+  "Description et icône": ["Description and icon", "Beschrijving en pictogram"],
+  "Icône et température": ["Icon and temperature", "Pictogram en temperatuur"],
+  "Bienvenue": ["Welcome", "Welkom"],
+  "Nom de bienvenue": ["Welcome name", "Naam in de begroeting"],
+  "Nom": ["Name", "Naam"],
+  "Message personnalisé": ["Custom message", "Eigen bericht"],
+  "Bonjour / Bonsoir auto": ["Good morning / evening (auto)", "Goedemorgen / goedenavond (auto)"],
+  "Barre de recherche": ["Search bar", "Zoekbalk"],
+  "Moteur web": ["Web search engine", "Zoekmachine"],
+  "Sauvegarde": ["Backup", "Back-up"],
+  "Données": ["Data", "Gegevens"],
+  "Importer…": ["Import…", "Importeren…"],
+  "Signets Safari": ["Safari bookmarks", "Safari-bladwijzers"],
+  "Dans Safari : Fichier → Exporter → Signets…, puis choisis ce fichier. Chaque dossier devient un bloc dans l'espace affiché.": ["In Safari: File → Export → Bookmarks…, then choose that file. Each folder becomes a block in the space shown.", "In Safari: Archief → Exporteer → Bladwijzers…, kies dan dat bestand. Elke map wordt een blok in de getoonde ruimte."],
+  "Réinitialiser": ["Reset", "Herstellen"],
+  "Revenir aux exemples": ["Back to the examples", "Terug naar de voorbeelden"],
+  "Remplace tes blocs par les exemples. Annulable quelques secondes.": ["Replaces your blocks with the examples. Can be undone for a few seconds.", "Vervangt je blokken door de voorbeelden. Enkele seconden ongedaan te maken."],
+  "Raccourcis": ["Shortcuts", "Sneltoetsen"],
+  "/  rechercher": ["/  search", "/  zoeken"],
+  "↑ ↓  choisir un résultat · Entrée ouvrir": ["↑ ↓  choose a result · Enter open", "↑ ↓  resultaat kiezen · Enter openen"],
+  "⌥1–⌥6  ouvrir un fréquent (Accueil, Cockpit)": ["⌥1–⌥6  open a frequent link (Welcome, Cockpit)", "⌥1–⌥6  vaak gebruikte link openen (Welkom, Cockpit)"],
+  "E  éditer les favoris": ["E  edit favorites", "E  favorieten bewerken"],
+  "?  aide": ["?  help", "?  help"],
+  "1–9  changer d'espace": ["1–9  switch space", "1–9  van ruimte wisselen"],
+  "T  tenant suivant": ["T  next tenant", "T  volgende tenant"],
+  "V  environnement suivant (DEV → TEST → PROD)": ["V  next environment (DEV → TEST → PROD)", "V  volgende omgeving (DEV → TEST → PROD)"],
+  ",  réglages": [",  settings", ",  instellingen"],
+  "Échap  fermer / vider": ["Esc  close / clear", "Esc  sluiten / wissen"],
+  "Coller une URL  l'ajoute au bloc survolé": ["Paste a URL  adds it to the hovered block", "URL plakken  voegt hem toe aan het aangewezen blok"],
+  "Enregistré dans Safari sur ce Mac.": ["Saved in Safari on this Mac.", "Opgeslagen in Safari op deze Mac."],
+  "Safari ne conserve pas les données : exporte avant de fermer.": ["Safari doesn't keep the data: export before closing.", "Safari bewaart de gegevens niet: exporteer voor je afsluit."],
+  "Jamais exporté.": ["Never exported.", "Nooit geëxporteerd."],
+  "Dernier export : aujourd'hui.": ["Last export: today.", "Laatste export: vandaag."],
+  "Dernier export : il y a {n} j.": ["Last export: {n} d ago.", "Laatste export: {n} d geleden."],
+
+  // Spaces and tenants editors
+  "Nom de l'espace {n}": ["Name of space {n}", "Naam van ruimte {n}"],
+  "Supprimer l'espace": ["Delete the space", "Ruimte verwijderen"],
+  "Nouvel espace": ["New space", "Nieuwe ruimte"],
+  "+ Ajouter un espace": ["+ Add a space", "+ Ruimte toevoegen"],
+  "Espace « {name} » supprimé, ses blocs sont dans « {other} »": ["Space “{name}” deleted, its blocks are in “{other}”", "Ruimte „{name}” verwijderd, de blokken staan in „{other}”"],
+  "Aucun tenant. Ajoutes-en un pour ouvrir les liens modèles.": ["No tenant. Add one to open template links.", "Geen tenant. Voeg er een toe om sjabloonlinks te openen."],
+  "Nom affiché": ["Display name", "Weergavenaam"],
+  "Nom du tenant": ["Tenant name", "Naam van de tenant"],
+  "Supprimer le tenant": ["Delete the tenant", "Tenant verwijderen"],
+  "Identifiant du tenant": ["Tenant ID", "ID van de tenant"],
+  "{slug} (par défaut)": ["{slug} (default)", "{slug} (standaard)"],
+  "Domaine": ["Domain", "Domein"],
+  "Couleur de {name}": ["Color of {name}", "Kleur van {name}"],
+  "Nouveau tenant": ["New tenant", "Nieuwe tenant"],
+  "Tenant « {name} » supprimé": ["Tenant “{name}” deleted", "Tenant „{name}” verwijderd"],
+  "Turquoise": ["Turquoise", "Turkoois"],
+  "Bleu": ["Blue", "Blauw"],
+  "Ardoise": ["Slate", "Leisteen"],
+  "Violet": ["Purple", "Paars"],
+  "Orange": ["Orange", "Oranje"],
+  "Vert": ["Green", "Groen"],
+
+  // Block menu
+  "Ouvrir les {n} liens": ["Open the {n} links", "De {n} links openen"],
+  "Ajouter un lien": ["Add a link", "Link toevoegen"],
+  "Modifier le bloc…": ["Edit block…", "Blok bewerken…"],
+  "Afficher en liste": ["Show as a list", "Als lijst tonen"],
+  "Afficher en grille d'icônes": ["Show as an icon grid", "Als pictogrammenraster tonen"],
+  "Placer avant": ["Move before", "Ervoor plaatsen"],
+  "Placer après": ["Move after", "Erna plaatsen"],
+  "Déplacer vers {name}": ["Move to {name}", "Verplaatsen naar {name}"],
+  "« {name} » déplacé vers {space}": ["“{name}” moved to {space}", "„{name}” verplaatst naar {space}"],
+  "Supprimer le bloc": ["Delete the block", "Blok verwijderen"],
+  "Safari a bloqué {n} onglet. Autorise les fenêtres pop-up pour cette page dans Safari → Réglages → Sites web.": ["Safari blocked {n} tab. Allow pop-up windows for this page in Safari → Settings → Websites.", "Safari blokkeerde {n} tabblad. Sta pop-upvensters toe voor deze pagina in Safari → Instellingen → Websites."],
+  "Safari a bloqué {n} onglets. Autorise les fenêtres pop-up pour cette page dans Safari → Réglages → Sites web.": ["Safari blocked {n} tabs. Allow pop-up windows for this page in Safari → Settings → Websites.", "Safari blokkeerde {n} tabbladen. Sta pop-upvensters toe voor deze pagina in Safari → Instellingen → Websites."],
+  "Bloc « {name} » supprimé": ["Block “{name}” deleted", "Blok „{name}” verwijderd"],
+
+  // Link drawer
+  "Modifier le lien": ["Edit link", "Link bewerken"],
+  "Adresse principale": ["Main address", "Hoofdadres"],
+  "Lien modèle :": ["Template link:", "Sjabloonlink:"],
+  "devient l'identifiant du tenant choisi,": ["becomes the chosen tenant's ID,", "wordt de ID van de gekozen tenant,"],
+  "son domaine. Ex.": ["its domain. E.g.", "het domein. Bv."],
+  "Environnements DEV / TEST": ["DEV / TEST environments", "DEV- / TEST-omgevingen"],
+  "Adresse": ["Address", "Adres"],
+  "Facultatif": ["Optional", "Optioneel"],
+  "Sans adresse pour l'environnement actif, le lien ouvre l'adresse principale.": ["Without an address for the active environment, the link opens the main address.", "Zonder adres voor de actieve omgeving opent de link het hoofdadres."],
+  "Deviné depuis l'adresse si vide": ["Guessed from the address if empty", "Afgeleid uit het adres als het leeg is"],
+  "Icône": ["Icon", "Pictogram"],
+  "Facultatif : adresse d'une image": ["Optional: address of an image", "Optioneel: adres van een afbeelding"],
+  "Sans icône, le favicon du site est utilisé, sinon les initiales.": ["Without an icon, the site's favicon is used, otherwise the initials.", "Zonder pictogram wordt het favicon van de site gebruikt, anders de initialen."],
+  "Bloc": ["Block", "Blok"],
+  "Position dans le bloc": ["Position in the block", "Positie in het blok"],
+  "Annuler": ["Cancel", "Annuleren"],
+  "Annuler|toast": ["Undo", "Ongedaan maken"],
+  "Enregistrer": ["Save", "Opslaan"],
+  "Avant « {name} »": ["Before “{name}”", "Voor „{name}”"],
+  "À la fin": ["At the end", "Achteraan"],
+  "Premier lien": ["First link", "Eerste link"],
+  "L'adresse {env} n'est pas valide.": ["The {env} address isn't valid.", "Het {env}-adres is niet geldig."],
+  "Cette adresse n'est pas valide. Exemple : https://github.com ou https://{tenant}.example.com": ["This address isn't valid. Example: https://github.com or https://{tenant}.example.com", "Dit adres is niet geldig. Voorbeeld: https://github.com of https://{tenant}.example.com"],
+  "L'adresse de l'icône n'est pas valide.": ["The icon address isn't valid.", "Het adres van het pictogram is niet geldig."],
+  "Crée d'abord un bloc pour y ranger ce lien.": ["Create a block first to put this link in.", "Maak eerst een blok om deze link in te zetten."],
+  "Lien mis à jour": ["Link updated", "Link bijgewerkt"],
+  "Lien ajouté à « {name} »": ["Link added to “{name}”", "Link toegevoegd aan „{name}”"],
+  "« {name} » supprimé": ["“{name}” deleted", "„{name}” verwijderd"],
+
+  // Block drawer
+  "Nouveau bloc": ["New block", "Nieuw blok"],
+  "Modifier le bloc": ["Edit block", "Blok bewerken"],
+  "Modèle": ["Template", "Sjabloon"],
+  "Bloc vide": ["Empty block", "Leeg blok"],
+  "Admin Microsoft 365": ["Microsoft 365 admin", "Microsoft 365-beheer"],
+  "ex. contoso (de contoso.onmicrosoft.com)": ["e.g. contoso (from contoso.onmicrosoft.com)", "bv. contoso (van contoso.onmicrosoft.com)"],
+  "Crée le tenant s'il n'existe pas. SharePoint, OneDrive et Azure suivent ensuite le tenant choisi au-dessus des blocs.": ["Creates the tenant if it doesn't exist. SharePoint, OneDrive and Azure then follow the tenant chosen above the blocks.", "Maakt de tenant aan als die nog niet bestaat. SharePoint, OneDrive en Azure volgen daarna de tenant die boven de blokken gekozen is."],
+  "Titre": ["Title", "Titel"],
+  "ex. Outils": ["e.g. Tools", "bv. Tools"],
+  "Espace": ["Space", "Ruimte"],
+  "Liste": ["List", "Lijst"],
+  "Grille d'icônes": ["Icon grid", "Pictogrammenraster"],
+  "Donne un titre au bloc.": ["Give the block a title.", "Geef het blok een titel."],
+  "Indique le nom du tenant, par exemple contoso.": ["Enter the tenant name, for example contoso.", "Vul de naam van de tenant in, bijvoorbeeld contoso."],
+  "Bloc Microsoft 365 créé pour « {name} »": ["Microsoft 365 block created for “{name}”", "Microsoft 365-blok gemaakt voor „{name}”"],
+
+  // Export, import
+  "Export téléchargé": ["Export downloaded", "Export gedownload"],
+  "Ce fichier n'est pas un export de Cockpit SteffPoint (il manque la liste des blocs).": ["This file isn't a Cockpit SteffPoint export (the list of blocks is missing).", "Dit bestand is geen export van Cockpit SteffPoint (de lijst met blokken ontbreekt)."],
+  "Import terminé : {n} bloc": ["Import done: {n} block", "Import klaar: {n} blok"],
+  "Import terminé : {n} blocs": ["Import done: {n} blocks", "Import klaar: {n} blokken"],
+  "Aucun signet trouvé. Choisis le fichier « Signets.html » exporté par Safari.": ["No bookmarks found. Choose the “Bookmarks.html” file exported by Safari.", "Geen bladwijzers gevonden. Kies het bestand „Bladwijzers.html” dat Safari exporteerde."],
+  "{blocks} blocs et {links} liens importés dans {space}": ["{blocks} blocks and {links} links imported into {space}", "{blocks} blokken en {links} links geïmporteerd in {space}"],
+  "{n} blocs importés. Range-les ou supprime ceux en trop en mode édition.": ["{n} blocks imported. Sort them or delete the extra ones in edit mode.", "{n} blokken geïmporteerd. Orden ze of verwijder de overbodige in bewerkmodus."],
+  "Exemples restaurés": ["Examples restored", "Voorbeelden hersteld"],
+
+  // Toast, default content, presets
+  "Pro": ["Work", "Werk"],
+  "Perso": ["Personal", "Privé"],
+  "Administration": ["Admin", "Beheer"],
+  "Sans titre": ["Untitled", "Zonder titel"],
+  "Wikipédia": ["Wikipedia", "Wikipedia"],
+  "Actualités": ["News", "Nieuws"],
+  "Musique": ["Music", "Muziek"],
+  "Quotidien": ["Everyday", "Dagelijks"],
+  "Messagerie": ["Mail", "E-mail"],
+  "Agenda": ["Calendar", "Agenda"],
+  "Documents": ["Documents", "Documenten"],
+  "Traduction": ["Translation", "Vertaling"],
+  "Cartes": ["Maps", "Kaarten"],
+  "Développement": ["Development", "Ontwikkeling"],
+  "Exemple · environnements": ["Example · environments", "Voorbeeld · omgevingen"],
+  "Documentation": ["Documentation", "Documentatie"],
+  "Admin SharePoint": ["SharePoint admin", "SharePoint-beheer"],
+  "Portail Azure": ["Azure portal", "Azure-portal"],
+  "Admin Teams": ["Teams admin", "Teams-beheer"],
+  "Admin Exchange": ["Exchange admin", "Exchange-beheer"],
+  "Admin Power Platform": ["Power Platform admin", "Power Platform-beheer"],
+  "Accueil SharePoint": ["SharePoint home", "SharePoint-startpagina"],
+  "Mes sites": ["My sites", "Mijn sites"],
+  "Tableau de bord": ["Dashboard", "Dashboard"],
+  "Centre d'admin": ["Admin center", "Beheercentrum"],
+  "Sécurité": ["Security", "Beveiliging"],
+  "Admin M365": ["M365 admin", "M365-beheer"],
+  "Teams, Outlook, Planner, OneDrive, Power Automate": ["Teams, Outlook, Planner, OneDrive, Power Automate", "Teams, Outlook, Planner, OneDrive, Power Automate"],
+  "Accueil du tenant, sites suivis, admin SharePoint": ["Tenant home, followed sites, SharePoint admin", "Startpagina van de tenant, gevolgde sites, SharePoint-beheer"],
+  "Power Apps, Automate, BI, centre d'admin": ["Power Apps, Automate, BI, admin center", "Power Apps, Automate, BI, beheercentrum"],
+  "Tableau de bord, PR, issues, notifications": ["Dashboard, PRs, issues, notifications", "Dashboard, PR's, issues, meldingen"],
+  "Portail, Entra ID, DevOps": ["Portal, Entra ID, DevOps", "Portal, Entra ID, DevOps"],
+  "Centre d'admin, Exchange, Teams, sécurité": ["Admin center, Exchange, Teams, security", "Beheercentrum, Exchange, Teams, beveiliging"],
+
+  // Onboarding
+  "Passer la configuration": ["Skip setup", "Configuratie overslaan"],
+  "← Retour": ["← Back", "← Terug"],
+  "Plus tard": ["Later", "Later"],
+  "Continuer →": ["Continue →", "Doorgaan →"],
+  "Aperçu": ["Preview", "Voorbeeld"],
+  "Style": ["Style", "Stijl"],
+  "Infos": ["Info", "Info"],
+  "Récap": ["Summary", "Overzicht"],
+  "Ton prénom sert seulement à la salutation. Rien ne quitte ton navigateur.": ["Your first name is only used for the greeting. Nothing leaves your browser.", "Je voornaam dient alleen voor de begroeting. Niets verlaat je browser."],
+  "Commence avec 2 ou 3 espaces. Tu en ajouteras quand le besoin viendra.": ["Start with 2 or 3 spaces. You'll add more when you need them.", "Begin met 2 of 3 ruimtes. Je voegt er meer toe wanneer je ze nodig hebt."],
+  "Les blocs SharePoint et OneDrive utilisent ton tenant pour construire les bons liens.": ["The SharePoint and OneDrive blocks use your tenant to build the right links.", "De SharePoint- en OneDrive-blokken gebruiken je tenant om de juiste links te maken."],
+  "Tu pourras changer de disposition à tout moment dans les réglages.": ["You can change the layout at any time in the settings.", "Je kunt de indeling altijd wijzigen in de instellingen."],
+  "La météo vient d'Open-Meteo. Ni compte ni clé API à fournir.": ["The weather comes from Open-Meteo. No account or API key needed.", "Het weer komt van Open-Meteo. Geen account of API-sleutel nodig."],
+  "Pense à exporter ta configuration (.json) pour la retrouver sur un autre poste.": ["Remember to export your setup (.json) to get it back on another computer.", "Vergeet niet je configuratie (.json) te exporteren om ze op een andere computer terug te vinden."],
+  "Grande horloge, la vue d'origine": ["Big clock, the original view", "Grote klok, de oorspronkelijke weergave"],
+  "Grande salutation, fréquents en avant": ["Big greeting, frequent links up front", "Grote begroeting, vaak gebruikte links vooraan"],
+  "Colonne d'infos, tout visible d'un coup": ["Info column, everything visible at once", "Infokolom, alles in één oogopslag"],
+  "Recherche au centre, tuiles d'icônes": ["Search in the middle, icon tiles", "Zoekbalk in het midden, icoontegels"],
+  "Photo floutée": ["Blurred photo", "Vervaagde foto"],
+  "Dégradé": ["Gradient", "Verloop"],
+  "Uni": ["Solid", "Effen"],
+  "On reprend la configuration": ["Let's go through the setup again", "We overlopen de configuratie opnieuw"],
+  "Bienvenue sur ton cockpit": ["Welcome to your cockpit", "Welkom in je cockpit"],
+  "Quelques questions pour préparer ta page. Ça prend une minute, et tout reste modifiable ensuite dans les réglages.": ["A few questions to set up your page. It takes a minute, and everything can be changed later in the settings.", "Een paar vragen om je pagina klaar te zetten. Het duurt een minuutje en alles blijft achteraf aanpasbaar in de instellingen."],
+  "Comment veux-tu qu'on t'appelle ?": ["What should we call you?", "Hoe mogen we je noemen?"],
+  "Ton prénom": ["Your first name", "Je voornaam"],
+  "Tu as déjà une configuration ?": ["Already have a setup?", "Heb je al een configuratie?"],
+  "Importer un .json": ["Import a .json", "Een .json importeren"],
+  "Tes espaces": ["Your spaces", "Je ruimtes"],
+  "Chaque espace est un onglet avec ses propres favoris. Les touches 1 à 9 permettent de passer de l'un à l'autre.": ["Each space is a tab with its own favorites. Keys 1 to 9 switch between them.", "Elke ruimte is een tabblad met eigen favorieten. Met de toetsen 1 tot 9 wissel je ertussen."],
+  "Autre espace…": ["Another space…", "Andere ruimte…"],
+  "Ajouter": ["Add", "Toevoegen"],
+  "De quoi partir ?": ["What to start with?", "Waarmee wil je starten?"],
+  "Choisis des blocs prêts à l'emploi. Ils arrivent dans l'espace <b>{space}</b>.": ["Pick ready-made blocks. They go into the <b>{space}</b> space.", "Kies kant-en-klare blokken. Ze komen in de ruimte <b>{space}</b>."],
+  "Blocs prêts à l'emploi": ["Ready-made blocks", "Kant-en-klare blokken"],
+  "Ton tenant Microsoft 365": ["Your Microsoft 365 tenant", "Je Microsoft 365-tenant"],
+  "monentreprise": ["mycompany", "mijnbedrijf"],
+  "Facultatif. Sert à construire les liens SharePoint et OneDrive. Tu pourras en ajouter d'autres ensuite.": ["Optional. Used to build the SharePoint and OneDrive links. You can add others later.", "Optioneel. Dient om de SharePoint- en OneDrive-links te maken. Je kunt er later andere toevoegen."],
+  "Importer les favoris du navigateur": ["Import the browser's favorites", "Favorieten uit de browser importeren"],
+  "{folders} dossiers, {links} liens prêts à importer": ["{folders} folders, {links} links ready to import", "{folders} mappen, {links} links klaar om te importeren"],
+  "Fichier .html exporté depuis Safari, Chrome, Edge ou Firefox": [".html file exported from Safari, Chrome, Edge or Firefox", ".html-bestand geëxporteerd uit Safari, Chrome, Edge of Firefox"],
+  "Ton style": ["Your style", "Jouw stijl"],
+  "La disposition change l'organisation de la page. L'aperçu se met à jour.": ["The layout changes how the page is organized. The preview updates.", "De indeling verandert de opbouw van de pagina. Het voorbeeld wordt bijgewerkt."],
+  "Fond d'écran": ["Wallpaper", "Achtergrond"],
+  "Une nouvelle photo chaque heure. Ta propre image, le flou et la luminosité se règlent ensuite.": ["A new photo every hour. Your own image, the blur and the brightness can be set later.", "Elk uur een nieuwe foto. Je eigen afbeelding, de vervaging en de helderheid stel je later in."],
+  "Un dégradé basé sur la couleur d'accent.": ["A gradient based on the accent color.", "Een verloop op basis van de accentkleur."],
+  "Un fond sobre, sans distraction.": ["A plain background, no distractions.", "Een sobere achtergrond, zonder afleiding."],
+  "Météo et recherche": ["Weather and search", "Weer en zoeken"],
+  "Pour la ligne d'infos sous la salutation.": ["For the info line under the greeting.", "Voor de infolijn onder de begroeting."],
+  "Bruxelles": ["Brussels", "Brussel"],
+  "Afficher la météo": ["Show the weather", "Het weer tonen"],
+  "Moteur de recherche par défaut": ["Default search engine", "Standaardzoekmachine"],
+  "{n} dossiers importés": ["{n} folders imported", "{n} mappen geïmporteerd"],
+  "Prénom": ["First name", "Voornaam"],
+  "Aucun": ["None", "Geen"],
+  "Météo masquée": ["Weather hidden", "Weer verborgen"],
+  "C'est prêt, {name}.": ["All set, {name}.", "Klaar, {name}."],
+  "C'est prêt.": ["All set.", "Klaar."],
+  "Voici ce qui a été configuré. Tout reste modifiable via ⚙ en bas à droite.": ["Here's what was set up. Everything can still be changed via ⚙ at the bottom right.", "Dit is wat er ingesteld is. Alles blijft aanpasbaar via ⚙ rechtsonder."],
+  "Modifier : {k}": ["Change: {k}", "Wijzigen: {k}"],
+  "Modifier": ["Change", "Wijzigen"],
+  "rechercher": ["search", "zoeken"],
+  "changer d'espace": ["switch space", "van ruimte wisselen"],
+  "mode édition": ["edit mode", "bewerkmodus"],
+  "Rechercher avec {engine}": ["Search with {engine}", "Zoeken met {engine}"],
+  "Aucun bloc pour l'instant": ["No blocks yet", "Nog geen blokken"],
+  "Étape {n} sur {total} · {name}": ["Step {n} of {total} · {name}", "Stap {n} van {total} · {name}"],
+  "Commencer, {name} →": ["Let's go, {name} →", "Aan de slag, {name} →"],
+  "Commencer →": ["Let's go →", "Aan de slag →"],
+  "Ouvrir mon tableau de bord": ["Open my dashboard", "Mijn dashboard openen"],
+  "Recherche de la ville…": ["Looking up the city…", "Stad opzoeken…"],
+  "Espace « {name} » ajouté": ["Space “{name}” added", "Ruimte „{name}” toegevoegd"],
+  "Tableau de bord prêt": ["Dashboard ready", "Dashboard klaar"],
+  "Position refusée. Saisis plutôt une ville.": ["Location refused. Type a city instead.", "Locatie geweigerd. Typ liever een stad."],
+  "Ce fichier n'est pas un export de Cockpit SteffPoint.": ["This file isn't a Cockpit SteffPoint export.", "Dit bestand is geen export van Cockpit SteffPoint."],
+  "Aucun signet trouvé dans ce fichier.": ["No bookmarks found in this file.", "Geen bladwijzers gevonden in dit bestand."],
+  "{n} dossiers trouvés. Ils seront ajoutés à la fin.": ["{n} folders found. They'll be added at the end.", "{n} mappen gevonden. Ze worden achteraan toegevoegd."]
+};
+// Browser language first; English when the browser speaks none of the three
+function pickLang(want = "auto") {
+  if (LANG_IDS.includes(want)) return want;
+  for (const l of navigator.languages?.length ? navigator.languages : [navigator.language || ""]) {
+    const base = String(l).slice(0, 2).toLowerCase();
+    if (LANG_IDS.includes(base)) return base;
+  }
+  return "en";
+}
+let lang = pickLang();
+const LOCALE = () => ({ fr: "fr-BE", en: "en-GB", nl: "nl-BE" })[lang];
+// tr("Bloc « {name} » supprimé", { name }) — unknown text comes back unchanged, {keys} without a value stay as typed.
+// "Annuler|toast": the |context part tells apart one French word with two translations (Cancel / Undo), French drops it
+function tr(s, vars) {
+  if (typeof s !== "string") return s;
+  let out = lang === "fr" ? s.replace(/\|\w+$/, "") : I18N[s]?.[LANG_IDS.indexOf(lang) - 1] ?? s.replace(/\|\w+$/, "");
+  if (vars) out = out.replace(/\{(\w+)\}/g, (m, k) => k in vars ? String(vars[k]) : m);
+  return out;
+}
+const plural = (n, one, other, vars) => tr(new Intl.PluralRules(LOCALE()).select(n) === "one" ? one : other, { n, ...vars });
+// The page's own markup is French: remember each text and label once, before any render, to translate it again on a language change
+const staticText = [];
+{
+  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = walk.nextNode());) if (n.nodeValue.trim() && !n.parentElement.closest("script")) staticText.push([n, n.nodeValue]);
+  for (const el of document.body.querySelectorAll("[placeholder],[title],[aria-label]"))
+    for (const a of ["placeholder", "title", "aria-label"]) if (el.hasAttribute(a)) staticText.push([el, el.getAttribute(a), a]);
+}
+function applyLang() {
+  lang = pickLang(S().lang);
+  document.documentElement.lang = lang;
+  for (const [node, src, attr] of staticText) {
+    const key = src.trim(), out = src.replace(key, () => tr(key));
+    if (attr) node.setAttribute(attr, out); else node.nodeValue = out;
+  }
 }
 
 /* ---------- Storage ---------- */
@@ -747,7 +1214,7 @@ function migrateSettings(s = {}) {
 }
 function normalize(d) {
   if (!d || !Array.isArray(d.blocks)) return null;
-  let spaces = (Array.isArray(d.spaces) ? d.spaces : []).filter(s => s && s.id).map(s => ({ id: String(s.id), name: String(s.name || "Espace") }));
+  let spaces = (Array.isArray(d.spaces) ? d.spaces : []).filter(s => s && s.id).map(s => ({ id: String(s.id), name: String(s.name || tr("Espace")) }));
   if (!spaces.length) spaces = DEFAULT_SPACES();
   const spaceIds = new Set(spaces.map(s => s.id));
   const tenants = (Array.isArray(d.tenants) ? d.tenants : []).filter(t => t && t.slug)
@@ -768,7 +1235,7 @@ function normalize(d) {
     spaces, tenants,
     blocks: d.blocks.map(b => ({
       id: b.id || uid(), space: spaceIds.has(b.space) ? b.space : spaces[0].id,
-      title: String(b.title || "Sans titre"), color: COLORS.includes(b.color) ? b.color : "c1",
+      title: String(b.title || tr("Sans titre")), color: COLORS.includes(b.color) ? b.color : "c1",
       view: b.view === "grid" ? "grid" : "list", collapsed: !!b.collapsed,
       // Imported files may come from someone else: drop javascript: and other unsafe schemes
       links: (Array.isArray(b.links) ? b.links : []).filter(l => l && safeScheme(l.url)).map(l => {
@@ -791,6 +1258,7 @@ let state = load();
 // People who already use the page never see the first-run assistant
 if (HAD_DATA && !state.meta.onboarded) state.meta.onboarded = state.meta.since;
 const S = () => state.settings;
+lang = pickLang(S().lang);
 
 /* ---------- Helpers ---------- */
 function h(tag, attrs = {}, ...kids) {
@@ -860,7 +1328,7 @@ function cycleTenant() {
   const i = state.tenants.indexOf(currentTenant());
   state.meta.tenant = state.tenants[(i + 1) % state.tenants.length].id;
   save(); render();
-  toast(`Tenant : ${currentTenant().name}`);
+  toast(tr("Tenant : {name}", { name: currentTenant().name }));
 }
 
 /* ---------- Environments: optional DEV / TEST address per link, main address = PROD ---------- */
@@ -900,13 +1368,14 @@ function commit(mutate, message) {
     state = JSON.parse(before);
     save(); applySettings(); render();
     if (panel.classList.contains("open")) buildPanel();
-    toast("Modification annulée");
+    toast(tr("Modification annulée"));
   });
 }
 function toast(msg, undo) {
   $("#toastMsg").textContent = msg;
   const btn = $("#toastUndo");
   btn.hidden = !undo;
+  btn.textContent = tr("Annuler|toast");
   btn.onclick = () => { $("#toast").hidden = true; undo && undo(); };
   $("#toast").hidden = false;
   clearTimeout(toastTimer);
@@ -970,7 +1439,7 @@ function render() {
       const envTag = usesEnvUrl(l) ? h("span", { class: "env-tag", "data-env": activeEnv }, activeEnv.toUpperCase()) : null;
       const a = h("a", {
         class: "lk" + (match ? " hit" : "") + (href ? "" : " tpl-missing"), href: href || "#", "data-link": l.id,
-        title: href || "Ajoute un tenant pour ouvrir ce lien",
+        title: href || tr("Ajoute un tenant pour ouvrir ce lien"),
         target: newTab && href ? "_blank" : null, rel: newTab && href ? "noopener" : null,
         onclick: e => {
           if (editing) { e.preventDefault(); openLinkDrawer(b.id, l.id); }
@@ -980,7 +1449,7 @@ function render() {
       }, h("span", { class: "grip", "aria-hidden": "true" }, svg(ICON.grip)), iconFor(l, b.color, href), h("span", { class: "nm" }, l.name), envTag,
         commonHost ? null : h("span", { class: "dm" }, href ? hostOf(href) : "{tenant}"));
       if (match) { hits.push(a); blockHit = true; }
-      const del = editing ? h("button", { class: "lk-del", type: "button", title: "Supprimer", "aria-label": `Supprimer ${l.name}`, onclick: () => deleteLink(l.id) }, "✕") : null;
+      const del = editing ? h("button", { class: "lk-del", type: "button", title: tr("Supprimer"), "aria-label": tr("Supprimer {name}", { name: l.name }), onclick: () => deleteLink(l.id) }, "✕") : null;
       list.append(h("li", { "data-link": l.id, draggable: editing ? "true" : null }, a, del));
     }
     if (capped) {
@@ -988,19 +1457,19 @@ function render() {
       list.append(h("li", { class: "more-row" }, h("button", {
         class: "more-btn", type: "button", "aria-expanded": String(open),
         onclick: () => { open ? expanded.delete(b.id) : expanded.add(b.id); render(); }
-      }, open ? "Afficher moins" : `Afficher plus (${b.links.length - max})`, svg(ICON.chev))));
+      }, open ? tr("Afficher moins") : tr("Afficher plus ({n})", { n: b.links.length - max }), svg(ICON.chev))));
     }
-    if (!b.links.length) list.append(h("li", { class: "empty" }, "Glisse un lien ici, colle une URL, ou passe en mode édition."));
-    list.append(h("li", { class: "add-row" }, h("button", { class: "dashed-btn", type: "button", onclick: () => openLinkDrawer(b.id) }, "+ Ajouter un lien")));
+    if (!b.links.length) list.append(h("li", { class: "empty" }, tr("Glisse un lien ici, colle une URL, ou passe en mode édition.")));
+    list.append(h("li", { class: "add-row" }, h("button", { class: "dashed-btn", type: "button", onclick: () => openLinkDrawer(b.id) }, tr("+ Ajouter un lien"))));
 
     const header = h("div", { class: "block-h", draggable: editing ? "true" : null },
       h("span", { class: "grip", "aria-hidden": "true" }, svg(ICON.grip)),
       h("span", { class: "sw", style: `background:var(--${b.color})` }),
       h("h2", {}, b.title),
       commonHost ? h("span", { class: "count host", title: commonHost }, commonHost) : null,
-      h("button", { class: "icon-btn chev", type: "button", "aria-label": (b.collapsed ? "Déplier " : "Replier ") + b.title, "aria-expanded": String(!b.collapsed),
+      h("button", { class: "icon-btn chev", type: "button", "aria-label": tr(b.collapsed ? "Déplier {name}" : "Replier {name}", { name: b.title }), "aria-expanded": String(!b.collapsed),
         onclick: () => { b.collapsed = !b.collapsed; save(); render(); } }, svg(ICON.chev)),
-      h("button", { class: "icon-btn", type: "button", "aria-label": "Options du bloc " + b.title, "aria-haspopup": "menu", onclick: e => openMenu(e.currentTarget, b.id) }, svg(ICON.more))
+      h("button", { class: "icon-btn", type: "button", "aria-label": tr("Options du bloc {name}", { name: b.title }), "aria-haspopup": "menu", onclick: e => openMenu(e.currentTarget, b.id) }, svg(ICON.more))
     );
     root.append(h("section", { class: "block" + (b.collapsed ? " collapsed" : "") + (blockHit ? " has-hit" : ""), "data-block": b.id, "aria-label": b.title }, header, list));
   }
@@ -1009,12 +1478,13 @@ function render() {
     const auto = S().spaces.auto && currentSpace === (isWeekend() ? S().spaces.weekend : S().spaces.weekday);
     const others = state.spaces.filter(s => s.id !== currentSpace);
     root.append(h("div", { class: "empty-space" },
-      h("p", {}, `Aucun bloc dans « ${name} » pour l'instant.`, auto ? ` Cet espace s'ouvre automatiquement ${isWeekend() ? "le week-end" : "en semaine"}.` : ""),
+      h("p", {}, tr("Aucun bloc dans « {name} » pour l'instant.", { name }),
+        auto ? " " + tr(isWeekend() ? "Cet espace s'ouvre automatiquement le week-end." : "Cet espace s'ouvre automatiquement en semaine.") : ""),
       h("div", { class: "acts" },
-        h("button", { class: "btn primary", type: "button", onclick: () => openBlockDrawer() }, "+ Nouveau bloc"),
-        others.length ? h("button", { class: "btn", type: "button", onclick: () => setSpace(others[0].id) }, `Voir ${others[0].name}`) : null)));
+        h("button", { class: "btn primary", type: "button", onclick: () => openBlockDrawer() }, tr("+ Nouveau bloc")),
+        others.length ? h("button", { class: "btn", type: "button", onclick: () => setSpace(others[0].id) }, tr("Voir {name}", { name: others[0].name })) : null)));
   }
-  root.append(h("button", { class: "new-block", type: "button", onclick: () => openBlockDrawer() }, "+ Nouveau bloc"));
+  root.append(h("button", { class: "new-block", type: "button", onclick: () => openBlockDrawer() }, tr("+ Nouveau bloc")));
   renderSpacebar();
   renderReminder();
   renderFreq();
@@ -1028,19 +1498,20 @@ function render() {
 }
 function updateHint() {
   const eng = ENGINES[S().search.engine][0];
-  $("#engineBtn").textContent = term && hits.length ? "Ouvrir" : eng;
+  $("#engineBtn").textContent = term && hits.length ? tr("Ouvrir") : eng;
   $("#hint").textContent = !term ? "" :
-    hits.length ? `${hits.length} favori${hits.length > 1 ? "s" : ""} · ↑↓ pour choisir · Entrée ouvre · ⌘ Entrée nouvel onglet · Maj Entrée cherche sur ${eng}`
-                : `Entrée cherche « ${term} » sur ${eng}`;
+    hits.length ? plural(hits.length, "{n} favori · ↑↓ pour choisir · Entrée ouvre · ⌘ Entrée nouvel onglet · Maj Entrée cherche sur {eng}",
+                                      "{n} favoris · ↑↓ pour choisir · Entrée ouvre · ⌘ Entrée nouvel onglet · Maj Entrée cherche sur {eng}", { eng })
+                : tr("Entrée cherche « {term} » sur {eng}", { term, eng });
 }
 
-const blockCount = id => { const n = state.blocks.filter(b => b.space === id).length; return `${n} bloc${n > 1 ? "s" : ""}`; };
+const blockCount = id => plural(state.blocks.filter(b => b.space === id).length, "{n} bloc", "{n} blocs");
 function renderSpacebar() {
   const bar = $("#spacebar");
   bar.replaceChildren();
   bar.append(state.spaces.length > 1
-    ? h("div", { class: "tabs", role: "tablist", "aria-label": "Espaces" }, state.spaces.map((sp, i) =>
-        h("button", { type: "button", role: "tab", "aria-selected": String(sp.id === currentSpace && !term), title: `Touche ${i + 1} · ${blockCount(sp.id)}`, onclick: () => setSpace(sp.id) }, sp.name)))
+    ? h("div", { class: "tabs", role: "tablist", "aria-label": tr("Espaces") }, state.spaces.map((sp, i) =>
+        h("button", { type: "button", role: "tab", "aria-selected": String(sp.id === currentSpace && !term), title: `${tr("Touche {k}", { k: i + 1 })} · ${blockCount(sp.id)}`, onclick: () => setSpace(sp.id) }, sp.name)))
     : h("span"));
   // One "where do my links point" capsule: tenant picker + environment switch
   const ctx = h("div", { class: "context", "data-env": activeEnv });
@@ -1050,24 +1521,24 @@ function renderSpacebar() {
     // nothing to pick
   } else if (state.tenants.length) {
     const cur = currentTenant();
-    ctx.append(h("select", { id: "tenantSel", class: "pill tenant-pill", style: `--tc:var(--${cur.color})`, title: "Tenant (touche T)", "aria-label": "Tenant",
-      onchange: e => { state.meta.tenant = e.target.value; save(); render(); toast(`Tenant : ${currentTenant().name}`); } },
+    ctx.append(h("select", { id: "tenantSel", class: "pill tenant-pill", style: `--tc:var(--${cur.color})`, title: tr("Tenant (touche T)"), "aria-label": tr("Tenant"),
+      onchange: e => { state.meta.tenant = e.target.value; save(); render(); toast(tr("Tenant : {name}", { name: currentTenant().name })); } },
       state.tenants.map(t => h("option", { value: t.id, selected: t.id === cur.id }, t.name))));
   } else {
-    ctx.append(h("button", { class: "pbtn", type: "button", onclick: () => openPanelAt("tenants") }, "+ Ajouter un tenant"));
+    ctx.append(h("button", { class: "pbtn", type: "button", onclick: () => openPanelAt("tenants") }, tr("+ Ajouter un tenant")));
   }
   const showEnv = hasEnvLinks();
   if (showEnv) {
     if (ctx.childNodes.length) ctx.append(h("span", { class: "ctx-sep", "aria-hidden": "true" }));
-    ctx.append(h("div", { class: "env", role: "group", "aria-label": "Environnement (touche V)" }, ENVS.map(([id, label]) =>
-      h("button", { type: "button", "data-env": id, "aria-pressed": String(activeEnv === id), title: `Ouvrir les favoris en ${label} (touche V)`, onclick: () => setEnv(id) }, label))));
+    ctx.append(h("div", { class: "env", role: "group", "aria-label": tr("Environnement (touche V)") }, ENVS.map(([id, label]) =>
+      h("button", { type: "button", "data-env": id, "aria-pressed": String(activeEnv === id), title: tr("Ouvrir les favoris en {env} (touche V)", { env: label }), onclick: () => setEnv(id) }, label))));
   }
   ctx.classList.toggle("off-prod", showEnv && activeEnv !== "prod");
   // Cockpit keeps tenant + environment in the left column
   const side = $("#sideCtx");
   side.replaceChildren();
   if (ctx.childNodes.length) {
-    if (S().layout === "cockpit") side.append(h("div", { class: "side-h" }, "Contexte"), ctx);
+    if (S().layout === "cockpit") side.append(h("div", { class: "side-h" }, tr("Contexte")), ctx);
     else bar.append(ctx);
   }
   // Safari tab title warns when links don't point to PROD, and names the active tenant
@@ -1078,7 +1549,7 @@ function cycleEnv() {
   if (!hasEnvLinks()) return;
   const ids = ENVS.map(([id]) => id);
   setEnv(ids[(ids.indexOf(activeEnv) + 1) % ids.length]);
-  toast(`Environnement : ${activeEnv.toUpperCase()}`);
+  toast(tr("Environnement : {env}", { env: activeEnv.toUpperCase() }));
 }
 /* ---------- Frequent links (click counts stay in this browser) ---------- */
 const FREQ_MAX = 6;
@@ -1103,7 +1574,7 @@ function renderFreq() {
   const top = topLinks();
   if (!top.length) return;
   const newTab = S().links.newTab;
-  nav.append(h("div", { class: "side-h" }, "Fréquents"), ...top.map(({ link: l, block: b }, i) => {
+  nav.append(h("div", { class: "side-h" }, tr("Fréquents")), ...top.map(({ link: l, block: b }, i) => {
     const href = linkHref(l);
     return h("a", { class: "fq", href: href || "#", title: `${l.name} (⌥${i + 1})`,
       target: newTab && href ? "_blank" : null, rel: newTab && href ? "noopener" : null,
@@ -1118,20 +1589,20 @@ function renderReminder() {
   el.hidden = days < 14 || Date.now() < m.snooze;
   if (el.hidden) return;
   el.replaceChildren(
-    h("span", { class: "sp" }, m.lastExport ? `Dernière sauvegarde il y a ${days} jours.` : "Tes favoris n'ont encore jamais été exportés.",
-      " Un export les protège si Safari efface ses données."),
-    h("button", { class: "pbtn", type: "button", onclick: exportData }, "Exporter"),
-    h("button", { class: "pbtn", type: "button", onclick: () => { m.snooze = Date.now() + 7 * 864e5; save(); renderReminder(); } }, "Dans 7 jours"));
+    h("span", { class: "sp" }, m.lastExport ? tr("Dernière sauvegarde il y a {n} jours.", { n: days }) : tr("Tes favoris n'ont encore jamais été exportés."),
+      " " + tr("Un export les protège si Safari efface ses données.")),
+    h("button", { class: "pbtn", type: "button", onclick: exportData }, tr("Exporter")),
+    h("button", { class: "pbtn", type: "button", onclick: () => { m.snooze = Date.now() + 7 * 864e5; save(); renderReminder(); } }, tr("Dans 7 jours")));
 }
 
 /* ---------- Clock + greeting ---------- */
+// "Good morning" can't stand in for an all-day "Bonjour", so every greeting follows the hour
+const autoGreet = (hr = new Date().getHours()) => tr(hr < 5 ? "Bonne nuit" : hr < 12 ? "Bonjour" : hr < 18 ? "Bon après-midi" : "Bonsoir");
 function tick() {
   const c = S().clock, d = new Date();
-  $("#clock").textContent = d.toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit", second: c.seconds ? "2-digit" : undefined, hour12: !c.h24 });
-  $("#date").textContent = c.date === "short" ? d.toLocaleDateString("fr-BE") : d.toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" });
-  const hr = d.getHours();
-  const auto = hr < 5 ? "Bonne nuit" : hr < 12 ? "Bonjour" : hr < 18 ? "Bon après-midi" : "Bonsoir";
-  const g = S().greet.custom.trim() || auto;
+  $("#clock").textContent = d.toLocaleTimeString(LOCALE(), { hour: "2-digit", minute: "2-digit", second: c.seconds ? "2-digit" : undefined, hour12: !c.h24 });
+  $("#date").textContent = c.date === "short" ? d.toLocaleDateString(LOCALE()) : d.toLocaleDateString(LOCALE(), { weekday: "long", day: "numeric", month: "long" });
+  const g = S().greet.custom.trim() || autoGreet(d.getHours());
   $("#greet").textContent = S().name ? `${g}, ${S().name}` : g;
   renderMetaLine();
 }
@@ -1182,7 +1653,8 @@ async function loadWeather(force) {
     } catch { if (!cache || cache.sig !== sig) { $("#weather").hidden = true; return; } }
   }
   const c = cache.data.current, dl = cache.data.daily;
-  const [, desc, icon0] = WMO.find(([codes]) => codes.includes(c.weather_code)) || [0, "Temps variable", "cloud"];
+  const [, desc0, icon0] = WMO.find(([codes]) => codes.includes(c.weather_code)) || [0, "Temps variable", "cloud"];
+  const desc = tr(desc0);
   const icon = icon0 === "sun" && !c.is_day ? "moon" : icon0;
   const t = Math.round(c.temperature_2m);
   $("#wDesc").textContent = desc;
@@ -1197,26 +1669,26 @@ async function loadWeather(force) {
 async function geocodeCity(name) {
   const note = $("#note-city");
   if (!name.trim()) return;
-  note.className = "note"; note.textContent = "Recherche…";
+  note.className = "note"; note.textContent = tr("Recherche…");
   try {
-    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=fr`);
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=${lang}`);
     const res = (await r.json()).results?.[0];
-    if (!res) { note.className = "note err"; note.textContent = `Aucune ville trouvée pour « ${name} ».`; return; }
+    if (!res) { note.className = "note err"; note.textContent = tr("Aucune ville trouvée pour « {name} ».", { name }); return; }
     Object.assign(S().weather, { city: res.name, lat: +res.latitude.toFixed(3), lon: +res.longitude.toFixed(3) });
     save(); syncPanel();
     note.className = "note ok"; note.textContent = `${res.name}${res.country ? ", " + res.country : ""}`;
     loadWeather(true);
-  } catch { note.className = "note err"; note.textContent = "Recherche impossible : pas de connexion ?"; }
+  } catch { note.className = "note err"; note.textContent = tr("Recherche impossible : pas de connexion ?"); }
 }
 function useMyPosition() {
   const note = $("#note-city");
-  if (!navigator.geolocation) { note.className = "note err"; note.textContent = "Géolocalisation indisponible dans ce navigateur."; return; }
-  note.className = "note"; note.textContent = "Localisation…";
+  if (!navigator.geolocation) { note.className = "note err"; note.textContent = tr("Géolocalisation indisponible dans ce navigateur."); return; }
+  note.className = "note"; note.textContent = tr("Localisation…");
   navigator.geolocation.getCurrentPosition(p => {
-    Object.assign(S().weather, { city: "Ma position", lat: +p.coords.latitude.toFixed(3), lon: +p.coords.longitude.toFixed(3) });
+    Object.assign(S().weather, { city: tr("Ma position"), lat: +p.coords.latitude.toFixed(3), lon: +p.coords.longitude.toFixed(3) });
     save(); syncPanel(); loadWeather(true);
-    note.className = "note ok"; note.textContent = "Position utilisée pour la météo.";
-  }, () => { note.className = "note err"; note.textContent = "Safari a refusé la position. Saisis plutôt une ville."; }, { timeout: 10000 });
+    note.className = "note ok"; note.textContent = tr("Position utilisée pour la météo.");
+  }, () => { note.className = "note err"; note.textContent = tr("Safari a refusé la position. Saisis plutôt une ville."); }, { timeout: 10000 });
 }
 
 /* ---------- Background ---------- */
@@ -1234,7 +1706,7 @@ function setBgImage(src, credit) {
     }, bgImg.classList.contains("ready") ? 250 : 0);
     showCredit(credit);
   };
-  im.onerror = () => { if (token === bgToken) { setFlat(); toast("Image de fond introuvable, retour au dégradé"); } };
+  im.onerror = () => { if (token === bgToken) { setFlat(); toast(tr("Image de fond introuvable, retour au dégradé")); } };
   im.src = src;
 }
 function setFlat(color) {
@@ -1248,7 +1720,7 @@ function showCredit(c) {
   const el = $("#credit");
   el.replaceChildren();
   el.hidden = !c;
-  if (c) el.append("Photo : ", h("a", { href: c.link, target: "_blank", rel: "noopener" }, c.author));
+  if (c) el.append(tr("Photo : "), h("a", { href: c.link, target: "_blank", rel: "noopener" }, c.author));
 }
 async function photoList() {
   let cache = store.get(KEY + "-photos");
@@ -1307,11 +1779,11 @@ function uploadBg(file) {
       cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
       const data = cv.toDataURL("image/jpeg", .82);
       try { localStorage.setItem(KEY + "-bgimg", data); }
-      catch { note.className = "note err"; note.textContent = "Image trop lourde pour le stockage de Safari. Essaie une image plus petite."; return; }
-      note.className = "note ok"; note.textContent = `${file.name} enregistrée.`;
+      catch { note.className = "note err"; note.textContent = tr("Image trop lourde pour le stockage de Safari. Essaie une image plus petite."); return; }
+      note.className = "note ok"; note.textContent = tr("{name} enregistrée.", { name: file.name });
       applyBackground();
     };
-    im.onerror = () => { note.className = "note err"; note.textContent = "Ce fichier n'est pas une image lisible."; };
+    im.onerror = () => { note.className = "note err"; note.textContent = tr("Ce fichier n'est pas une image lisible."); };
     im.src = reader.result;
   };
   reader.readAsDataURL(file);
@@ -1321,6 +1793,7 @@ $("#bgFile").addEventListener("change", e => { const f = e.target.files[0]; e.ta
 /* ---------- Apply settings ---------- */
 function applySettings() {
   const s = S(), root = document.documentElement, body = document.body;
+  applyLang();
   if (s.theme === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", s.theme);
   root.style.setProperty("--blur", s.bg.blur + "px");
   root.style.setProperty("--bright", s.bg.bright / 100);
@@ -1351,6 +1824,8 @@ const LAYOUTS = [["classic", "Classique"], ["accueil", "Accueil"], ["cockpit", "
 const SCHEMA = [
   { title: "Général", rows: [
     { type: "toggle", path: "showAll", label: "Afficher tous les réglages" },
+    { type: "select", path: "lang", label: "Langue", options: LANGS,
+      after: () => { render(); buildPanel(); loadWeather(); $("#set-lang")?.focus(); } },
     { type: "select", path: "theme", label: "Mode sombre", options: [["auto", "Système"], ["light", "Clair"], ["dark", "Sombre"]] },
     { type: "select", path: "layout", label: "Disposition", options: LAYOUTS, after: render,
       note: "Accueil : grande salutation et fréquents. Cockpit : colonne d'infos à gauche, tout tient à l'écran. Lanceur : grande recherche et tuiles d'icônes." },
@@ -1365,7 +1840,7 @@ const SCHEMA = [
       options: [["photo", "Photos"], ["gradient", "Dégradé SteffPoint"], ["color", "Couleur unie"], ["upload", "Ma photo"], ["url", "Image (URL)"]] },
     { type: "select", path: "bg.freq", label: "Fréquence", when: s => s.bg.type === "photo",
       options: [["tab", "Chaque onglet"], ["hour", "Chaque heure"], ["day", "Chaque jour"], ["pause", "En pause"]],
-      extra: () => h("button", { class: "pbtn sq", type: "button", title: "Nouvelle photo", "aria-label": "Nouvelle photo", onclick: () => applyBackground(true) }, svg(ICON.refresh)),
+      extra: () => h("button", { class: "pbtn sq", type: "button", title: tr("Nouvelle photo"), "aria-label": tr("Nouvelle photo"), onclick: () => applyBackground(true) }, svg(ICON.refresh)),
       note: "Photos libres de droits fournies par Picsum (Unsplash)." },
     { type: "text", path: "bg.url", label: "Adresse de l'image", placeholder: "https://…/image.jpg", when: s => s.bg.type === "url", after: () => applyBackground() },
     { type: "buttons", label: "Image", when: s => s.bg.type === "upload", noteId: "note-upload",
@@ -1388,7 +1863,7 @@ const SCHEMA = [
       note: "Le favicon est d'abord demandé au site lui-même, puis à Google, qui reçoit alors le domaine du lien. « Initiales » reste 100 % local (sauf icônes perso)." },
     { type: "buttons", label: "Blocs", when: s => s.links.on, buttons: [["+ Nouveau bloc", () => openBlockDrawer()], ["Éditer", () => toggleEdit(true)]] },
     { type: "buttons", label: "Fréquents", adv: true, when: s => s.links.on && ["accueil", "cockpit"].includes(s.layout),
-      buttons: [["Remettre à zéro", () => commit(() => { state.meta.hits = {}; }, "Fréquents remis à zéro")]],
+      buttons: [["Remettre à zéro", () => commit(() => { state.meta.hits = {}; }, tr("Fréquents remis à zéro"))]],
       note: "Les dispositions Accueil et Cockpit montrent tes 6 liens les plus ouverts (⌥1 à ⌥6). Le compte reste dans ce navigateur." }
   ]},
   { title: "Espaces", rows: [
@@ -1437,7 +1912,7 @@ const SCHEMA = [
     { type: "buttons", label: "Réinitialiser", adv: true, buttons: [["Revenir aux exemples", () => resetAll(), "danger"]], note: "Remplace tes blocs par les exemples. Annulable quelques secondes." }
   ]},
   { title: "Raccourcis", adv: true, html: () => h("div", { class: "keys" },
-      ["/  rechercher", "↑ ↓  choisir un résultat · Entrée ouvrir", "⌥1–⌥6  ouvrir un fréquent (Accueil, Cockpit)", "E  éditer les favoris", "?  aide", "1–9  changer d'espace", "T  tenant suivant", "V  environnement suivant (DEV → TEST → PROD)", ",  réglages", "Échap  fermer / vider", "Coller une URL  l'ajoute au bloc survolé"].map(t => h("div", {}, t))) }
+      ["/  rechercher", "↑ ↓  choisir un résultat · Entrée ouvrir", "⌥1–⌥6  ouvrir un fréquent (Accueil, Cockpit)", "E  éditer les favoris", "?  aide", "1–9  changer d'espace", "T  tenant suivant", "V  environnement suivant (DEV → TEST → PROD)", ",  réglages", "Échap  fermer / vider", "Coller une URL  l'ajoute au bloc survolé"].map(k => h("div", {}, tr(k)))) }
 ];
 const getP = p => p.split(".").reduce((o, k) => o?.[k], S());
 const setP = (p, v) => { const ks = p.split("."), last = ks.pop(); ks.reduce((o, k) => o[k], S())[last] = v; };
@@ -1447,7 +1922,7 @@ function buildPanel() {
   body.replaceChildren();
   rows.length = 0;
   for (const g of SCHEMA) {
-    const groupT = h("div", { class: "group-t", id: g.id ? "grp-" + g.id : null }, g.title);
+    const groupT = h("div", { class: "group-t", id: g.id ? "grp-" + g.id : null }, tr(g.title));
     const group = h("div", { class: "group" });
     if (g.adv) rows.push({ el: groupT, def: { adv: true } }, { el: group, def: { adv: true } });
     if (g.when) rows.push({ el: groupT, def: { when: g.when } }, { el: group, def: { when: g.when } });
@@ -1467,8 +1942,9 @@ function buildPanel() {
         input.addEventListener("change", () => commitVal(input.checked));
         ctl.append(h("label", { class: "switch" }, input, h("span")));
       } else if (def.type === "select") {
-        const opts = typeof def.options === "function" ? def.options() : def.options;
-        input = h("select", { class: "pill", id }, opts.map(([v, l]) => h("option", { value: v }, l)));
+        // Static choices are UI text; a function lists user data (space names) that stays as typed
+        const dyn = typeof def.options === "function", opts = dyn ? def.options() : def.options;
+        input = h("select", { class: "pill", id }, opts.map(([v, l]) => h("option", { value: v }, dyn ? l : tr(l))));
         input.addEventListener("change", () => commitVal(def.num ? +input.value : input.value));
         ctl.append(input);
       } else if (def.type === "range") {
@@ -1478,7 +1954,7 @@ function buildPanel() {
         input.addEventListener("input", () => { out.textContent = input.value + def.unit; commitVal(+input.value); });
         ctl.append(input, out);
       } else if (def.type === "text") {
-        input = h("input", { type: "text", class: "pill-input", id, placeholder: def.placeholder, autocomplete: "off", spellcheck: "false" });
+        input = h("input", { type: "text", class: "pill-input", id, placeholder: tr(def.placeholder), autocomplete: "off", spellcheck: "false" });
         if (def.commitOnly) input.addEventListener("change", () => commitVal(input.value.trim()));
         else input.addEventListener("input", () => commitVal(input.value.trim()));
         input.addEventListener("keydown", e => { if (e.key === "Enter") input.blur(); });
@@ -1488,14 +1964,14 @@ function buildPanel() {
         input.addEventListener("input", () => commitVal(input.value));
         ctl.append(input);
       } else if (def.type === "buttons") {
-        def.buttons.forEach(([label, fn, cls]) => ctl.append(h("button", { class: "pbtn" + (cls ? " " + cls : ""), type: "button", onclick: fn }, label)));
+        def.buttons.forEach(([label, fn, cls]) => ctl.append(h("button", { class: "pbtn" + (cls ? " " + cls : ""), type: "button", onclick: fn }, tr(label))));
       }
       if (def.extra) ctl.append(def.extra());
       if (def.type === "custom") {
-        if (def.label) el.append(h("span", { class: "lbl" }, def.label));
+        if (def.label) el.append(h("span", { class: "lbl" }, tr(def.label)));
         el.append(def.build());
-      } else el.append(input ? h("label", { for: id }, def.label) : h("span", { class: "lbl" }, def.label), ctl);
-      if (def.note || def.noteId) el.append(h("p", { class: "note", id: def.noteId || null }, def.note || ""));
+      } else el.append(input ? h("label", { for: id }, tr(def.label)) : h("span", { class: "lbl" }, tr(def.label)), ctl);
+      if (def.note || def.noteId) el.append(h("p", { class: "note", id: def.noteId || null }, tr(def.note) || ""));
       group.append(el);
       rows.push({ el, def, input });
     }
@@ -1515,8 +1991,8 @@ function syncPanel() {
   const note = $("#note-backup");
   if (note) {
     note.className = "note" + (days == null || days > 30 ? " err" : "");
-    note.textContent = (storageOk ? "Enregistré dans Safari sur ce Mac. " : "Safari ne conserve pas les données : exporte avant de fermer. ") +
-      (days == null ? "Jamais exporté." : `Dernier export : ${days === 0 ? "aujourd'hui" : `il y a ${days} j`}.`);
+    note.textContent = tr(storageOk ? "Enregistré dans Safari sur ce Mac." : "Safari ne conserve pas les données : exporte avant de fermer.") + " " +
+      (days == null ? tr("Jamais exporté.") : days === 0 ? tr("Dernier export : aujourd'hui.") : tr("Dernier export : il y a {n} j.", { n: days }));
   }
   updateRows();
 }
@@ -1548,17 +2024,17 @@ function buildSpaceEditor() {
   state.spaces.forEach((sp, i) => {
     wrap.append(h("div", { class: "le-row" },
       h("span", { class: "n" }, String(i + 1)),
-      h("input", { class: "pill-input", type: "text", value: sp.name, "aria-label": `Nom de l'espace ${i + 1}`,
+      h("input", { class: "pill-input", type: "text", value: sp.name, "aria-label": tr("Nom de l'espace {n}", { n: i + 1 }),
         onchange: e => { const v = e.target.value.trim(); if (!v) { e.target.value = sp.name; return; } sp.name = v; save(); render(); } }),
-      h("button", { class: "pbtn sq danger", type: "button", title: "Supprimer l'espace", "aria-label": `Supprimer ${sp.name}`,
+      h("button", { class: "pbtn sq danger", type: "button", title: tr("Supprimer l'espace"), "aria-label": tr("Supprimer {name}", { name: sp.name }),
         disabled: state.spaces.length < 2, onclick: () => deleteSpace(sp.id) }, "✕")));
   });
   wrap.append(h("div", {}, h("button", { class: "pbtn", type: "button", onclick: () => {
-    const id = uid();
-    state.spaces.push({ id, name: "Nouvel espace" });
+    const id = uid(), name = tr("Nouvel espace");
+    state.spaces.push({ id, name });
     save(); buildPanel(); setSpace(id);
-    setTimeout(() => [...document.querySelectorAll("#panelBody .list-edit .pill-input")].find(i => i.value === "Nouvel espace")?.select(), 50);
-  } }, "+ Ajouter un espace")));
+    setTimeout(() => [...document.querySelectorAll("#panelBody .list-edit .pill-input")].find(i => i.value === name)?.select(), 50);
+  } }, tr("+ Ajouter un espace"))));
   return wrap;
 }
 function deleteSpace(id) {
@@ -1567,14 +2043,14 @@ function deleteSpace(id) {
   commit(() => {
     state.spaces = others;
     state.blocks.forEach(b => { if (b.space === id) b.space = others[0].id; });
-  }, `Espace « ${sp.name} » supprimé, ses blocs sont dans « ${others[0].name} »`);
+  }, tr("Espace « {name} » supprimé, ses blocs sont dans « {other} »", { name: sp.name, other: others[0].name }));
   buildPanel();
 }
 function buildTenantEditor() {
   const wrap = h("div", { class: "list-edit" });
-  if (!state.tenants.length) wrap.append(h("p", { class: "tip" }, "Aucun tenant. Ajoutes-en un pour ouvrir les liens modèles."));
+  if (!state.tenants.length) wrap.append(h("p", { class: "tip" }, tr("Aucun tenant. Ajoutes-en un pour ouvrir les liens modèles.")));
   for (const t of state.tenants) {
-    const field = (key, ph, label) => h("input", { class: "pill-input", type: "text", value: t[key], placeholder: ph, "aria-label": label, spellcheck: "false", autocomplete: "off",
+    const field = (key, ph, label) => h("input", { class: "pill-input", type: "text", value: t[key], placeholder: ph, "aria-label": tr(label), spellcheck: "false", autocomplete: "off",
       onchange: e => {
         let v = e.target.value.trim();
         // Accept a pasted address and keep only its first label as the tenant id
@@ -1584,21 +2060,21 @@ function buildTenantEditor() {
         save(); render();
       } });
     wrap.append(h("div", { class: "tenant-card" },
-      h("div", { class: "le-row" }, field("name", "Nom affiché", "Nom du tenant"),
-        h("button", { class: "pbtn sq danger", type: "button", title: "Supprimer le tenant", "aria-label": `Supprimer ${t.name}`, onclick: () => deleteTenant(t.id) }, "✕")),
+      h("div", { class: "le-row" }, field("name", tr("Nom affiché"), "Nom du tenant"),
+        h("button", { class: "pbtn sq danger", type: "button", title: tr("Supprimer le tenant"), "aria-label": tr("Supprimer {name}", { name: t.name }), onclick: () => deleteTenant(t.id) }, "✕")),
       h("div", { class: "le-row" }, h("span", { class: "k" }, "{tenant}"), field("slug", "client-a", "Identifiant du tenant")),
-      h("div", { class: "le-row" }, h("span", { class: "k" }, "{domain}"), field("domain", `${t.slug} (par défaut)`, "Domaine")),
-      h("div", { class: "le-row" }, h("span", { class: "k" }, "Couleur"), h("div", { class: "mini-swatches", role: "radiogroup", "aria-label": `Couleur de ${t.name}` },
-        COLORS.map(c => h("button", { type: "button", role: "radio", "aria-checked": String(t.color === c), "aria-label": COLOR_NAMES[c], title: COLOR_NAMES[c], style: `background:var(--${c})`,
+      h("div", { class: "le-row" }, h("span", { class: "k" }, "{domain}"), field("domain", tr("{slug} (par défaut)", { slug: t.slug }), "Domaine")),
+      h("div", { class: "le-row" }, h("span", { class: "k" }, tr("Couleur")), h("div", { class: "mini-swatches", role: "radiogroup", "aria-label": tr("Couleur de {name}", { name: t.name }) },
+        COLORS.map(c => h("button", { type: "button", role: "radio", "aria-checked": String(t.color === c), "aria-label": tr(COLOR_NAMES[c]), title: tr(COLOR_NAMES[c]), style: `background:var(--${c})`,
           onclick: () => { t.color = c; save(); buildPanel(); render(); } }))))));
   }
   wrap.append(h("div", {}, h("button", { class: "pbtn", type: "button", onclick: () => {
-    const t = { id: uid(), name: "Nouveau tenant", slug: "nouveau", domain: "", color: COLORS[state.tenants.length % COLORS.length] };
+    const t = { id: uid(), name: tr("Nouveau tenant"), slug: "nouveau", domain: "", color: COLORS[state.tenants.length % COLORS.length] };
     state.tenants.push(t);
     state.meta.tenant = t.id;
     save(); buildPanel(); render();
     setTimeout(() => [...document.querySelectorAll("#panelBody .tenant-card")].pop()?.querySelector("input")?.select(), 50);
-  } }, "+ Ajouter un tenant")));
+  } }, tr("+ Ajouter un tenant"))));
   return wrap;
 }
 function deleteTenant(id) {
@@ -1606,7 +2082,7 @@ function deleteTenant(id) {
   commit(() => {
     state.tenants = state.tenants.filter(x => x.id !== id);
     if (state.meta.tenant === id) state.meta.tenant = state.tenants[0]?.id || null;
-  }, `Tenant « ${t.name} » supprimé`);
+  }, tr("Tenant « {name} » supprimé", { name: t.name }));
   buildPanel();
 }
 $("#settingsBtn").addEventListener("click", () => togglePanel());
@@ -1638,18 +2114,18 @@ function openMenu(anchor, blockId) {
   const item = (label, fn, cls) => h("button", { type: "button", role: "menuitem", class: cls, onclick: () => { closeMenu(); fn(); } }, label);
   const openable = b.links.filter(linkHref).length;
   menu.replaceChildren(...[
-    openable > 1 ? item(`Ouvrir les ${openable} liens`, () => openAll(b)) : null,
-    item("Ajouter un lien", () => openLinkDrawer(b.id)),
-    item("Modifier le bloc…", () => openBlockDrawer(b.id)),
-    item(b.view === "grid" ? "Afficher en liste" : "Afficher en grille d'icônes", () => { b.view = b.view === "grid" ? "list" : "grid"; save(); render(); }),
+    openable > 1 ? item(tr("Ouvrir les {n} liens", { n: openable }), () => openAll(b)) : null,
+    item(tr("Ajouter un lien"), () => openLinkDrawer(b.id)),
+    item(tr("Modifier le bloc…"), () => openBlockDrawer(b.id)),
+    item(tr(b.view === "grid" ? "Afficher en liste" : "Afficher en grille d'icônes"), () => { b.view = b.view === "grid" ? "list" : "grid"; save(); render(); }),
     // Pointer-free alternative to dragging blocks (WCAG 2.5.7)
-    blockNeighbor(b, -1) ? item("Placer avant", () => moveBlock(b, -1)) : null,
-    blockNeighbor(b, 1) ? item("Placer après", () => moveBlock(b, 1)) : null,
-    ...state.spaces.filter(sp => sp.id !== b.space).map(sp => item(`Déplacer vers ${sp.name}`, () => {
-      commit(() => { b.space = sp.id; }, `« ${b.title} » déplacé vers ${sp.name}`);
+    blockNeighbor(b, -1) ? item(tr("Placer avant"), () => moveBlock(b, -1)) : null,
+    blockNeighbor(b, 1) ? item(tr("Placer après"), () => moveBlock(b, 1)) : null,
+    ...state.spaces.filter(sp => sp.id !== b.space).map(sp => item(tr("Déplacer vers {name}", { name: sp.name }), () => {
+      commit(() => { b.space = sp.id; }, tr("« {name} » déplacé vers {space}", { name: b.title, space: sp.name }));
     })),
     h("hr"),
-    item("Supprimer le bloc", () => deleteBlock(b.id), "danger")
+    item(tr("Supprimer le bloc"), () => deleteBlock(b.id), "danger")
   ].filter(Boolean));
   menu.hidden = false;
   const r = anchor.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight;
@@ -1674,12 +2150,13 @@ function openAll(b) {
     const w = window.open(u, "_blank");
     if (w) w.opener = null; else blocked++;
   }
-  if (blocked) toast(`Safari a bloqué ${blocked} onglet${blocked > 1 ? "s" : ""}. Autorise les fenêtres pop-up pour cette page dans Safari → Réglages → Sites web.`);
+  if (blocked) toast(plural(blocked, "Safari a bloqué {n} onglet. Autorise les fenêtres pop-up pour cette page dans Safari → Réglages → Sites web.",
+    "Safari a bloqué {n} onglets. Autorise les fenêtres pop-up pour cette page dans Safari → Réglages → Sites web."));
 }
 document.addEventListener("click", e => { if (!menu.hidden && !menu.contains(e.target) && !e.target.closest("[aria-haspopup]")) closeMenu(); });
 function deleteBlock(id) {
   const b = findBlock(id);
-  commit(() => { state.blocks = state.blocks.filter(x => x.id !== id); }, `Bloc « ${b.title} » supprimé`);
+  commit(() => { state.blocks = state.blocks.filter(x => x.id !== id); }, tr("Bloc « {name} » supprimé", { name: b.title }));
 }
 
 /* ---------- Drawers ---------- */
@@ -1702,7 +2179,7 @@ let editLinkId = null;
 function openLinkDrawer(blockId, linkId, presetUrl) {
   editLinkId = linkId || null;
   const found = linkId ? findLink(linkId) : null;
-  $("#linkTitle").textContent = found ? "Modifier le lien" : "Ajouter un lien";
+  $("#linkTitle").textContent = tr(found ? "Modifier le lien" : "Ajouter un lien");
   $("#linkUrl").value = found ? found.link.url : (presetUrl || "");
   $("#linkName").value = found ? found.link.name : "";
   $("#linkIcon").value = found?.link.icon || "";
@@ -1722,8 +2199,8 @@ function fillLinkPos(current) {
   if (!b) { $("#linkPos").replaceChildren(); return; }
   const others = b.links.filter(l => l.id !== editLinkId);
   const at = current ?? others.length;
-  $("#linkPos").replaceChildren(...others.map((l, i) => h("option", { value: i, selected: i === at }, `Avant « ${l.name} »`)),
-    h("option", { value: others.length, selected: at >= others.length }, others.length ? "À la fin" : "Premier lien"));
+  $("#linkPos").replaceChildren(...others.map((l, i) => h("option", { value: i, selected: i === at }, tr("Avant « {name} »", { name: l.name }))),
+    h("option", { value: others.length, selected: at >= others.length }, tr(others.length ? "À la fin" : "Premier lien")));
 }
 $("#linkBlock").addEventListener("change", () => fillLinkPos(null));
 $("#linkUrl").addEventListener("blur", () => {
@@ -1738,14 +2215,14 @@ $("#linkForm").addEventListener("submit", e => {
     const raw = $(id).value.trim();
     if (!raw) continue;
     envs[key] = normalizeLinkUrl(raw);
-    if (!envs[key]) { $("#envFields").open = true; $("#linkErr").textContent = `L'adresse ${label} n'est pas valide.`; $("#linkErr").hidden = false; return; }
+    if (!envs[key]) { $("#envFields").open = true; $("#linkErr").textContent = tr("L'adresse {env} n'est pas valide.", { env: label }); $("#linkErr").hidden = false; return; }
   }
   const linkEnvs = envs.dev || envs.test ? { dev: envs.dev || "", test: envs.test || "" } : undefined;
-  if (!url) { $("#linkErr").textContent = "Cette adresse n'est pas valide. Exemple : https://github.com ou https://{tenant}.example.com"; $("#linkErr").hidden = false; return; }
+  if (!url) { $("#linkErr").textContent = tr("Cette adresse n'est pas valide. Exemple : https://github.com ou https://{tenant}.example.com"); $("#linkErr").hidden = false; return; }
   const rawIcon = $("#linkIcon").value.trim();
   const icon = /^data:image\//.test(rawIcon) ? rawIcon : rawIcon && normalizeUrl(rawIcon);
-  if (rawIcon && !icon) { $("#linkErr").textContent = "L'adresse de l'icône n'est pas valide."; $("#linkErr").hidden = false; return; }
-  if (!state.blocks.length) { $("#linkErr").textContent = "Crée d'abord un bloc pour y ranger ce lien."; $("#linkErr").hidden = false; return; }
+  if (rawIcon && !icon) { $("#linkErr").textContent = tr("L'adresse de l'icône n'est pas valide."); $("#linkErr").hidden = false; return; }
+  if (!state.blocks.length) { $("#linkErr").textContent = tr("Crée d'abord un bloc pour y ranger ce lien."); $("#linkErr").hidden = false; return; }
   const name = $("#linkName").value.trim() || guessName(fillTpl(url, "tenant", ""));
   const target = findBlock($("#linkBlock").value) || state.blocks[0];
   const pos = +$("#linkPos").value;
@@ -1767,11 +2244,11 @@ $("#linkForm").addEventListener("submit", e => {
     }
   });
   closeDrawer();
-  toast(wasEdit ? "Lien mis à jour" : `Lien ajouté à « ${target.title} »`);
+  toast(wasEdit ? tr("Lien mis à jour") : tr("Lien ajouté à « {name} »", { name: target.title }));
 });
 function deleteLink(id) {
   const f = findLink(id);
-  commit(() => f.block.links.splice(f.index, 1), `« ${f.link.name} » supprimé`);
+  commit(() => f.block.links.splice(f.index, 1), tr("« {name} » supprimé", { name: f.link.name }));
 }
 $("#linkDelete").addEventListener("click", () => { const id = editLinkId; closeDrawer(); deleteLink(id); });
 
@@ -1780,7 +2257,8 @@ $("#swatches").append(...COLORS.map(c => h("label", { title: COLOR_NAMES[c] }, h
 function openBlockDrawer(id) {
   editBlockId = id || null;
   const b = id ? findBlock(id) : null;
-  $("#blockTitle").textContent = b ? "Modifier le bloc" : "Nouveau bloc";
+  $("#blockTitle").textContent = tr(b ? "Modifier le bloc" : "Nouveau bloc");
+  $("#swatches").querySelectorAll("label").forEach((el, i) => { el.title = tr(COLOR_NAMES[COLORS[i]]); el.querySelector("input").setAttribute("aria-label", el.title); });
   $("#blockName").value = b ? b.title : "";
   const sp = b ? b.space : currentSpace;
   $("#blockSpace").replaceChildren(...state.spaces.map(s => h("option", { value: s.id, selected: s.id === sp }, s.name)));
@@ -1811,20 +2289,20 @@ const M365_LINKS = [
 $("#blockTpl").addEventListener("change", e => {
   const m365 = e.target.value === "m365";
   $("#blockTenantField").hidden = !m365;
-  if (m365 && !$("#blockName").value.trim()) $("#blockName").value = "Microsoft 365";
+  if (m365 && !$("#blockName").value.trim()) $("#blockName").value = tr("Microsoft 365");
   if (m365) $("#blockTenant").focus();
 });
 $("#blockForm").addEventListener("submit", e => {
   e.preventDefault();
   const title = $("#blockName").value.trim();
-  if (!title) { $("#blockErr").textContent = "Donne un titre au bloc."; $("#blockErr").hidden = false; return; }
+  if (!title) { $("#blockErr").textContent = tr("Donne un titre au bloc."); $("#blockErr").hidden = false; return; }
   const color = document.querySelector("input[name=blockColor]:checked").value;
   const view = document.querySelector("input[name=blockView]:checked").value;
   const space = $("#blockSpace").value;
   const m365 = !editBlockId && $("#blockTpl").value === "m365";
   // Same cleanup as the tenant editor: "https://contoso.sharepoint.com" or "contoso.onmicrosoft.com" → "contoso"
   const slug = $("#blockTenant").value.trim().toLowerCase().replace(/^https?:\/\//, "").split(/[./]/)[0].replace(/-(admin|my)$/, "");
-  if (m365 && !slug) { $("#blockErr").textContent = "Indique le nom du tenant, par exemple contoso."; $("#blockErr").hidden = false; return; }
+  if (m365 && !slug) { $("#blockErr").textContent = tr("Indique le nom du tenant, par exemple contoso."); $("#blockErr").hidden = false; return; }
   commit(() => {
     if (editBlockId) Object.assign(findBlock(editBlockId), { title, color, view, space });
     else if (m365) {
@@ -1834,12 +2312,12 @@ $("#blockForm").addEventListener("submit", e => {
         state.tenants.push(t);
       }
       state.meta.tenant = t.id;
-      state.blocks.push({ id: uid(), space, title, color, view, collapsed: false, links: M365_LINKS.map(([name, url]) => ({ id: uid(), name, url })) });
+      state.blocks.push({ id: uid(), space, title, color, view, collapsed: false, links: M365_LINKS.map(([name, url]) => ({ id: uid(), name: tr(name), url })) });
     }
     else state.blocks.push({ id: uid(), space, title, color, view, collapsed: false, links: [] });
   });
   closeDrawer();
-  if (m365) toast(`Bloc Microsoft 365 créé pour « ${currentTenant().name} »`);
+  if (m365) toast(tr("Bloc Microsoft 365 créé pour « {name} »", { name: currentTenant().name }));
 });
 $("#blockDelete").addEventListener("click", () => { const id = editBlockId; closeDrawer(); deleteBlock(id); });
 
@@ -1852,7 +2330,7 @@ function exportData() {
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   syncPanel();
-  toast("Export téléchargé");
+  toast(tr("Export téléchargé"));
 }
 $("#importFile").addEventListener("change", async e => {
   const file = e.target.files[0];
@@ -1861,9 +2339,9 @@ $("#importFile").addEventListener("change", async e => {
   let data;
   try { data = normalize(JSON.parse(await file.text())); } catch { data = null; }
   const note = $("#note-backup");
-  if (!data) { note.className = "note err"; note.textContent = "Ce fichier n'est pas un export de Cockpit SteffPoint (il manque la liste des blocs)."; return; }
+  if (!data) { note.className = "note err"; note.textContent = tr("Ce fichier n'est pas un export de Cockpit SteffPoint (il manque la liste des blocs)."); return; }
   store.set(KEY + "-backup", state);
-  commit(() => { state = data; }, `Import terminé : ${data.blocks.length} blocs`);
+  commit(() => { state = data; }, plural(data.blocks.length, "Import terminé : {n} bloc", "Import terminé : {n} blocs"));
   currentSpace = pickSpace();
   applySettings(); buildPanel(); render(); applyBackground(); loadWeather();
 });
@@ -1884,7 +2362,7 @@ function parseBookmarks(text) {
       path.unshift(h3.textContent.trim());
     }
     if (readingList) continue;
-    const key = path.join(" / ") || "Signets Safari";
+    const key = path.join(" / ") || tr("Signets Safari");
     if (!groups.has(key)) groups.set(key, { path, links: [] });
     groups.get(key).links.push({ id: uid(), name: a.textContent.trim() || guessName(url), url });
   }
@@ -1901,15 +2379,15 @@ $("#bookmarkFile").addEventListener("change", async e => {
   const note = $("#note-bookmarks");
   let groups = [];
   try { groups = parseBookmarks(await file.text()); } catch {}
-  if (!groups.length) { note.className = "note err"; note.textContent = "Aucun signet trouvé. Choisis le fichier « Signets.html » exporté par Safari."; return; }
+  if (!groups.length) { note.className = "note err"; note.textContent = tr("Aucun signet trouvé. Choisis le fichier « Signets.html » exporté par Safari."); return; }
   const total = groups.reduce((n, g) => n + g.links.length, 0);
   commit(() => {
     groups.forEach((g, i) => state.blocks.push({
       id: uid(), space: currentSpace, title: g.title, color: COLORS[(state.blocks.length + i) % COLORS.length],
       view: "list", collapsed: g.links.length > 12, links: g.links
     }));
-  }, `${groups.length} blocs et ${total} liens importés dans ${spaceName(currentSpace)}`);
-  note.className = "note ok"; note.textContent = `${groups.length} blocs importés. Range-les ou supprime ceux en trop en mode édition.`;
+  }, tr("{blocks} blocs et {links} liens importés dans {space}", { blocks: groups.length, links: total, space: spaceName(currentSpace) }));
+  note.className = "note ok"; note.textContent = tr("{n} blocs importés. Range-les ou supprime ceux en trop en mode édition.", { n: groups.length });
 });
 function resetAll() {
   const { settings, tenants, meta } = state;
@@ -1917,7 +2395,7 @@ function resetAll() {
     state = normalize(defaults());
     Object.assign(state, { settings, tenants });
     Object.assign(state.meta, { lastExport: meta.lastExport, since: meta.since, tenant: meta.tenant });
-  }, "Exemples restaurés");
+  }, tr("Exemples restaurés"));
   currentSpace = pickSpace();
   buildPanel(); render();
 }
@@ -1985,7 +2463,7 @@ blocksEl.addEventListener("drop", e => {
 function addUrlTo(block, raw) {
   const url = normalizeUrl(raw);
   if (!url || !block) return false;
-  commit(() => { block.links.push({ id: uid(), name: guessName(url), url }); block.collapsed = false; }, `Lien ajouté à « ${block.title} »`);
+  commit(() => { block.links.push({ id: uid(), name: guessName(url), url }); block.collapsed = false; }, tr("Lien ajouté à « {name} »", { name: block.title }));
   return true;
 }
 
@@ -2093,7 +2571,7 @@ function openOnboarding({ rerun = false } = {}) {
     rerun, step: 0, note: "",
     name: s.name,
     spaces: rerun ? state.spaces.map(x => ({ name: x.name, on: true, locked: true }))
-                  : [{ name: "Pro", on: true }, { name: "Perso", on: true }, { name: "Administration", on: false }],
+                  : [{ id: "pro", name: tr("Pro"), on: true }, { id: "perso", name: tr("Perso"), on: true }, { id: "admin", name: tr("Administration"), on: false }],
     newSpace: "",
     tenant: rerun && t ? t.slug : "",
     presets: new Set(),
@@ -2117,91 +2595,91 @@ function onbClose() {
 }
 
 function onbStepHtml() {
-  const firstSpace = W.spaces.find(x => x.on)?.name || "Pro";
+  const firstSpace = W.spaces.find(x => x.on)?.name || tr("Pro");
   const needTenant = PRESETS.some(p => W.presets.has(p.id) && presetNeedsTenant(p));
   switch (W.step) {
     case 0: return `
-      <h1 class="onb-h1" id="onbTitle">${W.rerun ? "On reprend la configuration" : "Bienvenue sur ton cockpit"}</h1>
-      <p class="onb-lead">Quelques questions pour préparer ta page. Ça prend une minute, et tout reste modifiable ensuite dans les réglages.</p>
-      <label class="onb-field"><span>Comment veux-tu qu'on t'appelle ?</span>
-        <input class="onb-input" data-field="name" value="${esc(W.name)}" placeholder="Ton prénom" autocomplete="given-name"></label>
-      ${W.rerun ? "" : `<div class="onb-callout"><span>Tu as déjà une configuration ?</span>
-        <button class="onb-btn soft" type="button" data-act="json">Importer un .json</button></div>`}
+      <h1 class="onb-h1" id="onbTitle">${tr(W.rerun ? "On reprend la configuration" : "Bienvenue sur ton cockpit")}</h1>
+      <p class="onb-lead">${tr("Quelques questions pour préparer ta page. Ça prend une minute, et tout reste modifiable ensuite dans les réglages.")}</p>
+      <label class="onb-field"><span>${tr("Comment veux-tu qu'on t'appelle ?")}</span>
+        <input class="onb-input" data-field="name" value="${esc(W.name)}" placeholder="${tr("Ton prénom")}" autocomplete="given-name"></label>
+      ${W.rerun ? "" : `<div class="onb-callout"><span>${tr("Tu as déjà une configuration ?")}</span>
+        <button class="onb-btn soft" type="button" data-act="json">${tr("Importer un .json")}</button></div>`}
       <p class="onb-note ${W.noteCls || ""}">${esc(W.note)}</p>`;
     case 1: return `
-      <div><h2 class="onb-h2" id="onbTitle">Tes espaces</h2>
-        <p class="onb-lead">Chaque espace est un onglet avec ses propres favoris. Les touches 1 à 9 permettent de passer de l'un à l'autre.</p></div>
-      <div class="onb-chips" role="group" aria-label="Espaces">
+      <div><h2 class="onb-h2" id="onbTitle">${tr("Tes espaces")}</h2>
+        <p class="onb-lead">${tr("Chaque espace est un onglet avec ses propres favoris. Les touches 1 à 9 permettent de passer de l'un à l'autre.")}</p></div>
+      <div class="onb-chips" role="group" aria-label="${tr("Espaces")}">
         ${W.spaces.map((x, i) => `<button class="onb-chip" type="button" data-act="space" data-i="${i}" aria-pressed="${x.on}" ${x.locked ? "disabled" : ""}>
           <span class="onb-check" aria-hidden="true"></span>${esc(x.name)}</button>`).join("")}
-        <div class="onb-add"><input data-field="newSpace" value="${esc(W.newSpace)}" placeholder="Autre espace…" aria-label="Nouvel espace">
-          <button type="button" data-act="addSpace">Ajouter</button></div>
+        <div class="onb-add"><input data-field="newSpace" value="${esc(W.newSpace)}" placeholder="${tr("Autre espace…")}" aria-label="${tr("Nouvel espace")}">
+          <button type="button" data-act="addSpace">${tr("Ajouter")}</button></div>
       </div>`;
     case 2: return `
-      <div><h2 class="onb-h2" id="onbTitle">De quoi partir ?</h2>
-        <p class="onb-lead">Choisis des blocs prêts à l'emploi. Ils arrivent dans l'espace <b>${esc(firstSpace)}</b>.</p></div>
-      <div class="onb-grid" role="group" aria-label="Blocs prêts à l'emploi">
+      <div><h2 class="onb-h2" id="onbTitle">${tr("De quoi partir ?")}</h2>
+        <p class="onb-lead">${tr("Choisis des blocs prêts à l'emploi. Ils arrivent dans l'espace <b>{space}</b>.", { space: esc(firstSpace) })}</p></div>
+      <div class="onb-grid" role="group" aria-label="${tr("Blocs prêts à l'emploi")}">
         ${PRESETS.map(p => `<button class="onb-card-opt" type="button" data-act="preset" data-id="${p.id}" aria-pressed="${W.presets.has(p.id)}">
-          <span class="hd"><span class="mono" style="background:var(--${p.color})" aria-hidden="true">${p.mono}</span><span class="t">${p.title}</span><span class="onb-check" aria-hidden="true"></span></span>
-          <span class="d">${p.desc}</span></button>`).join("")}
+          <span class="hd"><span class="mono" style="background:var(--${p.color})" aria-hidden="true">${p.mono}</span><span class="t">${tr(p.title)}</span><span class="onb-check" aria-hidden="true"></span></span>
+          <span class="d">${tr(p.desc)}</span></button>`).join("")}
       </div>
-      ${needTenant ? `<div class="onb-field"><label for="onbTenant"><span>Ton tenant Microsoft 365</span></label>
-        <div class="onb-affix"><input class="onb-input" id="onbTenant" data-field="tenant" value="${esc(W.tenant)}" placeholder="monentreprise" autocapitalize="off" spellcheck="false" aria-describedby="onbTenantNote"><span aria-hidden="true">.sharepoint.com</span></div>
-        <p class="onb-note" id="onbTenantNote">Facultatif. Sert à construire les liens SharePoint et OneDrive. Tu pourras en ajouter d'autres ensuite.</p></div>` : ""}
+      ${needTenant ? `<div class="onb-field"><label for="onbTenant"><span>${tr("Ton tenant Microsoft 365")}</span></label>
+        <div class="onb-affix"><input class="onb-input" id="onbTenant" data-field="tenant" value="${esc(W.tenant)}" placeholder="${tr("monentreprise")}" autocapitalize="off" spellcheck="false" aria-describedby="onbTenantNote"><span aria-hidden="true">.sharepoint.com</span></div>
+        <p class="onb-note" id="onbTenantNote">${tr("Facultatif. Sert à construire les liens SharePoint et OneDrive. Tu pourras en ajouter d'autres ensuite.")}</p></div>` : ""}
       <button class="onb-drop" type="button" data-act="bookmarks"><span class="i" aria-hidden="true">↥</span>
-        <span><b>Importer les favoris du navigateur</b><small>${W.imported.length
-          ? `${W.imported.length} dossiers, ${W.imported.reduce((n, g) => n + g.links.length, 0)} liens prêts à importer`
-          : "Fichier .html exporté depuis Safari, Chrome, Edge ou Firefox"}</small></span></button>
+        <span><b>${tr("Importer les favoris du navigateur")}</b><small>${W.imported.length
+          ? tr("{folders} dossiers, {links} liens prêts à importer", { folders: W.imported.length, links: W.imported.reduce((n, g) => n + g.links.length, 0) })
+          : tr("Fichier .html exporté depuis Safari, Chrome, Edge ou Firefox")}</small></span></button>
       <p class="onb-note ${W.noteCls || ""}">${esc(W.note)}</p>`;
     case 3: return `
-      <div><h2 class="onb-h2" id="onbTitle">Ton style</h2>
-        <p class="onb-lead">La disposition change l'organisation de la page. L'aperçu se met à jour.</p></div>
-      <div class="onb-grid layouts" role="group" aria-label="Disposition">
+      <div><h2 class="onb-h2" id="onbTitle">${tr("Ton style")}</h2>
+        <p class="onb-lead">${tr("La disposition change l'organisation de la page. L'aperçu se met à jour.")}</p></div>
+      <div class="onb-grid layouts" role="group" aria-label="${tr("Disposition")}">
         ${ONB_LAYOUTS.map(([id, n, d]) => `<button class="onb-card-opt" type="button" data-act="layout" data-id="${id}" aria-pressed="${W.layout === id}">
           <span class="onb-wf ${id}" aria-hidden="true">${id === "cockpit" ? '<span class="side"></span>' : ""}<span class="col"><span class="hd"></span><span class="sr"></span><span class="bk"><i></i><i></i><i></i></span></span></span>
-          <span class="t">${n}</span><span class="d">${d}</span></button>`).join("")}
+          <span class="t">${tr(n)}</span><span class="d">${tr(d)}</span></button>`).join("")}
       </div>
-      <div class="onb-field"><span id="onbBgLabel">Fond d'écran</span>
-        <div class="onb-seg" role="group" aria-labelledby="onbBgLabel">${ONB_BGS.map(([id, n]) => `<button type="button" data-act="bg" data-id="${id}" aria-pressed="${W.bg === id}">${n}</button>`).join("")}</div>
-        <p class="onb-note">${W.bg === "photo" ? "Une nouvelle photo chaque heure. Ta propre image, le flou et la luminosité se règlent ensuite."
-          : W.bg === "gradient" ? "Un dégradé basé sur la couleur d'accent." : "Un fond sobre, sans distraction."}</p></div>`;
+      <div class="onb-field"><span id="onbBgLabel">${tr("Fond d'écran")}</span>
+        <div class="onb-seg" role="group" aria-labelledby="onbBgLabel">${ONB_BGS.map(([id, n]) => `<button type="button" data-act="bg" data-id="${id}" aria-pressed="${W.bg === id}">${tr(n)}</button>`).join("")}</div>
+        <p class="onb-note">${tr(W.bg === "photo" ? "Une nouvelle photo chaque heure. Ta propre image, le flou et la luminosité se règlent ensuite."
+          : W.bg === "gradient" ? "Un dégradé basé sur la couleur d'accent." : "Un fond sobre, sans distraction.")}</p></div>`;
     case 4: return `
-      <div><h2 class="onb-h2" id="onbTitle">Météo et recherche</h2>
-        <p class="onb-lead">Pour la ligne d'infos sous la salutation.</p></div>
-      <div class="onb-field"><label for="onbCity"><span>Ville</span></label>
-        <div class="onb-row"><input class="onb-input" id="onbCity" data-field="city" value="${esc(W.city)}" placeholder="Bruxelles">
-          <button class="onb-btn soft" type="button" data-act="geo">◎ Ma position</button></div>
+      <div><h2 class="onb-h2" id="onbTitle">${tr("Météo et recherche")}</h2>
+        <p class="onb-lead">${tr("Pour la ligne d'infos sous la salutation.")}</p></div>
+      <div class="onb-field"><label for="onbCity"><span>${tr("Ville")}</span></label>
+        <div class="onb-row"><input class="onb-input" id="onbCity" data-field="city" value="${esc(W.city)}" placeholder="${tr("Bruxelles")}">
+          <button class="onb-btn soft" type="button" data-act="geo">◎ ${tr("Ma position")}</button></div>
         <p class="onb-note ${W.noteCls || ""}">${esc(W.note)}</p>
-        <button class="onb-switch" type="button" role="switch" data-act="weather" aria-checked="${W.weather}"><i aria-hidden="true"></i>Afficher la météo</button></div>
-      <div class="onb-field"><span id="onbEngineLabel">Moteur de recherche par défaut</span>
+        <button class="onb-switch" type="button" role="switch" data-act="weather" aria-checked="${W.weather}"><i aria-hidden="true"></i>${tr("Afficher la météo")}</button></div>
+      <div class="onb-field"><span id="onbEngineLabel">${tr("Moteur de recherche par défaut")}</span>
         <div class="onb-seg" role="group" aria-labelledby="onbEngineLabel">${Object.entries(ENGINES).map(([id, [n]]) => `<button type="button" data-act="engine" data-id="${id}" aria-pressed="${W.engine === id}">${n}</button>`).join("")}</div></div>`;
     case 5: {
       const nm = W.name.trim(), sp = W.spaces.filter(x => x.on).map(x => x.name);
-      const blocks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => p.title), ...(W.imported.length ? [`${W.imported.length} dossiers importés`] : [])];
+      const blocks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => tr(p.title)), ...(W.imported.length ? [tr("{n} dossiers importés", { n: W.imported.length })] : [])];
       const rows = [
-        ["Prénom", nm || "—", 0], ["Espaces", sp.join(", ") || "—", 1],
-        ...(needTenant || W.tenant ? [["Tenant", tenantSlug(W.tenant) ? tenantSlug(W.tenant) + ".sharepoint.com" : "—", 2]] : []),
-        ["Blocs", blocks.join(", ") || "Aucun", 2],
-        ["Style", ONB_LAYOUTS.find(l => l[0] === W.layout)[1] + " · " + ONB_BGS.find(b => b[0] === W.bg)[1], 3],
-        ["Infos", (W.weather ? W.city || "—" : "Météo masquée") + " · " + ENGINES[W.engine][0], 4]
+        [tr("Prénom"), nm || "—", 0], [tr("Espaces"), sp.join(", ") || "—", 1],
+        ...(needTenant || W.tenant ? [[tr("Tenant"), tenantSlug(W.tenant) ? tenantSlug(W.tenant) + ".sharepoint.com" : "—", 2]] : []),
+        [tr("Blocs"), blocks.join(", ") || tr("Aucun"), 2],
+        [tr("Style"), tr(ONB_LAYOUTS.find(l => l[0] === W.layout)[1]) + " · " + tr(ONB_BGS.find(b => b[0] === W.bg)[1]), 3],
+        [tr("Infos"), (W.weather ? W.city || "—" : tr("Météo masquée")) + " · " + ENGINES[W.engine][0], 4]
       ];
       return `
       <div><div class="onb-done" aria-hidden="true">✓</div></div>
-      <div><h1 class="onb-h1" id="onbTitle">${nm ? `C'est prêt, ${esc(nm)}.` : "C'est prêt."}</h1>
-        <p class="onb-lead">Voici ce qui a été configuré. Tout reste modifiable via ⚙ en bas à droite.</p></div>
+      <div><h1 class="onb-h1" id="onbTitle">${nm ? tr("C'est prêt, {name}.", { name: esc(nm) }) : tr("C'est prêt.")}</h1>
+        <p class="onb-lead">${tr("Voici ce qui a été configuré. Tout reste modifiable via ⚙ en bas à droite.")}</p></div>
       <div class="onb-recap">${rows.map(([k, v, st]) => `<div><span class="k">${k}</span><span class="v">${esc(v)}</span>
-        <button type="button" data-act="goto" data-step="${st}" aria-label="Modifier : ${k}">Modifier</button></div>`).join("")}</div>
-      ${S().keys ? `<div class="onb-keys"><span><kbd>/</kbd> rechercher</span><span><kbd>1–9</kbd> changer d'espace</span><span><kbd>E</kbd> mode édition</span></div>` : ""}`;
+        <button type="button" data-act="goto" data-step="${st}" aria-label="${tr("Modifier : {k}", { k })}">${tr("Modifier")}</button></div>`).join("")}</div>
+      ${S().keys ? `<div class="onb-keys"><span><kbd>/</kbd> ${tr("rechercher")}</span><span><kbd>1–9</kbd> ${tr("changer d'espace")}</span><span><kbd>E</kbd> ${tr("mode édition")}</span></div>` : ""}`;
     }
   }
 }
 
 function onbPreview() {
-  const nm = W.name.trim(), greet = nm ? `Bonjour, ${esc(nm)}` : "Bonjour";
+  const nm = W.name.trim(), greet = nm ? `${autoGreet()}, ${esc(nm)}` : autoGreet();
   const tabs = W.spaces.filter(x => x.on).map(x => `<span>${esc(x.name)}</span>`).join("");
-  const bks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => [p.title, `var(--${p.color})`]),
+  const bks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => [tr(p.title), `var(--${p.color})`]),
                ...W.imported.slice(0, 4).map((g, i) => [g.title, `var(--${COLORS[i % COLORS.length]})`])];
-  const time = new Date().toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit" });
+  const time = new Date().toLocaleTimeString(LOCALE(), { hour: "2-digit", minute: "2-digit" });
   const meta = [time, W.weather && W.city ? W.city : ""].filter(Boolean).join(" · ");
   const pv = $("#onbPv");
   pv.className = `onb-pv ${W.layout} ${W.bg}`;
@@ -2210,10 +2688,10 @@ function onbPreview() {
     <div class="col">
       ${W.layout === "classic" ? `<div><div class="greet">${time}</div><div class="meta">${greet}</div></div>` : ""}
       ${W.layout === "accueil" || W.layout === "lanceur" ? `<div><div class="greet">${greet}</div><div class="meta">${esc(meta)}</div></div>` : ""}
-      <div class="sr">Rechercher avec ${ENGINES[W.engine][0]}</div>
+      <div class="sr">${tr("Rechercher avec {engine}", { engine: ENGINES[W.engine][0] })}</div>
       <div class="tabs">${tabs}</div>
       ${bks.length ? `<div class="bks">${bks.map(([t, c]) => `<div class="bk"><b><i style="background:${c}"></i>${esc(t)}</b><s></s><s></s><s></s></div>`).join("")}</div>`
-                   : `<div class="empty">Aucun bloc pour l'instant</div>`}
+                   : `<div class="empty">${tr("Aucun bloc pour l'instant")}</div>`}
     </div>`;
 }
 
@@ -2229,14 +2707,14 @@ function onbRender(focus = true) {
   const st = W.step, last = ONB_STEPS.length - 1;
   const keep = focus ? null : onbFocusKey(document.activeElement);
   $("#onbBars").innerHTML = ONB_STEPS.map((_, i) => `<i class="${i <= st ? "on" : ""}"></i>`).join("");
-  $("#onbStep").textContent = `Étape ${st + 1} sur ${ONB_STEPS.length} · ${ONB_STEPS[st]}`;
+  $("#onbStep").textContent = tr("Étape {n} sur {total} · {name}", { n: st + 1, total: ONB_STEPS.length, name: tr(ONB_STEPS[st]) });
   $("#onbSkipAll").hidden = st === last;
   $("#onbBack").hidden = st === 0;
   $("#onbLater").hidden = st === 0 || st === last;
   const nm = W.name.trim();
-  $("#onbNext").textContent = st === 0 ? (nm ? `Commencer, ${nm} →` : "Commencer →") : st === last ? "Ouvrir mon tableau de bord" : "Continuer →";
+  $("#onbNext").textContent = st === 0 ? (nm ? tr("Commencer, {name} →", { name: nm }) : tr("Commencer →")) : tr(st === last ? "Ouvrir mon tableau de bord" : "Continuer →");
   $("#onbBody").innerHTML = onbStepHtml();
-  $("#onbTip").textContent = ONB_TIPS[st];
+  $("#onbTip").textContent = tr(ONB_TIPS[st]);
   onbPreview();
   if (focus) ($("#onbBody input") || $("#onbTitle") || $("#onbNext")).focus({ preventScroll: true });
   else if (keep) $("#onb").querySelector(keep)?.focus({ preventScroll: true });
@@ -2255,15 +2733,15 @@ async function onbNext() {
 }
 
 async function onbGeocode() {
-  onbNote("Recherche de la ville…");
+  onbNote(tr("Recherche de la ville…"));
   try {
-    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(W.city)}&count=1&language=fr`);
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(W.city)}&count=1&language=${lang}`);
     const res = (await r.json()).results?.[0];
-    if (!res) { onbNote(`Aucune ville trouvée pour « ${W.city} ».`, "err"); return false; }
+    if (!res) { onbNote(tr("Aucune ville trouvée pour « {name} ».", { name: W.city }), "err"); return false; }
     Object.assign(W, { city: res.name, lat: +res.latitude.toFixed(3), lon: +res.longitude.toFixed(3), cityOk: true });
     onbNote(`${res.name}${res.country ? ", " + res.country : ""}`, "ok");
     return true;
-  } catch { onbNote("Recherche impossible : pas de connexion ?", "err"); return false; }
+  } catch { onbNote(tr("Recherche impossible : pas de connexion ?"), "err"); return false; }
 }
 
 function onbAddSpace() {
@@ -2273,7 +2751,7 @@ function onbAddSpace() {
   W.newSpace = "";
   onbRender(false);
   $('[data-field="newSpace"]').focus();
-  $("#onbLive").textContent = `Espace « ${n} » ajouté`;
+  $("#onbLive").textContent = tr("Espace « {name} » ajouté", { name: n });
 }
 
 function onbFinish(skip) {
@@ -2283,11 +2761,12 @@ function onbFinish(skip) {
     const used = new Set(), spaces = [];
     for (const x of W.spaces.filter(x => x.on)) {
       const existing = state.spaces.find(e => e.name === x.name);
-      let id = existing?.id || slugify(x.name);
+      // Default spaces keep their fixed ids so the weekday / weekend switch still finds them once translated
+      let id = existing?.id || x.id || slugify(x.name);
       while (used.has(id)) id += "-2";
       used.add(id); spaces.push({ id, name: x.name });
     }
-    if (!spaces.length) spaces.push({ id: "pro", name: "Pro" });
+    if (!spaces.length) spaces.push({ id: "pro", name: tr("Pro") });
     const ids = spaces.map(x => x.id), first = ids[0];
     // Tenant, only when a block needs one or one was typed
     const slug = tenantSlug(W.tenant);
@@ -2297,8 +2776,8 @@ function onbFinish(skip) {
     // Blocks
     const fresh = [
       ...PRESETS.filter(p => W.presets.has(p.id)).map(p => ({
-        id: uid(), space: first, title: p.title, color: p.color, view: "list", collapsed: false,
-        links: p.links.map(([name, url]) => ({ id: uid(), name, url })) })),
+        id: uid(), space: first, title: tr(p.title), color: p.color, view: "list", collapsed: false,
+        links: p.links.map(([name, url]) => ({ id: uid(), name: tr(name), url })) })),
       ...W.imported.map((g, i) => ({
         id: uid(), space: first, title: g.title, color: COLORS[i % COLORS.length], view: "list",
         collapsed: g.links.length > 12, links: g.links }))
@@ -2322,7 +2801,7 @@ function onbFinish(skip) {
   currentSpace = pickSpace();
   onbClose();
   applySettings(); render(); buildPanel(); applyBackground(); loadWeather(true);
-  if (!skip) toast("Tableau de bord prêt");
+  if (!skip) toast(tr("Tableau de bord prêt"));
 }
 
 $("#onb").addEventListener("click", e => {
@@ -2341,11 +2820,11 @@ $("#onb").addEventListener("click", e => {
     case "json": return $("#onbJson").click();
     case "bookmarks": return $("#onbBookmarks").click();
     case "geo":
-      if (!navigator.geolocation) return onbNote("Géolocalisation indisponible dans ce navigateur.", "err");
-      onbNote("Localisation…");
+      if (!navigator.geolocation) return onbNote(tr("Géolocalisation indisponible dans ce navigateur."), "err");
+      onbNote(tr("Localisation…"));
       return navigator.geolocation.getCurrentPosition(
-        p => { Object.assign(W, { city: "Ma position", lat: +p.coords.latitude.toFixed(3), lon: +p.coords.longitude.toFixed(3), cityOk: true }); onbNote("Position utilisée pour la météo.", "ok"); },
-        () => onbNote("Position refusée. Saisis plutôt une ville.", "err"), { timeout: 10000 });
+        p => { Object.assign(W, { city: tr("Ma position"), lat: +p.coords.latitude.toFixed(3), lon: +p.coords.longitude.toFixed(3), cityOk: true }); onbNote(tr("Position utilisée pour la météo."), "ok"); },
+        () => onbNote(tr("Position refusée. Saisis plutôt une ville."), "err"), { timeout: 10000 });
     default: return;
   }
   onbRender(false);
@@ -2355,7 +2834,7 @@ $("#onb").addEventListener("input", e => {
   if (!f || !W) return;
   W[f] = f === "tenant" ? e.target.value.replace(/\s|\.sharepoint\.com.*$/gi, "") : e.target.value;
   if (f === "city") W.cityOk = false;
-  if (f === "name") { const nm = W.name.trim(); $("#onbNext").textContent = nm ? `Commencer, ${nm} →` : "Commencer →"; }
+  if (f === "name") { const nm = W.name.trim(); $("#onbNext").textContent = nm ? tr("Commencer, {name} →", { name: nm }) : tr("Commencer →"); }
   onbPreview();
 });
 $("#onb").addEventListener("keydown", e => {
@@ -2376,7 +2855,7 @@ $("#onbJson").addEventListener("change", async e => {
   if (!file) return;
   let data = null;
   try { data = normalize(JSON.parse(await file.text())); } catch {}
-  if (!data) return onbNote("Ce fichier n'est pas un export de Cockpit SteffPoint.", "err");
+  if (!data) return onbNote(tr("Ce fichier n'est pas un export de Cockpit SteffPoint."), "err");
   data.meta.onboarded = Date.now();
   state = data; save();
   location.reload();
@@ -2386,9 +2865,9 @@ $("#onbBookmarks").addEventListener("change", async e => {
   if (!file) return;
   let groups = [];
   try { groups = parseBookmarks(await file.text()); } catch {}
-  if (!groups.length) return onbNote("Aucun signet trouvé dans ce fichier.", "err");
+  if (!groups.length) return onbNote(tr("Aucun signet trouvé dans ce fichier."), "err");
   W.imported = groups;
-  onbNote(`${groups.length} dossiers trouvés. Ils seront ajoutés à la fin.`, "ok");
+  onbNote(tr("{n} dossiers trouvés. Ils seront ajoutés à la fin.", { n: groups.length }), "ok");
 });
 
 /* ---------- Boot ---------- */
