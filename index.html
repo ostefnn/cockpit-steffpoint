@@ -1026,7 +1026,9 @@ const I18N = {
   "{n} bloc Microsoft 365 créé pour « {name} »": ["{n} Microsoft 365 block created for “{name}”", "{n} Microsoft 365-blok gemaakt voor „{name}”"],
   "{n} blocs Microsoft 365 créés pour « {name} »": ["{n} Microsoft 365 blocks created for “{name}”", "{n} Microsoft 365-blokken gemaakt voor „{name}”"],
   "Administration Microsoft 365": ["Microsoft 365 administration", "Microsoft 365-beheer"],
-  "Pour les administrateurs d'un tenant. Ajoute le modèle « Admin Microsoft 365 » dans « Nouveau bloc » : un bloc par domaine (centre d'admin, collaboration, Power Platform, sécurité, appareils…).": ["For tenant administrators. Adds the “Microsoft 365 admin” template to “New block”: one block per area (admin center, collaboration, Power Platform, security, devices…).", "Voor beheerders van een tenant. Voegt het sjabloon „Microsoft 365-beheer” toe aan „Nieuw blok”: één blok per domein (beheercentrum, samenwerking, Power Platform, beveiliging, apparaten…)."],
+  "Pour les administrateurs d'un tenant. Ajoute un espace « Admin O365 » avec un bloc par domaine (centre d'admin, collaboration, Power Platform, sécurité, appareils…) et le modèle « Admin Microsoft 365 » dans « Nouveau bloc ».": ["For tenant administrators. Adds an “O365 admin” space with one block per area (admin center, collaboration, Power Platform, security, devices…) and the “Microsoft 365 admin” template to “New block”.", "Voor beheerders van een tenant. Voegt een ruimte „O365-beheer” toe met één blok per domein (beheercentrum, samenwerking, Power Platform, beveiliging, apparaten…) en het sjabloon „Microsoft 365-beheer” in „Nieuw blok”."],
+  "Espace « {space} » ajouté avec {n} blocs": ["“{space}” space added with {n} blocks", "Ruimte „{space}” toegevoegd met {n} blokken"],
+  "Espace « {space} » ajouté avec {n} blocs. Ajoute ton tenant pour SharePoint et OneDrive.": ["“{space}” space added with {n} blocks. Add your tenant for SharePoint and OneDrive.", "Ruimte „{space}” toegevoegd met {n} blokken. Voeg je tenant toe voor SharePoint en OneDrive."],
   "J'administre un tenant Microsoft 365": ["I administer a Microsoft 365 tenant", "Ik beheer een Microsoft 365-tenant"],
   "Ajoute un espace « {space} » avec un bloc par domaine : centre d'admin, collaboration, Power Platform, sécurité, appareils, mon compte.": ["Adds a “{space}” space with one block per area: admin center, collaboration, Power Platform, security, devices, my account.", "Voegt een ruimte „{space}” toe met één blok per domein: beheercentrum, samenwerking, Power Platform, beveiliging, apparaten, mijn account."],
   "Admin O365": ["O365 admin", "O365-beheer"],
@@ -1941,8 +1943,8 @@ const SCHEMA = [
       note: "Un favori peut avoir une adresse DEV et TEST en plus de son adresse principale (PROD), via « Environnements » quand tu modifies le lien. Le sélecteur DEV | TEST | PROD apparaît dès qu'un favori en a une." }
   ]},
   { title: "Administration Microsoft 365", rows: [
-    { type: "toggle", path: "m365admin", label: "Activer",
-      note: "Pour les administrateurs d'un tenant. Ajoute le modèle « Admin Microsoft 365 » dans « Nouveau bloc » : un bloc par domaine (centre d'admin, collaboration, Power Platform, sécurité, appareils…)." }
+    { type: "toggle", path: "m365admin", label: "Activer", after: () => { if (S().m365admin) addM365Space(); },
+      note: "Pour les administrateurs d'un tenant. Ajoute un espace « Admin O365 » avec un bloc par domaine (centre d'admin, collaboration, Power Platform, sécurité, appareils…) et le modèle « Admin Microsoft 365 » dans « Nouveau bloc »." }
   ]},
   // Only shown once tenants exist, a link uses {tenant} or the Microsoft 365 admin is on
   { title: "Tenants", id: "tenants", when: s => tenantsAnywhere() || s.m365admin, rows: [
@@ -2399,6 +2401,22 @@ const M365_CATS = [
 ];
 // Unchecked by default: personal pages and tools are less "admin"
 const M365_DEFAULT_OFF = new Set(["copilot", "tools"]);
+const M365_SPACE = "admin-o365";
+const m365AdminBlocks = space => M365_CATS.filter(c => !M365_DEFAULT_OFF.has(c.id)).map(c => ({
+  id: uid(), space, title: tr(c.title), color: c.color, view: "list", collapsed: false,
+  links: c.links.map(([name, url]) => ({ id: uid(), name: tr(name), url })) }));
+// Turning the switch on in an existing dashboard: add the Admin O365 tab once, never touch the other spaces
+function addM365Space() {
+  if (state.spaces.some(x => x.id === M365_SPACE)) return;
+  const blocks = m365AdminBlocks(M365_SPACE);
+  commit(() => {
+    state.spaces.push({ id: M365_SPACE, name: tr("Admin O365") });
+    state.blocks.push(...blocks);
+    setSpace(M365_SPACE);
+  }, tr(state.tenants.length ? "Espace « {space} » ajouté avec {n} blocs" : "Espace « {space} » ajouté avec {n} blocs. Ajoute ton tenant pour SharePoint et OneDrive.",
+    { space: tr("Admin O365"), n: blocks.length }));
+  buildPanel();
+}
 function renderTplCats() {
   $("#blockCats").replaceChildren(...M365_CATS.map(c => h("label", {},
     h("input", { type: "checkbox", value: c.id, checked: !M365_DEFAULT_OFF.has(c.id) }),
@@ -2896,8 +2914,8 @@ function onbFinish(skip) {
     }
     if (!spaces.length) spaces.push({ id: "pro", name: tr("Pro") });
     // Microsoft 365 admin: its own space, filled once with the default category blocks
-    const adminFresh = W.m365 && !spaces.some(x => x.id === "admin-o365");
-    if (adminFresh) spaces.push({ id: "admin-o365", name: tr("Admin O365") });
+    const adminFresh = W.m365 && !spaces.some(x => x.id === M365_SPACE);
+    if (adminFresh) spaces.push({ id: M365_SPACE, name: tr("Admin O365") });
     const ids = spaces.map(x => x.id), first = ids[0];
     // Tenant, only when a block needs one or one was typed
     const slug = tenantSlug(W.tenant);
@@ -2912,9 +2930,7 @@ function onbFinish(skip) {
       ...W.imported.map((g, i) => ({
         id: uid(), space: first, title: g.title, color: COLORS[i % COLORS.length], view: "list",
         collapsed: g.links.length > 12, links: g.links })),
-      ...(adminFresh ? M365_CATS.filter(c => !M365_DEFAULT_OFF.has(c.id)).map(c => ({
-        id: uid(), space: "admin-o365", title: tr(c.title), color: c.color, view: "list", collapsed: false,
-        links: c.links.map(([name, url]) => ({ id: uid(), name: tr(name), url })) })) : [])
+      ...(adminFresh ? m365AdminBlocks(M365_SPACE) : [])
     ];
     // Write everything at once
     s.name = W.name.trim();
