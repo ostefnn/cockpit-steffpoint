@@ -274,6 +274,12 @@ input[type=color]{width:44px;height:32px;border:0;padding:0;background:none;curs
 .swatches span{display:block;width:30px;height:30px;border-radius:8px;border:3px solid transparent}
 .swatches input:checked+span{border-color:var(--fg)}
 .swatches input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.tpl-cats{display:grid;gap:2px;border:1px solid var(--line);border-radius:8px;padding:6px}
+.tpl-cats label{display:grid;grid-template-columns:auto 12px minmax(0,1fr);align-items:center;gap:8px;padding:6px;border-radius:6px;cursor:pointer;color:var(--fg);font-weight:500}
+.tpl-cats label:hover{background:var(--accent-soft)}
+.tpl-cats input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.tpl-cats i{width:12px;height:12px;border-radius:4px}
+.tpl-cats small{display:block;color:var(--muted);font-weight:400;font-size:.78rem}
 .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg label{flex:1;text-align:center;cursor:pointer}
 .seg input{position:absolute;opacity:0}
@@ -611,7 +617,9 @@ body.l-lanceur .links.grid .lk{height:96px;justify-content:center}
     <div class="field" id="blockTplField"><label for="blockTpl">Modèle</label><select id="blockTpl"><option value="">Bloc vide</option><option value="m365">Admin Microsoft 365</option></select></div>
     <div class="field" id="blockTenantField" hidden><label for="blockTenant">Tenant</label><input id="blockTenant" type="text" placeholder="ex. contoso (de contoso.onmicrosoft.com)" spellcheck="false" autocomplete="off">
       <p class="tip">Crée le tenant s'il n'existe pas. SharePoint, OneDrive et Azure suivent ensuite le tenant choisi au-dessus des blocs.</p></div>
-    <div class="field"><label for="blockName">Titre</label><input id="blockName" type="text" placeholder="ex. Outils" required></div>
+    <div class="field" id="blockCatsField" hidden><span class="legend" id="blockCatsLegend">Catégories</span><div class="tpl-cats" id="blockCats" role="group" aria-labelledby="blockCatsLegend"></div>
+      <p class="tip">Un bloc par catégorie cochée.</p></div>
+    <div class="field" id="blockNameField"><label for="blockName">Titre</label><input id="blockName" type="text" placeholder="ex. Outils" required></div>
     <div class="field"><label for="blockSpace">Espace</label><select id="blockSpace"></select></div>
     <div class="field"><span class="legend">Couleur</span><div class="swatches" id="swatches"></div></div>
     <div class="field"><span class="legend">Affichage</span>
@@ -669,7 +677,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const $ = s => document.querySelector(s);
 
 const DEFAULT_SETTINGS = {
-  name: "", lang: "auto", theme: "auto", layout: "classic", showAll: false, hideDock: false, keys: true,
+  name: "", lang: "auto", theme: "auto", layout: "classic", showAll: false, hideDock: false, keys: true, m365admin: false,
   bg: { type: "photo", freq: "hour", blur: 12, bright: 85, veil: 35, color: "#0e7490", url: "", photo: null, at: 0 },
   links: { on: true, style: "glass", cols: "auto", radius: 12, newTab: false, icons: "favicon", max: 8 },
   clock: { on: true, h24: true, seconds: false, size: 100, date: "long" },
@@ -1015,7 +1023,55 @@ const I18N = {
   "Grille d'icônes": ["Icon grid", "Pictogrammenraster"],
   "Donne un titre au bloc.": ["Give the block a title.", "Geef het blok een titel."],
   "Indique le nom du tenant, par exemple contoso.": ["Enter the tenant name, for example contoso.", "Vul de naam van de tenant in, bijvoorbeeld contoso."],
-  "Bloc Microsoft 365 créé pour « {name} »": ["Microsoft 365 block created for “{name}”", "Microsoft 365-blok gemaakt voor „{name}”"],
+  "{n} bloc Microsoft 365 créé pour « {name} »": ["{n} Microsoft 365 block created for “{name}”", "{n} Microsoft 365-blok gemaakt voor „{name}”"],
+  "{n} blocs Microsoft 365 créés pour « {name} »": ["{n} Microsoft 365 blocks created for “{name}”", "{n} Microsoft 365-blokken gemaakt voor „{name}”"],
+  "Administration Microsoft 365": ["Microsoft 365 administration", "Microsoft 365-beheer"],
+  "Pour les administrateurs d'un tenant. Ajoute le modèle « Admin Microsoft 365 » dans « Nouveau bloc » : un bloc par domaine (centre d'admin, collaboration, Power Platform, sécurité, appareils…).": ["For tenant administrators. Adds the “Microsoft 365 admin” template to “New block”: one block per area (admin center, collaboration, Power Platform, security, devices…).", "Voor beheerders van een tenant. Voegt het sjabloon „Microsoft 365-beheer” toe aan „Nieuw blok”: één blok per domein (beheercentrum, samenwerking, Power Platform, beveiliging, apparaten…)."],
+  "J'administre un tenant Microsoft 365": ["I administer a Microsoft 365 tenant", "Ik beheer een Microsoft 365-tenant"],
+  "Ajoute un espace « {space} » avec un bloc par domaine : centre d'admin, collaboration, Power Platform, sécurité, appareils, mon compte.": ["Adds a “{space}” space with one block per area: admin center, collaboration, Power Platform, security, devices, my account.", "Voegt een ruimte „{space}” toe met één blok per domein: beheercentrum, samenwerking, Power Platform, beveiliging, apparaten, mijn account."],
+  "Admin O365": ["O365 admin", "O365-beheer"],
+  "Coche au moins une catégorie.": ["Tick at least one category.", "Vink minstens één categorie aan."],
+  "Catégories": ["Categories", "Categorieën"],
+  "Un bloc par catégorie cochée.": ["One block per ticked category.", "Eén blok per aangevinkte categorie."],
+  "{n} lien": ["{n} link", "{n} link"],
+  "{n} liens": ["{n} links", "{n} links"],
+  "Administration principale": ["Core administration", "Kernbeheer"],
+  "Centre d'admin, Entra, Azure, santé du service": ["Admin center, Entra, Azure, service health", "Beheercentrum, Entra, Azure, servicestatus"],
+  "Admin Microsoft 365 Apps": ["Microsoft 365 Apps admin", "Microsoft 365 Apps-beheer"],
+  "Utilisateurs actifs": ["Active users", "Actieve gebruikers"],
+  "Licences": ["Licenses", "Licenties"],
+  "Centre de messages": ["Message center", "Berichtencentrum"],
+  "Santé du service": ["Service health", "Servicestatus"],
+  "Collaboration": ["Collaboration", "Samenwerking"],
+  "SharePoint, OneDrive, Teams, Exchange": ["SharePoint, OneDrive, Teams, Exchange", "SharePoint, OneDrive, Teams, Exchange"],
+  "Suivi des messages": ["Message trace", "Berichttracering"],
+  "Centre d'admin, Apps, Automate, Fabric, Copilot Studio": ["Admin center, Apps, Automate, Fabric, Copilot Studio", "Beheercentrum, Apps, Automate, Fabric, Copilot Studio"],
+  "Sécurité et conformité": ["Security and compliance", "Beveiliging en compliance"],
+  "Defender, Secure Score, Purview, accès conditionnel": ["Defender, Secure Score, Purview, Conditional Access", "Defender, Secure Score, Purview, voorwaardelijke toegang"],
+  "Incidents": ["Incidents", "Incidenten"],
+  "Accès conditionnel": ["Conditional Access", "Voorwaardelijke toegang"],
+  "Journaux de connexion": ["Sign-in logs", "Aanmeldingslogboeken"],
+  "Appareils": ["Devices", "Apparaten"],
+  "Intune, Windows 365, appareils Defender": ["Intune, Windows 365, Defender devices", "Intune, Windows 365, Defender-apparaten"],
+  "Admin Intune": ["Intune admin", "Intune-beheer"],
+  "Tous les appareils": ["All devices", "Alle apparaten"],
+  "Inventaire Defender": ["Defender device inventory", "Defender-apparaatinventaris"],
+  "Copilot et IA": ["Copilot and AI", "Copilot en AI"],
+  "Admin Copilot, Copilot Chat, agents": ["Copilot admin, Copilot Chat, agents", "Copilot-beheer, Copilot Chat, agents"],
+  "Admin Copilot": ["Copilot admin", "Copilot-beheer"],
+  "Mon compte": ["My account", "Mijn account"],
+  "Profil, applis, connexions, accès, groupes": ["Profile, apps, sign-ins, access, groups", "Profiel, apps, aanmeldingen, toegang, groepen"],
+  "Mes applications": ["My apps", "Mijn apps"],
+  "Mes connexions": ["My sign-ins", "Mijn aanmeldingen"],
+  "Mes accès": ["My access", "Mijn toegang"],
+  "Mes groupes": ["My groups", "Mijn groepen"],
+  "Outils et diagnostic": ["Tools and diagnostics", "Tools en diagnose"],
+  "Graph Explorer, état du service, feuille de route": ["Graph Explorer, service status, roadmap", "Graph Explorer, servicestatus, roadmap"],
+  "État des services Microsoft": ["Microsoft service status", "Status van Microsoft-services"],
+  "Feuille de route Microsoft 365": ["Microsoft 365 roadmap", "Microsoft 365-roadmap"],
+  "Analyseur de connectivité": ["Connectivity analyzer", "Connectiviteitsanalyse"],
+  "Analyseur d'en-têtes": ["Message header analyzer", "Analyse van berichtkoppen"],
+  "Docs admin Microsoft 365": ["Microsoft 365 admin docs", "Microsoft 365-beheerdocs"],
 
   // Export, import
   "Export téléchargé": ["Export downloaded", "Export gedownload"],
@@ -1054,13 +1110,15 @@ const I18N = {
   "Tableau de bord": ["Dashboard", "Dashboard"],
   "Centre d'admin": ["Admin center", "Beheercentrum"],
   "Sécurité": ["Security", "Beveiliging"],
-  "Admin M365": ["M365 admin", "M365-beheer"],
-  "Teams, Outlook, Planner, OneDrive, Power Automate": ["Teams, Outlook, Planner, OneDrive, Power Automate", "Teams, Outlook, Planner, OneDrive, Power Automate"],
-  "Accueil du tenant, sites suivis, admin SharePoint": ["Tenant home, followed sites, SharePoint admin", "Startpagina van de tenant, gevolgde sites, SharePoint-beheer"],
-  "Power Apps, Automate, BI, centre d'admin": ["Power Apps, Automate, BI, admin center", "Power Apps, Automate, BI, beheercentrum"],
+  "Accueil, Outlook, Calendrier, Teams, OneDrive, Copilot": ["Home, Outlook, Calendar, Teams, OneDrive, Copilot", "Start, Outlook, Agenda, Teams, OneDrive, Copilot"],
+  "Accueil Microsoft 365": ["Microsoft 365 home", "Microsoft 365-start"],
+  "Calendrier": ["Calendar", "Agenda"],
+  "Word, Excel, PowerPoint, OneNote, Forms, Loop": ["Word, Excel, PowerPoint, OneNote, Forms, Loop", "Word, Excel, PowerPoint, OneNote, Forms, Loop"],
+  "Accueil du tenant, sites suivis, Viva Engage": ["Tenant home, followed sites, Viva Engage", "Startpagina van de tenant, gevolgde sites, Viva Engage"],
+  "Tâches": ["Tasks", "Taken"],
+  "Planner, To Do, Bookings": ["Planner, To Do, Bookings", "Planner, To Do, Bookings"],
+  "Power Apps, Automate, BI, Copilot Studio": ["Power Apps, Automate, BI, Copilot Studio", "Power Apps, Automate, BI, Copilot Studio"],
   "Tableau de bord, PR, issues, notifications": ["Dashboard, PRs, issues, notifications", "Dashboard, PR's, issues, meldingen"],
-  "Portail, Entra ID, DevOps": ["Portal, Entra ID, DevOps", "Portal, Entra ID, DevOps"],
-  "Centre d'admin, Exchange, Teams, sécurité": ["Admin center, Exchange, Teams, security", "Beheercentrum, Exchange, Teams, beveiliging"],
 
   // Onboarding
   "Passer la configuration": ["Skip setup", "Configuratie overslaan"],
@@ -1221,9 +1279,12 @@ function normalize(d) {
     .map((t, i) => ({ id: String(t.id || uid()), name: String(t.name || t.slug), slug: String(t.slug).trim(), domain: String(t.domain || ""),
       color: COLORS.includes(t.color) ? t.color : COLORS[i % COLORS.length] }));
   const m = d.meta || {};
+  const settings = merge(DEFAULT_SETTINGS, migrateSettings(d.settings));
+  // Files from before the Microsoft 365 switch: whoever already has tenants keeps the admin template
+  if (d.settings && !("m365admin" in d.settings) && tenants.length) settings.m365admin = true;
   return {
     version: 1,
-    settings: merge(DEFAULT_SETTINGS, migrateSettings(d.settings)),
+    settings,
     meta: {
       lastExport: m.lastExport || null, since: +m.since || Date.now(), snooze: +m.snooze || 0,
       onboarded: +m.onboarded || 0,
@@ -1879,8 +1940,12 @@ const SCHEMA = [
     { type: "toggle", path: "env.remember", label: "Mémoriser le dernier choisi", after: () => { activeEnv = S().env.remember && state.meta.env ? state.meta.env : S().env.def; render(); },
       note: "Un favori peut avoir une adresse DEV et TEST en plus de son adresse principale (PROD), via « Environnements » quand tu modifies le lien. Le sélecteur DEV | TEST | PROD apparaît dès qu'un favori en a une." }
   ]},
-  // Only shown once tenants exist or a link uses {tenant}; a Microsoft 365 block is the usual way in
-  { title: "Tenants", id: "tenants", when: () => tenantsAnywhere(), rows: [
+  { title: "Administration Microsoft 365", rows: [
+    { type: "toggle", path: "m365admin", label: "Activer",
+      note: "Pour les administrateurs d'un tenant. Ajoute le modèle « Admin Microsoft 365 » dans « Nouveau bloc » : un bloc par domaine (centre d'admin, collaboration, Power Platform, sécurité, appareils…)." }
+  ]},
+  // Only shown once tenants exist, a link uses {tenant} or the Microsoft 365 admin is on
+  { title: "Tenants", id: "tenants", when: s => tenantsAnywhere() || s.m365admin, rows: [
     { type: "custom", build: buildTenantEditor,
       note: "Dans l'adresse d'un lien, {tenant} est remplacé par l'identifiant du tenant choisi (client-a → https://client-a.example.com) et {domain} par son domaine (l'identifiant si vide). Touche T pour passer au tenant suivant." }
   ]},
@@ -2267,42 +2332,100 @@ function openBlockDrawer(id) {
   document.querySelector(`input[name=blockView][value=${b ? b.view : "list"}]`).checked = true;
   $("#blockDelete").hidden = !b;
   $("#blockErr").hidden = true;
-  $("#blockTplField").hidden = !!b;
+  $("#blockTplField").hidden = !!b || !S().m365admin;
   $("#blockTpl").value = "";
   $("#blockTenant").value = state.tenants.length ? currentTenant().slug : "";
   $("#blockTenantField").hidden = true;
+  $("#blockCatsField").hidden = true;
+  $("#blockNameField").hidden = false;
+  $("#swatches").closest(".field").hidden = false;
   showDrawer($("#blockDrawer"));
 }
-// Links whose address follows the chosen tenant; the admin centers open the signed-in account's tenant
-const M365_LINKS = [
-  ["SharePoint", "https://{tenant}.sharepoint.com"],
-  ["Admin SharePoint", "https://{tenant}-admin.sharepoint.com"],
-  ["OneDrive", "https://{tenant}-my.sharepoint.com"],
-  ["Portail Azure", "https://portal.azure.com/#@{tenant}.onmicrosoft.com"],
-  ["Admin Microsoft 365", "https://admin.microsoft.com"],
-  ["Entra ID", "https://entra.microsoft.com"],
-  ["Admin Teams", "https://admin.teams.microsoft.com"],
-  ["Admin Exchange", "https://admin.exchange.microsoft.com"],
-  ["Purview", "https://purview.microsoft.com"],
-  ["Admin Power Platform", "https://admin.powerplatform.microsoft.com"]
+// One block per category. Links with {tenant} follow the chosen tenant; the admin centers open the signed-in account's tenant
+const M365_CATS = [
+  { id: "core", title: "Administration principale", color: "c6", desc: "Centre d'admin, Entra, Azure, santé du service", links: [
+    ["Admin Microsoft 365", "https://admin.microsoft.com"],
+    ["Entra ID", "https://entra.microsoft.com"],
+    ["Portail Azure", "https://portal.azure.com/#@{tenant}.onmicrosoft.com"],
+    ["Admin Microsoft 365 Apps", "https://config.office.com"],
+    ["Utilisateurs actifs", "https://admin.microsoft.com/#/users"],
+    ["Licences", "https://admin.microsoft.com/#/licenses"],
+    ["Centre de messages", "https://admin.microsoft.com/#/MessageCenter"],
+    ["Santé du service", "https://admin.microsoft.com/#/servicehealth"]] },
+  { id: "collab", title: "Collaboration", color: "c2", desc: "SharePoint, OneDrive, Teams, Exchange", links: [
+    ["Admin SharePoint", "https://{tenant}-admin.sharepoint.com"],
+    ["Accueil SharePoint", "https://{tenant}.sharepoint.com"],
+    ["OneDrive", "https://{tenant}-my.sharepoint.com"],
+    ["Admin Teams", "https://admin.teams.microsoft.com"],
+    ["Admin Exchange", "https://admin.exchange.microsoft.com"],
+    ["Suivi des messages", "https://admin.exchange.microsoft.com/#/messagetrace"]] },
+  { id: "pp", title: "Power Platform", color: "c5", desc: "Centre d'admin, Apps, Automate, Fabric, Copilot Studio", links: [
+    ["Admin Power Platform", "https://admin.powerplatform.microsoft.com"],
+    ["Power Automate", "https://make.powerautomate.com"],
+    ["Power Apps", "https://make.powerapps.com"],
+    ["Power Pages", "https://make.powerpages.microsoft.com"],
+    ["Power BI / Fabric", "https://app.fabric.microsoft.com"],
+    ["Copilot Studio", "https://copilotstudio.microsoft.com"]] },
+  { id: "sec", title: "Sécurité et conformité", color: "c1", desc: "Defender, Secure Score, Purview, accès conditionnel", links: [
+    ["Microsoft Defender", "https://security.microsoft.com"],
+    ["Secure Score", "https://security.microsoft.com/securescore"],
+    ["Incidents", "https://security.microsoft.com/incidents"],
+    ["Microsoft Purview", "https://purview.microsoft.com"],
+    ["Accès conditionnel", "https://entra.microsoft.com/#view/Microsoft_AAD_ConditionalAccess/ConditionalAccessBlade/~/Policies"],
+    ["Journaux de connexion", "https://entra.microsoft.com/#view/Microsoft_AAD_IAM/SignInEventsV3Blade"]] },
+  { id: "dev", title: "Appareils", color: "c3", desc: "Intune, Windows 365, appareils Defender", links: [
+    ["Admin Intune", "https://intune.microsoft.com"],
+    ["Tous les appareils", "https://intune.microsoft.com/#view/Microsoft_Intune_DeviceSettings/DevicesMenu/~/allDevices"],
+    ["Windows 365", "https://windows365.microsoft.com"],
+    ["Inventaire Defender", "https://security.microsoft.com/machines"]] },
+  { id: "copilot", title: "Copilot et IA", color: "c4", desc: "Admin Copilot, Copilot Chat, agents", links: [
+    ["Admin Copilot", "https://admin.microsoft.com/#/copilot"],
+    ["Microsoft 365 Copilot", "https://m365.cloud.microsoft/chat"],
+    ["Copilot Studio", "https://copilotstudio.microsoft.com"],
+    ["Azure AI Foundry", "https://ai.azure.com"]] },
+  { id: "me", title: "Mon compte", color: "c4", desc: "Profil, applis, connexions, accès, groupes", links: [
+    ["Mon compte", "https://myaccount.microsoft.com"],
+    ["Mes applications", "https://myapps.microsoft.com"],
+    ["Mes connexions", "https://mysignins.microsoft.com"],
+    ["Mes accès", "https://myaccess.microsoft.com"],
+    ["Mes groupes", "https://mygroups.microsoft.com"]] },
+  { id: "tools", title: "Outils et diagnostic", color: "c3", desc: "Graph Explorer, état du service, feuille de route", links: [
+    ["Graph Explorer", "https://developer.microsoft.com/graph/graph-explorer"],
+    ["État des services Microsoft", "https://status.cloud.microsoft"],
+    ["Feuille de route Microsoft 365", "https://www.microsoft.com/microsoft-365/roadmap"],
+    ["Analyseur de connectivité", "https://testconnectivity.microsoft.com"],
+    ["Analyseur d'en-têtes", "https://mha.azurewebsites.net"],
+    ["Docs admin Microsoft 365", "https://learn.microsoft.com/microsoft-365/admin/"]] }
 ];
+// Unchecked by default: personal pages and tools are less "admin"
+const M365_DEFAULT_OFF = new Set(["copilot", "tools"]);
+function renderTplCats() {
+  $("#blockCats").replaceChildren(...M365_CATS.map(c => h("label", {},
+    h("input", { type: "checkbox", value: c.id, checked: !M365_DEFAULT_OFF.has(c.id) }),
+    h("i", { style: `background:var(--${c.color})` }),
+    h("span", {}, tr(c.title), h("small", {}, `${tr(c.desc)} · ${plural(c.links.length, "{n} lien", "{n} liens")}`)))));
+}
 $("#blockTpl").addEventListener("change", e => {
   const m365 = e.target.value === "m365";
   $("#blockTenantField").hidden = !m365;
-  if (m365 && !$("#blockName").value.trim()) $("#blockName").value = tr("Microsoft 365");
-  if (m365) $("#blockTenant").focus();
+  $("#blockCatsField").hidden = !m365;
+  // Each category block takes its own title and color
+  $("#blockNameField").hidden = m365;
+  $("#swatches").closest(".field").hidden = m365;
+  if (m365) { renderTplCats(); $("#blockTenant").focus(); }
 });
 $("#blockForm").addEventListener("submit", e => {
   e.preventDefault();
+  const m365 = !editBlockId && $("#blockTpl").value === "m365";
   const title = $("#blockName").value.trim();
-  if (!title) { $("#blockErr").textContent = tr("Donne un titre au bloc."); $("#blockErr").hidden = false; return; }
+  if (!title && !m365) { $("#blockErr").textContent = tr("Donne un titre au bloc."); $("#blockErr").hidden = false; return; }
   const color = document.querySelector("input[name=blockColor]:checked").value;
   const view = document.querySelector("input[name=blockView]:checked").value;
   const space = $("#blockSpace").value;
-  const m365 = !editBlockId && $("#blockTpl").value === "m365";
-  // Same cleanup as the tenant editor: "https://contoso.sharepoint.com" or "contoso.onmicrosoft.com" → "contoso"
-  const slug = $("#blockTenant").value.trim().toLowerCase().replace(/^https?:\/\//, "").split(/[./]/)[0].replace(/-(admin|my)$/, "");
+  const slug = tenantSlug($("#blockTenant").value);
+  const cats = m365 ? M365_CATS.filter(c => $("#blockCats").querySelector(`input[value=${c.id}]`)?.checked) : [];
   if (m365 && !slug) { $("#blockErr").textContent = tr("Indique le nom du tenant, par exemple contoso."); $("#blockErr").hidden = false; return; }
+  if (m365 && !cats.length) { $("#blockErr").textContent = tr("Coche au moins une catégorie."); $("#blockErr").hidden = false; return; }
   commit(() => {
     if (editBlockId) Object.assign(findBlock(editBlockId), { title, color, view, space });
     else if (m365) {
@@ -2312,12 +2435,13 @@ $("#blockForm").addEventListener("submit", e => {
         state.tenants.push(t);
       }
       state.meta.tenant = t.id;
-      state.blocks.push({ id: uid(), space, title, color, view, collapsed: false, links: M365_LINKS.map(([name, url]) => ({ id: uid(), name: tr(name), url })) });
+      for (const c of cats)
+        state.blocks.push({ id: uid(), space, title: tr(c.title), color: c.color, view, collapsed: false, links: c.links.map(([name, url]) => ({ id: uid(), name: tr(name), url })) });
     }
     else state.blocks.push({ id: uid(), space, title, color, view, collapsed: false, links: [] });
   });
   closeDrawer();
-  if (m365) toast(tr("Bloc Microsoft 365 créé pour « {name} »", { name: currentTenant().name }));
+  if (m365) toast(plural(cats.length, "{n} bloc Microsoft 365 créé pour « {name} »", "{n} blocs Microsoft 365 créés pour « {name} »", { name: currentTenant().name }));
 });
 $("#blockDelete").addEventListener("click", () => { const id = editBlockId; closeDrawer(); deleteBlock(id); });
 
@@ -2536,26 +2660,27 @@ const ONB_LAYOUTS = [
 const ONB_BGS = [["photo", "Photo floutée"], ["gradient", "Dégradé"], ["color", "Uni"]];
 // Links with {tenant} are resolved by resolveUrl() for the active tenant
 const PRESETS = [
-  { id: "m365", title: "Microsoft 365", color: "c4", mono: "M", desc: "Teams, Outlook, Planner, OneDrive, Power Automate", links: [
-    ["Teams", "https://teams.microsoft.com"], ["Outlook", "https://outlook.office.com/mail/"],
-    ["Planner", "https://planner.cloud.microsoft"], ["OneDrive", "https://{tenant}-my.sharepoint.com"],
-    ["Power Automate", "https://make.powerautomate.com"]] },
-  { id: "sp", title: "SharePoint", color: "c2", mono: "SP", desc: "Accueil du tenant, sites suivis, admin SharePoint", links: [
+  { id: "m365", title: "Microsoft 365", color: "c4", mono: "M", desc: "Accueil, Outlook, Calendrier, Teams, OneDrive, Copilot", links: [
+    ["Accueil Microsoft 365", "https://m365.cloud.microsoft"], ["Outlook", "https://outlook.office.com/mail/"],
+    ["Calendrier", "https://outlook.office.com/calendar/"], ["Teams", "https://teams.microsoft.com"],
+    ["OneDrive", "https://{tenant}-my.sharepoint.com"], ["Microsoft 365 Copilot", "https://m365.cloud.microsoft/chat"]] },
+  { id: "office", title: "Office", color: "c1", mono: "O", desc: "Word, Excel, PowerPoint, OneNote, Forms, Loop", links: [
+    ["Word", "https://www.office.com/launch/word"], ["Excel", "https://www.office.com/launch/excel"],
+    ["PowerPoint", "https://www.office.com/launch/powerpoint"], ["OneNote", "https://www.onenote.com/notebooks"],
+    ["Forms", "https://forms.office.com"], ["Loop", "https://loop.cloud.microsoft"]] },
+  { id: "sp", title: "SharePoint", color: "c2", mono: "SP", desc: "Accueil du tenant, sites suivis, Viva Engage", links: [
     ["Accueil SharePoint", "https://{tenant}.sharepoint.com"],
     ["Mes sites", "https://{tenant}.sharepoint.com/_layouts/15/sharepoint.aspx"],
-    ["Admin SharePoint", "https://{tenant}-admin.sharepoint.com"]] },
-  { id: "pp", title: "Power Platform", color: "c5", mono: "PP", desc: "Power Apps, Automate, BI, centre d'admin", links: [
+    ["Viva Engage", "https://engage.cloud.microsoft"]] },
+  { id: "tasks", title: "Tâches", color: "c6", mono: "T", desc: "Planner, To Do, Bookings", links: [
+    ["Planner", "https://planner.cloud.microsoft"], ["To Do", "https://to-do.office.com"],
+    ["Bookings", "https://outlook.office.com/bookings/"]] },
+  { id: "pp", title: "Power Platform", color: "c5", mono: "PP", desc: "Power Apps, Automate, BI, Copilot Studio", links: [
     ["Power Apps", "https://make.powerapps.com"], ["Power Automate", "https://make.powerautomate.com"],
-    ["Power BI", "https://app.powerbi.com"], ["Admin Power Platform", "https://admin.powerplatform.microsoft.com"]] },
+    ["Power BI", "https://app.powerbi.com"], ["Copilot Studio", "https://copilotstudio.microsoft.com"]] },
   { id: "gh", title: "GitHub", color: "c3", mono: "GH", desc: "Tableau de bord, PR, issues, notifications", links: [
     ["Tableau de bord", "https://github.com"], ["Pull requests", "https://github.com/pulls"],
-    ["Issues", "https://github.com/issues"], ["Notifications", "https://github.com/notifications"]] },
-  { id: "az", title: "Azure", color: "c1", mono: "AZ", desc: "Portail, Entra ID, DevOps", links: [
-    ["Portail Azure", "https://portal.azure.com"], ["Entra ID", "https://entra.microsoft.com"],
-    ["Azure DevOps", "https://dev.azure.com"]] },
-  { id: "adm", title: "Admin M365", color: "c6", mono: "AD", desc: "Centre d'admin, Exchange, Teams, sécurité", links: [
-    ["Centre d'admin", "https://admin.microsoft.com"], ["Exchange", "https://admin.exchange.microsoft.com"],
-    ["Admin Teams", "https://admin.teams.microsoft.com"], ["Sécurité", "https://security.microsoft.com"]] }
+    ["Issues", "https://github.com/issues"], ["Notifications", "https://github.com/notifications"]] }
 ];
 const presetNeedsTenant = p => p.links.some(([, url]) => TPL.test(url));
 
@@ -2575,6 +2700,7 @@ function openOnboarding({ rerun = false } = {}) {
     newSpace: "",
     tenant: rerun && t ? t.slug : "",
     presets: new Set(),
+    m365: rerun && S().m365admin,
     imported: [],
     layout: s.layout, bg: ["photo", "gradient", "color"].includes(s.bg.type) ? s.bg.type : "photo",
     weather: s.weather.on, city: s.weather.city, lat: s.weather.lat, lon: s.weather.lon, cityOk: true,
@@ -2596,7 +2722,7 @@ function onbClose() {
 
 function onbStepHtml() {
   const firstSpace = W.spaces.find(x => x.on)?.name || tr("Pro");
-  const needTenant = PRESETS.some(p => W.presets.has(p.id) && presetNeedsTenant(p));
+  const needTenant = W.m365 || PRESETS.some(p => W.presets.has(p.id) && presetNeedsTenant(p));
   switch (W.step) {
     case 0: return `
       <h1 class="onb-h1" id="onbTitle">${tr(W.rerun ? "On reprend la configuration" : "Bienvenue sur ton cockpit")}</h1>
@@ -2623,6 +2749,8 @@ function onbStepHtml() {
           <span class="hd"><span class="mono" style="background:var(--${p.color})" aria-hidden="true">${p.mono}</span><span class="t">${tr(p.title)}</span><span class="onb-check" aria-hidden="true"></span></span>
           <span class="d">${tr(p.desc)}</span></button>`).join("")}
       </div>
+      <div class="onb-field"><button class="onb-switch" type="button" role="switch" data-act="m365" aria-checked="${W.m365}" aria-describedby="onbM365Note"><i aria-hidden="true"></i>${tr("J'administre un tenant Microsoft 365")}</button>
+        <p class="onb-note" id="onbM365Note">${tr("Ajoute un espace « {space} » avec un bloc par domaine : centre d'admin, collaboration, Power Platform, sécurité, appareils, mon compte.", { space: tr("Admin O365") })}</p></div>
       ${needTenant ? `<div class="onb-field"><label for="onbTenant"><span>${tr("Ton tenant Microsoft 365")}</span></label>
         <div class="onb-affix"><input class="onb-input" id="onbTenant" data-field="tenant" value="${esc(W.tenant)}" placeholder="${tr("monentreprise")}" autocapitalize="off" spellcheck="false" aria-describedby="onbTenantNote"><span aria-hidden="true">.sharepoint.com</span></div>
         <p class="onb-note" id="onbTenantNote">${tr("Facultatif. Sert à construire les liens SharePoint et OneDrive. Tu pourras en ajouter d'autres ensuite.")}</p></div>` : ""}
@@ -2655,7 +2783,7 @@ function onbStepHtml() {
         <div class="onb-seg" role="group" aria-labelledby="onbEngineLabel">${Object.entries(ENGINES).map(([id, [n]]) => `<button type="button" data-act="engine" data-id="${id}" aria-pressed="${W.engine === id}">${n}</button>`).join("")}</div></div>`;
     case 5: {
       const nm = W.name.trim(), sp = W.spaces.filter(x => x.on).map(x => x.name);
-      const blocks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => tr(p.title)), ...(W.imported.length ? [tr("{n} dossiers importés", { n: W.imported.length })] : [])];
+      const blocks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => tr(p.title)), ...(W.m365 ? [tr("Admin O365")] : []), ...(W.imported.length ? [tr("{n} dossiers importés", { n: W.imported.length })] : [])];
       const rows = [
         [tr("Prénom"), nm || "—", 0], [tr("Espaces"), sp.join(", ") || "—", 1],
         ...(needTenant || W.tenant ? [[tr("Tenant"), tenantSlug(W.tenant) ? tenantSlug(W.tenant) + ".sharepoint.com" : "—", 2]] : []),
@@ -2676,7 +2804,7 @@ function onbStepHtml() {
 
 function onbPreview() {
   const nm = W.name.trim(), greet = nm ? `${autoGreet()}, ${esc(nm)}` : autoGreet();
-  const tabs = W.spaces.filter(x => x.on).map(x => `<span>${esc(x.name)}</span>`).join("");
+  const tabs = [...W.spaces.filter(x => x.on).map(x => x.name), ...(W.m365 ? [tr("Admin O365")] : [])].map(n => `<span>${esc(n)}</span>`).join("");
   const bks = [...PRESETS.filter(p => W.presets.has(p.id)).map(p => [tr(p.title), `var(--${p.color})`]),
                ...W.imported.slice(0, 4).map((g, i) => [g.title, `var(--${COLORS[i % COLORS.length]})`])];
   const time = new Date().toLocaleTimeString(LOCALE(), { hour: "2-digit", minute: "2-digit" });
@@ -2767,6 +2895,9 @@ function onbFinish(skip) {
       used.add(id); spaces.push({ id, name: x.name });
     }
     if (!spaces.length) spaces.push({ id: "pro", name: tr("Pro") });
+    // Microsoft 365 admin: its own space, filled once with the default category blocks
+    const adminFresh = W.m365 && !spaces.some(x => x.id === "admin-o365");
+    if (adminFresh) spaces.push({ id: "admin-o365", name: tr("Admin O365") });
     const ids = spaces.map(x => x.id), first = ids[0];
     // Tenant, only when a block needs one or one was typed
     const slug = tenantSlug(W.tenant);
@@ -2780,10 +2911,14 @@ function onbFinish(skip) {
         links: p.links.map(([name, url]) => ({ id: uid(), name: tr(name), url })) })),
       ...W.imported.map((g, i) => ({
         id: uid(), space: first, title: g.title, color: COLORS[i % COLORS.length], view: "list",
-        collapsed: g.links.length > 12, links: g.links }))
+        collapsed: g.links.length > 12, links: g.links })),
+      ...(adminFresh ? M365_CATS.filter(c => !M365_DEFAULT_OFF.has(c.id)).map(c => ({
+        id: uid(), space: "admin-o365", title: tr(c.title), color: c.color, view: "list", collapsed: false,
+        links: c.links.map(([name, url]) => ({ id: uid(), name: tr(name), url })) })) : [])
     ];
     // Write everything at once
     s.name = W.name.trim();
+    s.m365admin = W.m365;
     s.layout = W.layout;
     s.bg.type = W.bg;
     Object.assign(s.weather, { on: W.weather, city: W.city, lat: W.lat, lon: W.lon });
@@ -2816,6 +2951,7 @@ $("#onb").addEventListener("click", e => {
     case "bg": W.bg = id; break;
     case "engine": W.engine = id; break;
     case "weather": W.weather = !W.weather; break;
+    case "m365": W.m365 = !W.m365; break;
     case "goto": return onbGo(+step);
     case "json": return $("#onbJson").click();
     case "bookmarks": return $("#onbBookmarks").click();
