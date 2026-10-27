@@ -6,9 +6,30 @@ Un seul fichier `index.html`, sans dépendance ni serveur. Inspiré de [Bonjourr
 
 **En ligne : https://ostefnn.github.io/cockpit-steffpoint/**
 
+## Vidéo de présentation
+
+[![Lire le teaser de Cockpit SteffPoint (34 secondes, vidéo MP4)](media/teaser-poster.jpg)](https://ostefnn.github.io/cockpit-steffpoint/media/Teaser_LinkedIn_Cockpit_SteffPoint_musique.mp4)
+
+[Lire la vidéo (MP4, 34 s, 11 Mo)](https://ostefnn.github.io/cockpit-steffpoint/Teaser_LinkedIn_Cockpit_SteffPoint_musique.mp4) · musique seule, sans voix ni dialogue · tout le texte est à l'écran et repris ci-dessous.
+
+<details>
+<summary>Description textuelle de la vidéo</summary>
+
+1. **0:00** – Sur fond sombre, des noms d'outils apparaissent en rafale : Microsoft 365, SharePoint, Teams, Azure, GitHub, Power Platform. Texte : « Encore un lien à retrouver ? »
+2. **0:03** – La page Cockpit SteffPoint s'affiche : heure, salutation « Bonjour », barre de recherche, onglets Pro / Perso et blocs de favoris. Texte : « Et si tout commençait ici ? », puis « Cockpit SteffPoint ».
+3. **0:06** – Le curseur tape « SharePoint » dans la recherche et les favoris se filtrent en direct. Texte : « Trouve. », puis « Lance. »
+4. **0:10** – Passage de l'espace Pro à l'espace Perso : les blocs changent. Texte : « Ton contexte. », puis « Tes accès. »
+5. **0:13** – Le sélecteur passe de DEV à TEST puis PROD : les favoris prennent un badge de couleur et changent d'adresse. Texte : « Le bon environnement. », puis « Au bon moment. »
+6. **0:19** – Le sélecteur de tenant passe de « Tenant A » à « Tenant B » et les liens SharePoint suivent. Texte : « Change de tenant. », puis « Pas tes habitudes. »
+7. **0:23** – Le panneau Réglages s'ouvre et la page passe en thème sombre. Texte : « Ton cockpit. », puis « À ta façon. »
+8. **0:27** – Vue d'ensemble de la page. Texte : « COCKPIT STEFFPOINT », « Ton web. Ton espace. Ton cockpit. », « Ce n'est que le début. »
+9. **0:32** – Logo et texte final : « Cockpit SteffPoint – Envie de voir la suite ? »
+
+</details>
+
 ## Fonctionnalités
 
-- **Assistant de démarrage** : à la première ouverture, 6 étapes pour choisir prénom, espaces, blocs prêts à l'emploi (Microsoft 365, SharePoint, Power Platform, GitHub, Azure, Admin M365) ou import de signets, disposition, fond, météo et moteur de recherche. Relançable depuis les réglages, sans rien supprimer.
+- **Assistant de démarrage** : à la première ouverture, 6 étapes pour choisir prénom, espaces, blocs prêts à l'emploi (Microsoft 365, Office, SharePoint, Tâches, Power Platform, GitHub) ou import de signets, disposition, fond, météo et moteur de recherche. Relançable depuis les réglages, sans rien supprimer.
 - **Accueil** : horloge, date, salutation, météo ([Open-Meteo](https://open-meteo.com), sans clé).
 - **Dispositions** : Classique (grande horloge, par défaut), Accueil (grande salutation et liens fréquents), Cockpit (colonne d'infos à gauche, tout tient à l'écran) ou Lanceur (grande recherche et tuiles d'icônes).
 - **Fond** : photo floutée qui change à chaque onglet, chaque heure ou chaque jour ([Picsum](https://picsum.photos)), dégradé, couleur unie, image par URL ou photo locale. Flou, luminosité et voile réglables (voile d'au moins 20 % sur une photo pour garder le texte lisible).
@@ -20,9 +41,10 @@ Un seul fichier `index.html`, sans dépendance ni serveur. Inspiré de [Bonjourr
 - **Espaces** (Pro / Perso…) avec bascule automatique le week-end.
 - **Environnements** : chaque favori peut avoir une adresse DEV et TEST en plus de l'adresse principale (PROD). Hors PROD, la capsule s'entoure d'un liseré et le titre de l'onglet est préfixé `[DEV]` ou `[TEST]`.
 - **Tenants** (facultatif) : dans une adresse, `{tenant}` et `{domain}` sont remplacés par le tenant choisi. Rien n'apparaît tant qu'aucun lien n'en utilise.
+- **Administration Microsoft 365** (facultatif, coupé par défaut) : ajoute un espace « Admin O365 » avec un bloc par domaine (administration, collaboration, Power Platform, sécurité, appareils, mon compte).
 - **Réglages** façon Bonjourr, thème clair / sombre / système.
 - **Sauvegarde** : export / import JSON, import des signets Safari, rappel d'export.
-- **Accessibilité** : vise le niveau WCAG 2.2 AA. Raccourcis à une touche désactivables, alternative au glisser-déposer, contrastes vérifiés avec axe-core.
+- **Accessibilité** : vise le niveau WCAG 2.2 AA. Raccourcis à une touche désactivables, alternative au glisser-déposer, contrastes vérifiés avec axe-core. La vidéo de présentation ne se lance pas toute seule et a une description textuelle complète.
 
 ## Installation dans Safari
 
@@ -78,7 +100,9 @@ Les raccourcis à une touche se désactivent dans **Réglages → Général → 
 
 ## Tenants Microsoft 365
 
-Le plus rapide : **+ Nouveau bloc** → Modèle **Admin Microsoft 365** → nom du tenant (`contoso`, ou une adresse comme `contoso.sharepoint.com`). Le bloc est créé avec SharePoint, Admin SharePoint, OneDrive, le portail Azure et les centres d'admin, et le tenant est ajouté s'il n'existe pas.
+Active **Réglages → Administration Microsoft 365** (ou « J'administre un tenant Microsoft 365 » dans l'assistant) : un espace **Admin O365** est ajouté avec un bloc par domaine. Tes autres espaces ne changent pas.
+
+Pour un autre tenant ou d'autres catégories : **+ Nouveau bloc** → Modèle **Admin Microsoft 365** → nom du tenant (`contoso`, ou une adresse comme `contoso.sharepoint.com`), puis coche les catégories : administration principale, collaboration, Power Platform, sécurité et conformité, appareils, Copilot et IA, mon compte, outils et diagnostic. Un bloc est créé par catégorie, et le tenant est ajouté s'il n'existe pas.
 
 Seuls SharePoint, OneDrive et Azure suivent le tenant choisi. Les centres d'admin (Microsoft 365, Entra, Teams, Exchange…) ouvrent le tenant du compte connecté.
 
