@@ -260,6 +260,20 @@ if (ONLY !== "compare") {
     ok(errors.length === 0, "no errors " + errors.join(" | "));
     await ctx.close();
   }
+  {
+    const { ctx, page, errors } = await live({ data: withSettings({ hideDock: true }) });
+    const op = () => page.$$eval(".dock .fab", els => els.map(e => getComputedStyle(e).opacity).join(","));
+    await page.mouse.move(10, 10); await wait(300);
+    ok(await op() === "0,0,0", "discreet dock: buttons hidden");
+    const box = await page.$eval("#settingsBtn", e => { const r = e.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; });
+    await page.mouse.move(...box); await wait(300);
+    ok(await op() === "1,1,1", "discreet dock: buttons come back on hover");
+    await page.mouse.move(10, 10); await wait(300);
+    await blurAll(page); await page.focus("#helpBtn"); await page.keyboard.press("Tab"); await wait(300);
+    ok(await op() === "1,1,1", "discreet dock: buttons come back on keyboard focus");
+    ok(errors.length === 0, "no errors " + errors.join(" | "));
+    await ctx.close();
+  }
   for (const lang of ["fr", "en", "nl"]) {
     const { ctx, page, errors } = await live({ file: `aide.html?lang=${lang}` });
     ok((await axeRun(page)).length === 0 && errors.length === 0, `help page (${lang}): axe and errors`);

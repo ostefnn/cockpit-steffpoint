@@ -157,8 +157,9 @@ a.fab{text-decoration:none}
 .fab[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .fab svg{transition:transform .4s}
 .fab.gear[aria-expanded="true"] svg{transform:rotate(90deg)}
-body.hide-dock .dock .fab:not([aria-expanded="true"]):not([aria-pressed="true"]){opacity:0}
-body.hide-dock .dock .fab:hover,body.hide-dock .dock .fab:focus-visible{opacity:1}
+/* :where() keeps the hiding rule weaker than the hover/focus one, so the buttons come back */
+body.hide-dock .dock .fab:where(:not([aria-expanded="true"]):not([aria-pressed="true"])){opacity:0;transition:opacity .2s,transform .15s}
+body.hide-dock .dock:hover .fab,body.hide-dock .dock:focus-within .fab{opacity:1}
 .credit{position:fixed;left:calc(20px + env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));font-size:.8rem;color:#fff;background:rgb(0 0 0 / .6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:4px 11px;border-radius:999px;z-index:5;transition:opacity .2s}
 body.scrolled .credit{opacity:0;pointer-events:none}
 
