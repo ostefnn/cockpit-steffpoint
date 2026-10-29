@@ -1,0 +1,15 @@
+{
+  "name": "cockpit-steffpoint-tests",
+  "private": true,
+  "type": "module",
+  "description": "Non-regression tests: headless Chrome, axe-core, comparison with a reference git tag",
+  "scripts": {
+    "test": "node regression.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.10.2",
+    "pixelmatch": "6.0.0",
+    "pngjs": "7.0.0",
+    "puppeteer-core": "23.11.1"
+  }
+}

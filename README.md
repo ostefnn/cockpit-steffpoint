@@ -126,6 +126,22 @@ https://mail.{domain}                 → https://mail.contoso.com (si le domain
 
 Les tenants se gèrent dans **Réglages → Tenants**. Ce groupe n'apparaît que si un tenant existe ou si un lien utilise `{tenant}`. Le sélecteur ne s'affiche que dans les espaces qui contiennent un lien modèle.
 
+## Tests
+
+Tests de non-régression dans Chrome headless, sans rien installer dans la page elle-même :
+
+```bash
+cd tests
+npm install
+npm test            # tout
+npm test compare    # seulement la comparaison avec la version de référence
+npm test features   # seulement les fonctions et l'accessibilité
+```
+
+- **Comparaison** : chaque scénario (4 dispositions en clair et sombre, mobile, réglages, édition, tiroirs, recherche, palette, assistant, imports…) est joué sur la copie de travail et sur le tag git `pre-modularisation` (ou `BASE_REF=…`). Captures d'écran, DOM et données enregistrées doivent être identiques.
+- **Fonctions** : données existantes intactes, favicons privés, palette, partage, abonnements, ménage, heures de travail, et axe-core (WCAG 2.2 AA) sur l'appli et l'aide.
+- Prérequis : Google Chrome (`CHROME=…` pour un autre chemin) et `python3`. En cas d'échec, captures et différences dans `tests/out/`.
+
 ## Licence
 
 [MIT](LICENSE) © 2026 ostefnn.

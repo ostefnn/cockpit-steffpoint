@@ -10,3 +10,8 @@
 # Page
 /Solution.md
 /Onboarding.md
+# Tests
+tests/node_modules/
+tests/out/
+!tests/package.json
+!tests/package-lock.json
