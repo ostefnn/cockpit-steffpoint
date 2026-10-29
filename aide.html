@@ -45,6 +45,11 @@ kbd{display:inline-block;min-width:1.7em;text-align:center;background:var(--surf
 .hero .gutter{display:grid;gap:12px}
 .back{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-weight:600;opacity:.9;width:fit-content;background:rgb(255 255 255 / .14);border:1px solid rgb(255 255 255 / .25);padding:6px 12px;border-radius:10px}
 .back:hover{opacity:1;background:rgb(255 255 255 / .22)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.langs{display:flex;gap:2px;background:rgb(255 255 255 / .14);border:1px solid rgb(255 255 255 / .25);border-radius:10px;padding:3px}
+.langs a{color:#fff;text-decoration:none;font-weight:600;font-size:.9rem;padding:4px 10px;border-radius:7px}
+.langs a:hover{background:rgb(255 255 255 / .18)}
+.langs a[aria-current]{background:#fff;color:var(--hero-a)}
 .hero h1{font-size:clamp(2rem,5vw,3rem);font-weight:300;display:flex;align-items:center;gap:14px}
 .hero h1 .badge{width:52px;height:52px;border-radius:15px;background:rgb(255 255 255 / .16);border:1px solid rgb(255 255 255 / .3);display:grid;place-items:center;flex:none}
 .hero p{margin:0;max-width:60ch;opacity:.92;font-size:1.1rem}
@@ -106,9 +111,10 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
   </defs>
 </svg>
 
+<div data-lang="fr" lang="fr">
 <header class="hero">
   <div class="gutter">
-    <a class="back" href="index.html">← Retour au cockpit</a>
+    <div class="top"><a class="back" href="index.html">← Retour au cockpit</a><nav class="langs" aria-label="Langue"><a href="?lang=fr" lang="fr" hreflang="fr" aria-current="page">Français</a><a href="?lang=en" lang="en" hreflang="en">English</a><a href="?lang=nl" lang="nl" hreflang="nl">Nederlands</a></nav></div>
     <h1><span class="badge"><svg width="28" height="28"><use href="#i-help"/></svg></span>Aide</h1>
     <p>Tout ce qu'il faut savoir pour utiliser Cockpit SteffPoint au quotidien : favoris, espaces, tenants, environnements et sauvegarde.</p>
   </div>
@@ -137,6 +143,9 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
         <li>Dans <b>Page d'accueil</b>, colle l'adresse du cockpit, par exemple <code>https://ostefnn.github.io/cockpit-steffpoint/</code>.</li>
         <li>Pour <b>Les nouvelles fenêtres</b> et <b>Les nouveaux onglets</b>, choisis <b>Page d'accueil</b>.</li>
       </ol>
+      <h3>L'assistant de démarrage</h3>
+      <p>À la première ouverture, un assistant en 6 étapes te demande ton prénom, tes espaces, des blocs prêts à l'emploi (Microsoft 365, Office, SharePoint, Power Platform, GitHub…), la disposition, le fond, la ville et le moteur de recherche. Rien n'est enregistré avant la dernière étape. <b>Passer la configuration</b> ou <kbd>Échap</kbd> garde les exemples.</p>
+      <p>Pour le relancer : ⚙ Réglages → Général → <b>Relancer l'assistant</b>. Il ajoute des espaces et des blocs sans rien supprimer.</p>
       <h3>Repartir de tes favoris existants</h3>
       <ul>
         <li><b>Depuis Safari</b> : Fichier → Exporter → Signets…, puis dans le cockpit ⚙ Réglages → Sauvegarde → <b>Signets Safari</b>. Chaque dossier devient un bloc.</li>
@@ -154,6 +163,12 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
         <li><kbd>⌘</kbd> <kbd>Entrée</kbd> l'ouvre dans un nouvel onglet.</li>
         <li><kbd>Maj</kbd> <kbd>Entrée</kbd> force la recherche web, même s'il y a des favoris.</li>
         <li><kbd>Échap</kbd> vide la recherche.</li>
+      </ul>
+      <h3>La palette de commandes</h3>
+      <p><kbd>⌘</kbd> <kbd>K</kbd> (<kbd>Ctrl</kbd> <kbd>K</kbd> sur Windows), ou le bouton <kbd>⌘K</kbd> dans la barre de recherche, ouvre une palette qui trouve tes liens <b>et des actions</b> : changer d'espace, de tenant ou d'environnement, créer un bloc, passer en sombre, faire le ménage… Pas besoin de taper le nom exact : « shrpt » trouve SharePoint.</p>
+      <ul>
+        <li><code>@contoso</code> ouvre le lien pour ce tenant, <code>!test</code> (ou <code>!dev</code>, <code>!prod</code>) dans cet environnement. Exemple : <code>sharepoint @fab !test</code>.</li>
+        <li>Ce choix ne vaut que pour ce lien : le tenant et l'environnement de la page ne changent pas.</li>
       </ul>
       <p>Le moteur web (Bing, Google, DuckDuckGo, Ecosia) se choisit dans ⚙ Réglages → Recherche.</p>
     </section>
@@ -176,6 +191,16 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
         <li>La flèche <b>⌄</b> replie un bloc. Au-delà de 8 liens, un bouton <b>Afficher plus</b> ouvre le reste (nombre réglable).</li>
       </ul>
       <div class="tip"><svg width="18" height="18"><use href="#i-bulb"/></svg><span>Pas de confirmation à chaque suppression : un bandeau <b>Annuler</b> apparaît quelques secondes en bas de l'écran.</span></div>
+      <h3>Partager un bloc</h3>
+      <p>Menu <b>⋯</b> d'un bloc → <b>Partager…</b> :</p>
+      <ul>
+        <li><b>Lien à envoyer</b> : ton collègue l'ouvre, voit le contenu et choisit l'espace où ranger le bloc. Les adresses voyagent dans le lien lui-même, après le <code>#</code> : aucun serveur ne les reçoit, mais toute personne qui a le lien les voit. La case du haut partage tout l'espace d'un coup.</li>
+        <li><b>Fichier d'abonnement</b>, pour une équipe : publie ce fichier à une adresse publique qui autorise la lecture depuis une autre page (GitHub Pages, bouton « Raw » d'un Gist…). Chacun fait <b>+ Nouveau bloc</b> → Modèle <b>S'abonner à une adresse</b>. Quand tu remplaces le fichier, leurs blocs se mettent à jour (toutes les 6 heures, ou menu ⋯ → <b>Actualiser</b>).</li>
+        <li>Un bloc abonné porte le badge <b>Abonné</b> et reste en lecture seule. Menu ⋯ → <b>Se désabonner (garder une copie)</b> le transforme en bloc normal. Si la source ne répond plus, le badge passe à <b>Hors ligne</b> et le contenu est gardé.</li>
+        <li>Les liens modèles (<code>{tenant}</code>) restent des modèles : chacun les ouvre avec son propre tenant.</li>
+      </ul>
+      <h3>Faire le ménage</h3>
+      <p>⚙ Réglages → Favoris → <b>Faire le ménage…</b> (ou la palette) liste les liens en double, les blocs vides et, après deux mois de suivi, les liens jamais ouverts ou plus ouverts depuis six mois. Le compte se fait dans ce navigateur seulement, et chaque suppression s'annule.</p>
     </section>
 
     <section id="espaces">
@@ -185,6 +210,7 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
       <ul>
         <li>Clique sur un onglet, ou utilise les touches <kbd>1</kbd> à <kbd>9</kbd>.</li>
         <li><b>Bascule automatique</b> : Pro du lundi au vendredi, Perso le week-end. Réglable dans ⚙ Réglages → Espaces.</li>
+        <li><b>Heures de travail</b> (facultatif) : par exemple Pro de 8 h à 18 h en semaine, Perso le soir. Une page restée ouverte change d'espace toute seule à l'heure dite, sauf si tu viens de choisir un espace à la main.</li>
         <li>Créer, renommer ou supprimer un espace : ⚙ Réglages → Espaces. Les blocs d'un espace supprimé passent dans un autre.</li>
         <li>Déplacer un bloc : menu ⋯ → <b>Déplacer vers…</b></li>
       </ul>
@@ -200,7 +226,7 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
           <tr><td><code>{domain}</code></td><td>son domaine (ou l'identifiant si vide)</td><td><code>https://mail.{domain}</code> → <code>https://mail.client-a.com</code></td></tr>
         </tbody>
       </table></div>
-      <p><b>Microsoft 365, le plus rapide :</b> <b>+ Nouveau bloc</b> → Modèle <b>Admin Microsoft 365</b> → nom du tenant (<code>contoso</code>). Le bloc est créé avec SharePoint, Admin SharePoint, OneDrive, le portail Azure et les centres d'admin, et le tenant est ajouté s'il n'existe pas.</p>
+      <p><b>Microsoft 365, le plus rapide :</b> active d'abord ⚙ → <b>Administration Microsoft 365</b> (coupé par défaut, ou case « J'administre un tenant Microsoft 365 » dans l'assistant, qui crée un espace <b>Admin O365</b>). Puis <b>+ Nouveau bloc</b> → Modèle <b>Admin Microsoft 365</b> → nom du tenant (<code>contoso</code>). Coche les catégories voulues (administration principale, collaboration, Power Platform, sécurité et conformité, appareils, Copilot et IA, mon compte, outils et diagnostic) : un bloc est créé par catégorie, et le tenant est ajouté s'il n'existe pas.</p>
       <p>À la main :</p>
       <ol>
         <li>Mets <code>{tenant}</code> dans l'adresse de tes liens.</li>
@@ -238,6 +264,7 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
       <h2><span class="ic"><svg width="20" height="20"><use href="#i-gear"/></svg></span>Personnaliser</h2>
       <p>Bouton ⚙ en bas à droite, ou touche <kbd>,</kbd>. Les changements s'appliquent en direct. Active <b>Afficher tous les réglages</b> pour voir les options avancées.</p>
       <ul>
+        <li><b>Langue</b> : français, anglais ou néerlandais, ou automatique (suit le navigateur).</li>
         <li><b>Arrière-plan</b> : photos qui changent (chaque onglet, heure ou jour, bouton ↻ pour en tirer une nouvelle), dégradé, couleur unie, ta propre photo ou une image en ligne. Flou, luminosité et voile de couleur.</li>
         <li><b>Favoris</b> : verre dépoli ou opaque, colonnes, arrondi, nombre de liens visibles, favicons ou initiales.</li>
         <li><b>Date &amp; heure</b> : 24 h, secondes, taille, format de date.</li>
@@ -273,6 +300,7 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
           <tr><td><kbd>T</kbd></td><td>Tenant suivant (si les tenants sont activés)</td></tr>
           <tr><td><kbd>V</kbd></td><td>Environnement suivant (DEV → TEST → PROD)</td></tr>
           <tr><td><kbd>Échap</kbd></td><td>Fermer un panneau, vider la recherche, quitter l'édition</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>K</kbd></td><td>Palette de commandes : liens et actions, <code>@tenant</code>, <code>!dev</code> <code>!test</code> <code>!prod</code></td></tr>
         </tbody>
       </table></div>
       <p>Les raccourcis à une touche se désactivent dans ⚙ Réglages → Général → <b>Raccourcis à une touche</b>, utile avec la dictée vocale ou une aide technique. Sans glisser-déposer, l'ordre se change aussi au clic : menu <b>⋯</b> d'un bloc → <b>Placer avant / après</b>, et pour un lien, <b>Position dans le bloc</b> dans sa fenêtre de modification.</p>
@@ -287,7 +315,7 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
       <details><summary>« Utiliser ma position » est refusé</summary>
         <p>Safari bloque souvent la géolocalisation. Tape plutôt ta ville dans ⚙ Réglages → Météo &amp; bienvenue.</p></details>
       <details><summary>Les icônes des liens sont des lettres</summary>
-        <p>C'est le cas quand ni le site ni Google ne fournissent d'icône, ou si tu as choisi « Initiales ». Le favicon est d'abord demandé au site lui-même (ça marche aussi pour les sites internes), puis à Google, qui reçoit alors le nom de domaine du lien. Tu peux aussi coller l'adresse d'une image dans le champ <b>Icône</b> du lien.</p></details>
+        <p>C'est le cas quand ni le site ni Google ne fournissent d'icône, ou si tu as choisi « Initiales ». Le favicon est d'abord demandé au site lui-même (ça marche aussi pour les sites internes), puis à Google, qui reçoit alors le nom de domaine du lien. Les adresses internes (sans point, <code>.local</code>, <code>.corp</code>, <code>.lan</code>, adresses IP privées…) ne sont jamais envoyées à Google. Tu peux aussi coller l'adresse d'une image dans le champ <b>Icône</b> du lien.</p></details>
       <details><summary>J'ai supprimé quelque chose par erreur</summary>
         <p>Clique sur <b>Annuler</b> dans le bandeau en bas, dans les secondes qui suivent. Sinon, réimporte ton dernier export.</p></details>
     </section>
@@ -295,13 +323,447 @@ footer{color:var(--muted);font-size:.9rem;padding-block:0 40px;text-align:center
 </div>
 
 <footer>Cockpit SteffPoint · O. Steffen · <a href="https://github.com/ostefnn/cockpit-steffpoint">code source</a> · licence MIT</footer>
+</div>
+
+<div data-lang="en" lang="en" hidden>
+<header class="hero">
+  <div class="gutter">
+    <div class="top"><a class="back" href="index.html">← Back to the cockpit</a><nav class="langs" aria-label="Language"><a href="?lang=fr" lang="fr" hreflang="fr">Français</a><a href="?lang=en" lang="en" hreflang="en" aria-current="page">English</a><a href="?lang=nl" lang="nl" hreflang="nl">Nederlands</a></nav></div>
+    <h1><span class="badge"><svg width="28" height="28"><use href="#i-help"/></svg></span>Help</h1>
+    <p>Everything you need to use Cockpit SteffPoint every day: favorites, spaces, tenants, environments and backup.</p>
+  </div>
+</header>
+
+<div class="gutter layout">
+  <nav class="toc" aria-label="Contents">
+    <a href="#en-start"><svg width="18" height="18"><use href="#i-start"/></svg>Getting started</a>
+    <a href="#en-search"><svg width="18" height="18"><use href="#i-search"/></svg>Search</a>
+    <a href="#en-favorites"><svg width="18" height="18"><use href="#i-star"/></svg>Favorites and blocks</a>
+    <a href="#en-spaces"><svg width="18" height="18"><use href="#i-spaces"/></svg>Spaces</a>
+    <a href="#en-tenants"><svg width="18" height="18"><use href="#i-tenant"/></svg>Tenants</a>
+    <a href="#en-environments"><svg width="18" height="18"><use href="#i-env"/></svg>DEV / TEST / PROD</a>
+    <a href="#en-settings"><svg width="18" height="18"><use href="#i-gear"/></svg>Customize</a>
+    <a href="#en-backup"><svg width="18" height="18"><use href="#i-save"/></svg>Backup</a>
+    <a href="#en-shortcuts"><svg width="18" height="18"><use href="#i-keys"/></svg>Shortcuts</a>
+    <a href="#en-faq"><svg width="18" height="18"><use href="#i-help"/></svg>FAQ</a>
+  </nav>
+
+  <main>
+    <section id="en-start">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-start"/></svg></span>Getting started</h2>
+      <h3>Make it your Safari homepage</h3>
+      <ol>
+        <li>Open Safari → <b>Settings</b> → <b>General</b>.</li>
+        <li>In <b>Homepage</b>, paste the cockpit's address, for example <code>https://ostefnn.github.io/cockpit-steffpoint/</code>.</li>
+        <li>For <b>New windows open with</b> and <b>New tabs open with</b>, choose <b>Homepage</b>.</li>
+      </ol>
+      <h3>The setup assistant</h3>
+      <p>The first time you open it, a 6-step assistant asks for your first name, your spaces, ready-made blocks (Microsoft 365, Office, SharePoint, Power Platform, GitHub…), the layout, the background, your city and the search engine. Nothing is saved before the last step. <b>Skip setup</b> or <kbd>Esc</kbd> keeps the examples.</p>
+      <p>To run it again: ⚙ Settings → General → <b>Run the assistant again</b>. It adds spaces and blocks without deleting anything.</p>
+      <h3>Start from your existing favorites</h3>
+      <ul>
+        <li><b>From Safari</b>: File → Export → Bookmarks…, then in the cockpit ⚙ Settings → Backup → <b>Safari bookmarks</b>. Each folder becomes a block.</li>
+        <li><b>From another copy of the cockpit</b>: Export there, then Settings → Backup → <b>Import</b> here.</li>
+      </ul>
+      <div class="tip"><svg width="18" height="18"><use href="#i-bulb"/></svg><span>The blocks you start with are examples. Delete them freely in edit mode.</span></div>
+    </section>
+
+    <section id="en-search">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-search"/></svg></span>Search</h2>
+      <p>The bar at the top does two things at once. It filters your favorites as you type, across all spaces. And when no favorite matches, it searches the web.</p>
+      <ul>
+        <li><kbd>/</kbd> puts the cursor in the search, wherever you are on the page.</li>
+        <li><kbd>↑</kbd> <kbd>↓</kbd> choose a result, <kbd>Enter</kbd> opens it.</li>
+        <li><kbd>⌘</kbd> <kbd>Enter</kbd> opens it in a new tab.</li>
+        <li><kbd>Shift</kbd> <kbd>Enter</kbd> forces a web search, even when favorites match.</li>
+        <li><kbd>Esc</kbd> clears the search.</li>
+      </ul>
+      <h3>The command palette</h3>
+      <p><kbd>⌘</kbd> <kbd>K</kbd> (<kbd>Ctrl</kbd> <kbd>K</kbd> on Windows), or the <kbd>⌘K</kbd> button in the search bar, opens a palette that finds your links <b>and actions</b>: switch space, tenant or environment, create a block, go dark, clean up… No need to type the exact name: “shrpt” finds SharePoint.</p>
+      <ul>
+        <li><code>@contoso</code> opens the link for that tenant, <code>!test</code> (or <code>!dev</code>, <code>!prod</code>) in that environment. Example: <code>sharepoint @fab !test</code>.</li>
+        <li>That choice only applies to this link: the page's tenant and environment stay as they are.</li>
+      </ul>
+      <p>The web search engine (Bing, Google, DuckDuckGo, Ecosia) is chosen in ⚙ Settings → Search.</p>
+    </section>
+
+    <section id="en-favorites">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-star"/></svg></span>Favorites and blocks</h2>
+      <p>Favorites are sorted into blocks, one per topic. Everything is changed in <b>edit mode</b>: the ✏️ button at the bottom right, or the <kbd>E</kbd> key.</p>
+      <h3>Add a link</h3>
+      <ul>
+        <li><b>Fastest</b>: copy an address, hover over a block and paste (<kbd>⌘</kbd> <kbd>V</kbd>) anywhere on the page.</li>
+        <li><b>Drag</b> the address from Safari's address bar onto a block.</li>
+        <li>In edit mode: <b>+ Add a link</b> at the bottom of the block, or the block's ⋯ menu.</li>
+      </ul>
+      <h3>Edit, sort, delete</h3>
+      <ul>
+        <li>In edit mode, <b>click a link</b> to change its name, address or block.</li>
+        <li>In edit mode, a link's red <b>✕</b> deletes it straight away. <b>Undo</b> in the message at the bottom brings it back.</li>
+        <li><b>Drag and drop</b> links (even from one block to another) and blocks by their header.</li>
+        <li>A block's <b>⋯</b> menu: edit (title, color, list or icon grid), move to another space, open all its links, delete.</li>
+        <li>The <b>⌄</b> arrow collapses a block. Beyond 8 links, a <b>Show more</b> button opens the rest (number adjustable).</li>
+      </ul>
+      <div class="tip"><svg width="18" height="18"><use href="#i-bulb"/></svg><span>No confirmation for each deletion: an <b>Undo</b> banner appears for a few seconds at the bottom of the screen.</span></div>
+      <h3>Share a block</h3>
+      <p>A block's <b>⋯</b> menu → <b>Share…</b>:</p>
+      <ul>
+        <li><b>Link to send</b>: your colleague opens it, sees the content and picks the space for the block. The addresses travel inside the link itself, after the <code>#</code>: no server receives them, but anyone who has the link can see them. The box at the top shares the whole space at once.</li>
+        <li><b>Subscription file</b>, for a team: publish this file at a public address that allows reading from another page (GitHub Pages, a Gist's “Raw” button…). Everyone does <b>+ New block</b> → Template <b>Subscribe to an address</b>. When you replace the file, their blocks update (every 6 hours, or ⋯ menu → <b>Refresh</b>).</li>
+        <li>A subscribed block shows a <b>Subscribed</b> badge and stays read-only. ⋯ menu → <b>Unsubscribe (keep a copy)</b> turns it into a normal block. If the source stops answering, the badge turns to <b>Offline</b> and the content is kept.</li>
+        <li>Template links (<code>{tenant}</code>) stay templates: everyone opens them with their own tenant.</li>
+      </ul>
+      <h3>Clean up</h3>
+      <p>⚙ Settings → Favorites → <b>Clean up…</b> (or the palette) lists duplicate links, empty blocks and, after two months of tracking, links never opened or not opened for six months. Counting happens in this browser only, and every deletion can be undone.</p>
+    </section>
+
+    <section id="en-spaces">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-spaces"/></svg></span>Spaces</h2>
+      <p>Spaces keep your worlds apart, for example <b>Work</b> and <b>Personal</b>. Each block belongs to one space.</p>
+      <div class="demo" aria-hidden="true"><span class="pill on">Work 3</span><span class="pill">Personal 1</span></div>
+      <ul>
+        <li>Click a tab, or use the keys <kbd>1</kbd> to <kbd>9</kbd>.</li>
+        <li><b>Automatic switch</b>: Work from Monday to Friday, Personal at the weekend. Adjustable in ⚙ Settings → Spaces.</li>
+        <li><b>Working hours</b> (optional): for example Work from 8:00 to 18:00 on weekdays, Personal in the evening. A page left open switches space by itself at that time, unless you just picked a space by hand.</li>
+        <li>Create, rename or delete a space: ⚙ Settings → Spaces. The blocks of a deleted space move to another one.</li>
+        <li>Move a block: ⋯ menu → <b>Move to…</b></li>
+      </ul>
+    </section>
+
+    <section id="en-tenants">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-tenant"/></svg></span>Tenants</h2>
+      <p>If you work for several clients or organizations with the same address structure, write the link <b>once</b> as a template, then switch tenant in one click.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>In the address</th><th>Becomes</th><th>Example with “client-a”</th></tr></thead>
+        <tbody>
+          <tr><td><code>{tenant}</code></td><td>the tenant's ID</td><td><code>https://{tenant}.example.com</code> → <code>https://client-a.example.com</code></td></tr>
+          <tr><td><code>{domain}</code></td><td>its domain (or the ID if empty)</td><td><code>https://mail.{domain}</code> → <code>https://mail.client-a.com</code></td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Microsoft 365, the fastest way:</b> first turn on ⚙ → <b>Microsoft 365 administration</b> (off by default, or the “I administer a Microsoft 365 tenant” switch in the assistant, which creates an <b>O365 admin</b> space). Then <b>+ New block</b> → Template <b>Microsoft 365 admin</b> → tenant name (<code>contoso</code>). Tick the categories you want (core administration, collaboration, Power Platform, security and compliance, devices, Copilot and AI, my account, tools and diagnostics): one block is created per category, and the tenant is added if it doesn't exist.</p>
+      <p>By hand:</p>
+      <ol>
+        <li>Put <code>{tenant}</code> in your links' address.</li>
+        <li>⚙ Settings → <b>Tenants</b> → <b>+ Add a tenant</b>: a display name, an ID, an optional domain and a color.</li>
+        <li>Pick the tenant in the menu above the blocks, or press <kbd>T</kbd> to move to the next one.</li>
+      </ol>
+      <p>The tenant menu only appears in spaces that contain a template link. Its color and the name in the tab title (<code>[CONTOSO]</code>) remind you which tenant you're working on.</p>
+      <p>Only SharePoint, OneDrive and Azure follow the tenant. The admin centers (Microsoft 365, Entra, Teams, Exchange…) open the signed-in account's tenant.</p>
+      <div class="tip"><svg width="18" height="18"><use href="#i-bulb"/></svg><span>A template link with no tenant defined is greyed out. Clicking it opens the tenant settings directly.</span></div>
+    </section>
+
+    <section id="en-environments">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-env"/></svg></span>DEV / TEST / PROD environments</h2>
+      <p>A favorite can have three addresses: its <b>main address</b> (PROD) and, optionally, a <b>DEV</b> address and a <b>TEST</b> address. You choose the environment once, and every favorite follows.</p>
+      <div class="demo" aria-hidden="true">
+        <span class="pill" data-env="dev"><span class="dot"></span>DEV</span>
+        <span class="pill" data-env="test"><span class="dot"></span>TEST</span>
+        <span class="pill env-on" data-env="prod"><span class="dot"></span>PROD</span>
+      </div>
+      <ol>
+        <li>In edit mode, click a link and open <b>DEV / TEST environments</b>.</li>
+        <li>Fill in the addresses you need. They accept <code>{tenant}</code> too.</li>
+        <li>The DEV · TEST · PROD switch appears next to the tenant. The <kbd>V</kbd> key moves to the next one.</li>
+      </ol>
+      <h3>Knowing where you are</h3>
+      <ul>
+        <li>Outside PROD, the switch is outlined in the environment's color <span class="pill ring" data-env="dev" style="padding:2px 8px"><span class="dot"></span>DEV</span> and the Safari tab is titled <code>[DEV] Cockpit SteffPoint</code>.</li>
+        <li>Links that use a DEV or TEST address carry a <span class="tag" data-env="test">TEST</span> badge.</li>
+        <li>A favorite with no address for the chosen environment opens its main address.</li>
+      </ul>
+      <p>⚙ Settings → Environments: default environment, and whether the cockpit remembers your last choice.</p>
+    </section>
+
+    <section id="en-settings">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-gear"/></svg></span>Customize</h2>
+      <p>The ⚙ button at the bottom right, or the <kbd>,</kbd> key. Changes apply live. Turn on <b>Show all settings</b> to see the advanced options.</p>
+      <ul>
+        <li><b>Language</b>: French, English or Dutch, or automatic (follows the browser).</li>
+        <li><b>Background</b>: changing photos (every tab, hour or day, ↻ button to draw a new one), gradient, solid color, your own photo or an online image. Blur, brightness and color overlay.</li>
+        <li><b>Favorites</b>: frosted glass or opaque, columns, corner radius, number of visible links, favicons or initials.</li>
+        <li><b>Date &amp; time</b>: 24-hour, seconds, size, date format.</li>
+        <li><b>Weather &amp; welcome</b>: your city, Celsius or Fahrenheit, your first name, a custom message.</li>
+        <li><b>Dark mode</b>: light, dark or like the system.</li>
+        <li><b>Layout</b>: <b>Classic</b> (big clock), <b>Welcome</b> (big greeting, one time · date · weather line, your frequent links as pills), <b>Cockpit</b> (info column on the left with context and frequent links, everything fits on screen) or <b>Launcher</b> (big search, each block as a row of tiles).</li>
+      </ul>
+    </section>
+
+    <section id="en-backup">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-save"/></svg></span>Backup and data</h2>
+      <p>Your favorites and settings are saved <b>automatically in Safari</b>, on this Mac. Nothing is sent to a server.</p>
+      <div class="tip warn"><svg width="18" height="18"><use href="#i-help"/></svg><span>Clearing Safari's history or website data also clears your favorites. They don't move from one Mac to another on their own either.</span></div>
+      <ul>
+        <li><b>Export</b> (⚙ Settings → Backup) downloads a <code>.json</code> file with your whole cockpit. Keep it in iCloud Drive or a backed-up folder.</li>
+        <li><b>Import</b> restores that file, on this Mac or another one.</li>
+        <li>The cockpit reminds you to export when your last backup is more than 14 days old.</li>
+      </ul>
+    </section>
+
+    <section id="en-shortcuts">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-keys"/></svg></span>Keyboard shortcuts</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Key</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>/</kbd></td><td>Go to the search</td></tr>
+          <tr><td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>Enter</kbd></td><td>Choose and open a result</td></tr>
+          <tr><td><kbd>⌥</kbd> <kbd>1</kbd>–<kbd>6</kbd></td><td>Open a frequent link (Welcome and Cockpit layouts)</td></tr>
+          <tr><td><kbd>E</kbd></td><td>Edit mode</td></tr>
+          <tr><td><kbd>,</kbd></td><td>Settings</td></tr>
+          <tr><td><kbd>?</kbd></td><td>This help</td></tr>
+          <tr><td><kbd>1</kbd>–<kbd>9</kbd></td><td>Switch space</td></tr>
+          <tr><td><kbd>T</kbd></td><td>Next tenant (when tenants are in use)</td></tr>
+          <tr><td><kbd>V</kbd></td><td>Next environment (DEV → TEST → PROD)</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Close a panel, clear the search, leave edit mode</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>K</kbd></td><td>Command palette: links and actions, <code>@tenant</code>, <code>!dev</code> <code>!test</code> <code>!prod</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Single-key shortcuts can be turned off in ⚙ Settings → General → <b>Single-key shortcuts</b>, useful with voice dictation or assistive technology. Without drag and drop, the order can also be changed by clicking: a block's <b>⋯</b> menu → <b>Move before / after</b>, and for a link, <b>Position in the block</b> in its edit window.</p>
+    </section>
+
+    <section id="en-faq">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-help"/></svg></span>Frequently asked questions</h2>
+      <details><summary>An orange banner says Safari doesn't keep the data</summary>
+        <p>Safari refuses to save for this address (private browsing, or a page opened from a local file depending on the settings). Use the online version, and export before closing the tab.</p></details>
+      <details><summary>“Open the links” only opens one tab</summary>
+        <p>Safari blocks pop-up windows. Allow them for the cockpit: Safari → Settings → Websites → Pop-up Windows.</p></details>
+      <details><summary>“Use my location” is refused</summary>
+        <p>Safari often blocks geolocation. Type your city instead in ⚙ Settings → Weather &amp; welcome.</p></details>
+      <details><summary>The link icons are letters</summary>
+        <p>That happens when neither the site nor Google provides an icon, or if you chose “Initials”. The favicon is first requested from the site itself (this works for internal sites too), then from Google, which then receives the link's domain name. Internal addresses (no dot, <code>.local</code>, <code>.corp</code>, <code>.lan</code>, private IP addresses…) are never sent to Google. You can also paste an image address into the link's <b>Icon</b> field.</p></details>
+      <details><summary>I deleted something by mistake</summary>
+        <p>Click <b>Undo</b> in the banner at the bottom, within the next few seconds. Otherwise, import your last export again.</p></details>
+    </section>
+  </main>
+</div>
+
+<footer>Cockpit SteffPoint · O. Steffen · <a href="https://github.com/ostefnn/cockpit-steffpoint">source code</a> · MIT license</footer>
+</div>
+
+<div data-lang="nl" lang="nl" hidden>
+<header class="hero">
+  <div class="gutter">
+    <div class="top"><a class="back" href="index.html">← Terug naar de cockpit</a><nav class="langs" aria-label="Taal"><a href="?lang=fr" lang="fr" hreflang="fr">Français</a><a href="?lang=en" lang="en" hreflang="en">English</a><a href="?lang=nl" lang="nl" hreflang="nl" aria-current="page">Nederlands</a></nav></div>
+    <h1><span class="badge"><svg width="28" height="28"><use href="#i-help"/></svg></span>Help</h1>
+    <p>Alles wat je moet weten om Cockpit SteffPoint dagelijks te gebruiken: favorieten, ruimtes, tenants, omgevingen en back-up.</p>
+  </div>
+</header>
+
+<div class="gutter layout">
+  <nav class="toc" aria-label="Inhoud">
+    <a href="#nl-starten"><svg width="18" height="18"><use href="#i-start"/></svg>Aan de slag</a>
+    <a href="#nl-zoeken"><svg width="18" height="18"><use href="#i-search"/></svg>Zoeken</a>
+    <a href="#nl-favorieten"><svg width="18" height="18"><use href="#i-star"/></svg>Favorieten en blokken</a>
+    <a href="#nl-ruimtes"><svg width="18" height="18"><use href="#i-spaces"/></svg>Ruimtes</a>
+    <a href="#nl-tenants"><svg width="18" height="18"><use href="#i-tenant"/></svg>Tenants</a>
+    <a href="#nl-omgevingen"><svg width="18" height="18"><use href="#i-env"/></svg>DEV / TEST / PROD</a>
+    <a href="#nl-instellingen"><svg width="18" height="18"><use href="#i-gear"/></svg>Aanpassen</a>
+    <a href="#nl-backup"><svg width="18" height="18"><use href="#i-save"/></svg>Back-up</a>
+    <a href="#nl-sneltoetsen"><svg width="18" height="18"><use href="#i-keys"/></svg>Sneltoetsen</a>
+    <a href="#nl-faq"><svg width="18" height="18"><use href="#i-help"/></svg>Veelgestelde vragen</a>
+  </nav>
+
+  <main>
+    <section id="nl-starten">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-start"/></svg></span>Aan de slag</h2>
+      <h3>Maak er je beginpagina in Safari van</h3>
+      <ol>
+        <li>Open Safari → <b>Instellingen</b> → <b>Algemeen</b>.</li>
+        <li>Plak bij <b>Beginpagina</b> het adres van de cockpit, bijvoorbeeld <code>https://ostefnn.github.io/cockpit-steffpoint/</code>.</li>
+        <li>Kies <b>Beginpagina</b> bij <b>Nieuwe vensters openen met</b> en <b>Nieuwe tabbladen openen met</b>.</li>
+      </ol>
+      <h3>De installatieassistent</h3>
+      <p>Bij de eerste keer vraagt een assistent in 6 stappen naar je voornaam, je ruimtes, kant-en-klare blokken (Microsoft 365, Office, SharePoint, Power Platform, GitHub…), de indeling, de achtergrond, je stad en de zoekmachine. Niets wordt opgeslagen voor de laatste stap. <b>Configuratie overslaan</b> of <kbd>Esc</kbd> behoudt de voorbeelden.</p>
+      <p>Opnieuw starten: ⚙ Instellingen → Algemeen → <b>Assistent opnieuw starten</b>. Die voegt ruimtes en blokken toe zonder iets te verwijderen.</p>
+      <h3>Vertrekken van je bestaande favorieten</h3>
+      <ul>
+        <li><b>Vanuit Safari</b>: Archief → Exporteer → Bladwijzers…, en dan in de cockpit ⚙ Instellingen → Back-up → <b>Safari-bladwijzers</b>. Elke map wordt een blok.</li>
+        <li><b>Vanuit een andere versie van de cockpit</b>: daar Exporteren, en hier Instellingen → Back-up → <b>Importeren</b>.</li>
+      </ul>
+      <div class="tip"><svg width="18" height="18"><use href="#i-bulb"/></svg><span>De blokken waarmee je start, zijn voorbeelden. Verwijder ze gerust in bewerkmodus.</span></div>
+    </section>
+
+    <section id="nl-zoeken">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-search"/></svg></span>Zoeken</h2>
+      <p>De balk bovenaan doet twee dingen tegelijk. Terwijl je typt, filtert hij je favorieten, in alle ruimtes. En als geen enkele favoriet overeenkomt, zoekt hij op het web.</p>
+      <ul>
+        <li><kbd>/</kbd> zet de cursor in de zoekbalk, waar je ook bent op de pagina.</li>
+        <li><kbd>↑</kbd> <kbd>↓</kbd> kiezen een resultaat, <kbd>Enter</kbd> opent het.</li>
+        <li><kbd>⌘</kbd> <kbd>Enter</kbd> opent het in een nieuw tabblad.</li>
+        <li><kbd>Shift</kbd> <kbd>Enter</kbd> zoekt altijd op het web, ook als er favorieten overeenkomen.</li>
+        <li><kbd>Esc</kbd> wist de zoekopdracht.</li>
+      </ul>
+      <h3>Het opdrachtenpalet</h3>
+      <p><kbd>⌘</kbd> <kbd>K</kbd> (<kbd>Ctrl</kbd> <kbd>K</kbd> op Windows), of de knop <kbd>⌘K</kbd> in de zoekbalk, opent een palet dat je links <b>en acties</b> vindt: van ruimte, tenant of omgeving wisselen, een blok maken, donker thema, opruimen… De exacte naam hoeft niet: „shrpt” vindt SharePoint.</p>
+      <ul>
+        <li><code>@contoso</code> opent de link voor die tenant, <code>!test</code> (of <code>!dev</code>, <code>!prod</code>) in die omgeving. Voorbeeld: <code>sharepoint @fab !test</code>.</li>
+        <li>Die keuze geldt alleen voor deze link: de tenant en omgeving van de pagina blijven ongewijzigd.</li>
+      </ul>
+      <p>De zoekmachine (Bing, Google, DuckDuckGo, Ecosia) kies je in ⚙ Instellingen → Zoeken.</p>
+    </section>
+
+    <section id="nl-favorieten">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-star"/></svg></span>Favorieten en blokken</h2>
+      <p>Favorieten zijn geordend in blokken, één per thema. Alles wijzig je in <b>bewerkmodus</b>: de knop ✏️ rechtsonder, of de toets <kbd>E</kbd>.</p>
+      <h3>Een link toevoegen</h3>
+      <ul>
+        <li><b>Het snelst</b>: kopieer een adres, wijs een blok aan en plak (<kbd>⌘</kbd> <kbd>V</kbd>) ergens op de pagina.</li>
+        <li><b>Sleep</b> het adres vanuit de adresbalk van Safari naar een blok.</li>
+        <li>In bewerkmodus: <b>+ Link toevoegen</b> onderaan het blok, of het menu ⋯ van het blok.</li>
+      </ul>
+      <h3>Wijzigen, ordenen, verwijderen</h3>
+      <ul>
+        <li>Klik in bewerkmodus <b>op een link</b> om de naam, het adres of het blok te wijzigen.</li>
+        <li>In bewerkmodus verwijdert het rode <b>✕</b> van een link die meteen. <b>Ongedaan maken</b> in het bericht onderaan zet hem terug.</li>
+        <li><b>Versleep</b> links (ook van het ene blok naar het andere) en blokken via hun kop.</li>
+        <li>Menu <b>⋯</b> van een blok: bewerken (titel, kleur, lijst of pictogrammenraster), naar een andere ruimte verplaatsen, alle links openen, verwijderen.</li>
+        <li>Het pijltje <b>⌄</b> klapt een blok dicht. Boven 8 links opent een knop <b>Meer tonen</b> de rest (aantal instelbaar).</li>
+      </ul>
+      <div class="tip"><svg width="18" height="18"><use href="#i-bulb"/></svg><span>Geen bevestiging bij elke verwijdering: onderaan het scherm verschijnt een paar seconden een balk met <b>Ongedaan maken</b>.</span></div>
+      <h3>Een blok delen</h3>
+      <p>Menu <b>⋯</b> van een blok → <b>Delen…</b>:</p>
+      <ul>
+        <li><b>Link om te versturen</b>: je collega opent hem, ziet de inhoud en kiest de ruimte voor het blok. De adressen zitten in de link zelf, na de <code>#</code>: geen enkele server ontvangt ze, maar wie de link heeft, ziet ze. Met het vakje bovenaan deel je meteen de hele ruimte.</li>
+        <li><b>Abonnementsbestand</b>, voor een team: publiceer dit bestand op een openbaar adres dat lezen vanaf een andere pagina toestaat (GitHub Pages, knop „Raw” van een Gist…). Iedereen kiest <b>+ Nieuw blok</b> → Sjabloon <b>Abonneren op een adres</b>. Vervang je het bestand, dan werken hun blokken zichzelf bij (om de 6 uur, of menu ⋯ → <b>Vernieuwen</b>).</li>
+        <li>Een geabonneerd blok draagt de badge <b>Geabonneerd</b> en blijft alleen-lezen. Menu ⋯ → <b>Uitschrijven (kopie houden)</b> maakt er een gewoon blok van. Antwoordt de bron niet meer, dan wordt de badge <b>Offline</b> en blijft de inhoud behouden.</li>
+        <li>Sjabloonlinks (<code>{tenant}</code>) blijven sjablonen: iedereen opent ze met de eigen tenant.</li>
+      </ul>
+      <h3>Opruimen</h3>
+      <p>⚙ Instellingen → Favorieten → <b>Opruimen…</b> (of het palet) toont dubbele links, lege blokken en, na twee maanden bijhouden, links die nooit of al zes maanden niet meer geopend werden. Er wordt alleen in deze browser geteld, en elke verwijdering kun je ongedaan maken.</p>
+    </section>
+
+    <section id="nl-ruimtes">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-spaces"/></svg></span>Ruimtes</h2>
+      <p>Ruimtes houden je werelden gescheiden, bijvoorbeeld <b>Werk</b> en <b>Privé</b>. Elk blok hoort bij één ruimte.</p>
+      <div class="demo" aria-hidden="true"><span class="pill on">Werk 3</span><span class="pill">Privé 1</span></div>
+      <ul>
+        <li>Klik op een tabblad, of gebruik de toetsen <kbd>1</kbd> tot <kbd>9</kbd>.</li>
+        <li><b>Automatisch wisselen</b>: Werk van maandag tot vrijdag, Privé in het weekend. Instelbaar in ⚙ Instellingen → Ruimtes.</li>
+        <li><b>Werkuren</b> (optioneel): bijvoorbeeld Werk van 8 tot 18 uur op weekdagen, Privé 's avonds. Een pagina die openblijft, wisselt op dat uur zelf van ruimte, behalve als je net zelf een ruimte koos.</li>
+        <li>Een ruimte maken, hernoemen of verwijderen: ⚙ Instellingen → Ruimtes. De blokken van een verwijderde ruimte gaan naar een andere.</li>
+        <li>Een blok verplaatsen: menu ⋯ → <b>Verplaatsen naar…</b></li>
+      </ul>
+    </section>
+
+    <section id="nl-tenants">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-tenant"/></svg></span>Tenants</h2>
+      <p>Werk je voor meerdere klanten of organisaties met dezelfde adresstructuur? Schrijf de link dan <b>één keer</b> als sjabloon en wissel met één klik van tenant.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>In het adres</th><th>Wordt</th><th>Voorbeeld met „client-a”</th></tr></thead>
+        <tbody>
+          <tr><td><code>{tenant}</code></td><td>de ID van de tenant</td><td><code>https://{tenant}.example.com</code> → <code>https://client-a.example.com</code></td></tr>
+          <tr><td><code>{domain}</code></td><td>het domein (of de ID als het leeg is)</td><td><code>https://mail.{domain}</code> → <code>https://mail.client-a.com</code></td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Microsoft 365, het snelst:</b> zet eerst ⚙ → <b>Microsoft 365-beheer</b> aan (standaard uit, of de schakelaar „Ik beheer een Microsoft 365-tenant” in de assistent, die een ruimte <b>O365-beheer</b> maakt). Dan <b>+ Nieuw blok</b> → Sjabloon <b>Microsoft 365-beheer</b> → naam van de tenant (<code>contoso</code>). Vink de gewenste categorieën aan (kernbeheer, samenwerking, Power Platform, beveiliging en compliance, apparaten, Copilot en AI, mijn account, tools en diagnose): per categorie wordt een blok gemaakt, en de tenant wordt toegevoegd als die nog niet bestaat.</p>
+      <p>Met de hand:</p>
+      <ol>
+        <li>Zet <code>{tenant}</code> in het adres van je links.</li>
+        <li>⚙ Instellingen → <b>Tenants</b> → <b>+ Tenant toevoegen</b>: een weergavenaam, een ID, een optioneel domein en een kleur.</li>
+        <li>Kies de tenant in het menu boven de blokken, of druk op <kbd>T</kbd> om naar de volgende te gaan.</li>
+      </ol>
+      <p>Het tenantmenu verschijnt alleen in ruimtes met een sjabloonlink. De kleur en de naam in de titel van het tabblad (<code>[CONTOSO]</code>) herinneren je eraan in welke tenant je werkt.</p>
+      <p>Alleen SharePoint, OneDrive en Azure volgen de tenant. De beheercentra (Microsoft 365, Entra, Teams, Exchange…) openen de tenant van het aangemelde account.</p>
+      <div class="tip"><svg width="18" height="18"><use href="#i-bulb"/></svg><span>Een sjabloonlink zonder ingestelde tenant is grijs. Als je erop klikt, gaan meteen de tenantinstellingen open.</span></div>
+    </section>
+
+    <section id="nl-omgevingen">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-env"/></svg></span>Omgevingen DEV / TEST / PROD</h2>
+      <p>Een favoriet kan drie adressen hebben: zijn <b>hoofdadres</b> (PROD) en, optioneel, een <b>DEV</b>-adres en een <b>TEST</b>-adres. Je kiest de omgeving één keer en alle favorieten volgen.</p>
+      <div class="demo" aria-hidden="true">
+        <span class="pill" data-env="dev"><span class="dot"></span>DEV</span>
+        <span class="pill" data-env="test"><span class="dot"></span>TEST</span>
+        <span class="pill env-on" data-env="prod"><span class="dot"></span>PROD</span>
+      </div>
+      <ol>
+        <li>Klik in bewerkmodus op een link en open <b>DEV- / TEST-omgevingen</b>.</li>
+        <li>Vul de gewenste adressen in. Ook daar werkt <code>{tenant}</code>.</li>
+        <li>De keuze DEV · TEST · PROD verschijnt naast de tenant. Toets <kbd>V</kbd> gaat naar de volgende.</li>
+      </ol>
+      <h3>Weten waar je bent</h3>
+      <ul>
+        <li>Buiten PROD krijgt de keuze een rand in de kleur van de omgeving <span class="pill ring" data-env="dev" style="padding:2px 8px"><span class="dot"></span>DEV</span> en heet het Safari-tabblad <code>[DEV] Cockpit SteffPoint</code>.</li>
+        <li>Links die een DEV- of TEST-adres gebruiken, krijgen een badge <span class="tag" data-env="test">TEST</span>.</li>
+        <li>Een favoriet zonder adres voor de gekozen omgeving opent zijn hoofdadres.</li>
+      </ul>
+      <p>⚙ Instellingen → Omgevingen: standaardomgeving, en of de cockpit je laatste keuze onthoudt.</p>
+    </section>
+
+    <section id="nl-instellingen">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-gear"/></svg></span>Aanpassen</h2>
+      <p>De knop ⚙ rechtsonder, of de toets <kbd>,</kbd>. Wijzigingen worden meteen toegepast. Zet <b>Alle instellingen tonen</b> aan voor de geavanceerde opties.</p>
+      <ul>
+        <li><b>Taal</b>: Frans, Engels of Nederlands, of automatisch (volgt de browser).</li>
+        <li><b>Achtergrond</b>: wisselende foto's (elk tabblad, uur of dag, knop ↻ voor een nieuwe), verloop, effen kleur, je eigen foto of een online afbeelding. Vervaging, helderheid en kleurfilter.</li>
+        <li><b>Favorieten</b>: matglas of ondoorzichtig, kolommen, afronding, aantal zichtbare links, favicons of initialen.</li>
+        <li><b>Datum &amp; tijd</b>: 24 uur, seconden, grootte, datumnotatie.</li>
+        <li><b>Weer &amp; welkom</b>: je stad, Celsius of Fahrenheit, je voornaam, een eigen bericht.</li>
+        <li><b>Donkere modus</b>: licht, donker of zoals het systeem.</li>
+        <li><b>Indeling</b>: <b>Klassiek</b> (grote klok), <b>Welkom</b> (grote begroeting, één lijn tijd · datum · weer, je vaak gebruikte links als knoppen), <b>Cockpit</b> (infokolom links met context en vaak gebruikte links, alles past op het scherm) of <b>Starter</b> (grote zoekbalk, elk blok als een rij tegels).</li>
+      </ul>
+    </section>
+
+    <section id="nl-backup">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-save"/></svg></span>Back-up en gegevens</h2>
+      <p>Je favorieten en instellingen worden <b>automatisch in Safari</b> bewaard, op deze Mac. Er wordt niets naar een server gestuurd.</p>
+      <div class="tip warn"><svg width="18" height="18"><use href="#i-help"/></svg><span>Als je in Safari de geschiedenis of websitegegevens wist, verdwijnen ook je favorieten. Ze gaan ook niet vanzelf van de ene Mac naar de andere.</span></div>
+      <ul>
+        <li><b>Exporteren</b> (⚙ Instellingen → Back-up) downloadt een <code>.json</code>-bestand met je hele cockpit. Bewaar het in iCloud Drive of in een map met back-up.</li>
+        <li><b>Importeren</b> zet dat bestand terug, op deze Mac of een andere.</li>
+        <li>De cockpit herinnert je eraan te exporteren als je laatste back-up ouder is dan 14 dagen.</li>
+      </ul>
+    </section>
+
+    <section id="nl-sneltoetsen">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-keys"/></svg></span>Sneltoetsen</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Toets</th><th>Actie</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>/</kbd></td><td>Naar de zoekbalk</td></tr>
+          <tr><td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>Enter</kbd></td><td>Een resultaat kiezen en openen</td></tr>
+          <tr><td><kbd>⌥</kbd> <kbd>1</kbd>–<kbd>6</kbd></td><td>Een vaak gebruikte link openen (indelingen Welkom en Cockpit)</td></tr>
+          <tr><td><kbd>E</kbd></td><td>Bewerkmodus</td></tr>
+          <tr><td><kbd>,</kbd></td><td>Instellingen</td></tr>
+          <tr><td><kbd>?</kbd></td><td>Deze help</td></tr>
+          <tr><td><kbd>1</kbd>–<kbd>9</kbd></td><td>Van ruimte wisselen</td></tr>
+          <tr><td><kbd>T</kbd></td><td>Volgende tenant (als tenants gebruikt worden)</td></tr>
+          <tr><td><kbd>V</kbd></td><td>Volgende omgeving (DEV → TEST → PROD)</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Een paneel sluiten, de zoekopdracht wissen, bewerkmodus verlaten</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>K</kbd></td><td>Opdrachtenpalet: links en acties, <code>@tenant</code>, <code>!dev</code> <code>!test</code> <code>!prod</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Sneltoetsen met één toets schakel je uit in ⚙ Instellingen → Algemeen → <b>Sneltoetsen met één toets</b>, handig met spraakdictee of hulptechnologie. Zonder slepen kun je de volgorde ook met klikken wijzigen: menu <b>⋯</b> van een blok → <b>Ervoor / Erna plaatsen</b>, en voor een link <b>Positie in het blok</b> in het bewerkvenster.</p>
+    </section>
+
+    <section id="nl-faq">
+      <h2><span class="ic"><svg width="20" height="20"><use href="#i-help"/></svg></span>Veelgestelde vragen</h2>
+      <details><summary>Een oranje balk meldt dat Safari de gegevens niet bewaart</summary>
+        <p>Safari weigert op te slaan voor dit adres (privénavigatie, of een pagina geopend vanuit een lokaal bestand, afhankelijk van de instellingen). Gebruik de online versie en exporteer voor je het tabblad sluit.</p></details>
+      <details><summary>„De links openen” opent maar één tabblad</summary>
+        <p>Safari blokkeert pop-upvensters. Sta ze toe voor de cockpit: Safari → Instellingen → Websites → Pop-upvensters.</p></details>
+      <details><summary>„Mijn locatie gebruiken” wordt geweigerd</summary>
+        <p>Safari blokkeert geolocatie vaak. Typ liever je stad in ⚙ Instellingen → Weer &amp; welkom.</p></details>
+      <details><summary>De pictogrammen van de links zijn letters</summary>
+        <p>Dat gebeurt als noch de site noch Google een pictogram levert, of als je „Initialen” koos. Het favicon wordt eerst bij de site zelf opgevraagd (dat werkt ook voor interne sites), daarna bij Google, dat dan de domeinnaam van de link ontvangt. Interne adressen (zonder punt, <code>.local</code>, <code>.corp</code>, <code>.lan</code>, privé-IP-adressen…) worden nooit naar Google gestuurd. Je kunt ook het adres van een afbeelding plakken in het veld <b>Pictogram</b> van de link.</p></details>
+      <details><summary>Ik heb per ongeluk iets verwijderd</summary>
+        <p>Klik binnen enkele seconden op <b>Ongedaan maken</b> in de balk onderaan. Anders importeer je je laatste export opnieuw.</p></details>
+    </section>
+  </main>
+</div>
+
+<footer>Cockpit SteffPoint · O. Steffen · <a href="https://github.com/ostefnn/cockpit-steffpoint">broncode</a> · MIT-licentie</footer>
+</div>
 
 <script>
-// Same theme choice as the cockpit when both share the same address
-try {
-  const t = JSON.parse(localStorage.getItem("cockpit-steffpoint"))?.settings?.theme;
-  if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
-} catch {}
+// Same theme and language as the cockpit when both share the same address; ?lang= from the switcher wins
+let settings = null;
+try { settings = JSON.parse(localStorage.getItem("cockpit-steffpoint"))?.settings; } catch {}
+if (settings?.theme === "light" || settings?.theme === "dark") document.documentElement.setAttribute("data-theme", settings.theme);
+const LANG_IDS = ["fr", "en", "nl"];
+const lang = [new URLSearchParams(location.search).get("lang"), settings?.lang, ...(navigator.languages || [navigator.language || ""]).map(l => String(l).slice(0, 2).toLowerCase())]
+  .find(l => LANG_IDS.includes(l)) || "en";
+document.documentElement.lang = lang;
+document.title = (lang === "fr" ? "Aide" : "Help") + " · Cockpit SteffPoint";
+for (const el of document.querySelectorAll("[data-lang]")) el.hidden = el.dataset.lang !== lang;
 document.addEventListener("keydown", e => { if (e.key === "Escape") location.href = "index.html"; });
 </script>
 </body>
